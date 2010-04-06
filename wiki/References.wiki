@@ -1,13 +1,11 @@
 #summary references
 
-= References =
+=References=
 
-Add your content here.
+==Empathic Painting==
+===For images and video:===
+ * http://www.cs.bu.edu/fac/betke/research/empathic-painting.html
+ * http://www.cs.bath.ac.uk/~vision/empaint/
 
-
-= Details =
-
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+===Paper:===
+ * http://www.cs.bu.edu/fac/betke/papers/ShugrinaBetkeCollomosse-2006.pdf
