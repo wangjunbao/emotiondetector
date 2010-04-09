@@ -2,6 +2,13 @@
 
 =Brainstorm!=
 
+==Approach==
+ 1. Use Haar cascades to find faces
+ 2. Use size of face to scale our default template
+ 3. Search subsection of each face to find location of eyebrows, eyes, mouth
+ 4. Search each feature location for more precise templates (corner of eyes, iris, corner and middle point of eyebrow, corners and top and bottom of lips)
+ 5. 
+
 ==Challenges==
  * Changes in face size (moving towards and away from camera)
  * Changes in angle (tilting head or turning left or right)
