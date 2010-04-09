@@ -1,0 +1,14 @@
+#summary Ideas for the project.
+
+=Brainstorm!=
+
+==Challenges==
+ * Changes in face size (moving towards and away from camera)
+ * Changes in angle (tilting head or turning left or right)
+ * Occlusion of features
+
+==Possible Improvements / Differences from Previous Approaches==
+ * Automatic detection of face and feature (Shugrina had this, Black and Yacoob did not)
+ * Detecting emotion in a single image - compare to some average normal face if a normal face is not available for that person. (Black and Yacoob used video sequences)
+ * Detecting emotions of multiple faces simultaneously - aggregate emotions to change output even more
+ * Real-time / fast detection
