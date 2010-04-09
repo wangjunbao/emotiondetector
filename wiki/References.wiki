@@ -2,6 +2,12 @@
 
 =References=
 
+==OpenCV Face Detection==
+ * http://www.cs.princeton.edu/courses/archive/fall08/cos429/CourseMaterials/Precept1/facedetect.pdf
+ * http://nashruddin.com/OpenCV_Face_Detection
+ * http://opencv.willowgarage.com/wiki/FaceDetection
+
+
 ==Face Detection==
  * Robust Real-time Object Detection: http://research.microsoft.com/en-us/um/people/viola/pubs/detect/violajones_ijcv.pdf
  * Automatic Face Localization http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.28.5660&rep=rep1&type=pdf
