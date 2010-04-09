@@ -3,8 +3,11 @@
 =References=
 
 ==Face Detection==
- * [Robust Real-time Object Detection]
- * http://research.microsoft.com/en-us/um/people/viola/pubs/detect/violajones_ijcv.pdf
+ * Robust Real-time Object Detection: http://research.microsoft.com/en-us/um/people/viola/pubs/detect/violajones_ijcv.pdf
+
+==Feature Tracking==
+ * A Self-initializing Eyebrow Tracker for Binary Switch Emulation http://www.cs.bu.edu/techreports/pdf/2002-023-eyebrow-tracker.pdf
+ * Tracking and Recognizing Facial Expressions in Image Sequences...handout from class
 
 ==Empathic Painting==
  ===For images and video:===
