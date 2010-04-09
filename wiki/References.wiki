@@ -2,10 +2,14 @@
 
 =References=
 
-==Empathic Painting==
-===For images and video:===
- * http://www.cs.bu.edu/fac/betke/research/empathic-painting.html
- * http://www.cs.bath.ac.uk/~vision/empaint/
+==Face Detection==
+ * [Robust Real-time Object Detection]
+ * http://research.microsoft.com/en-us/um/people/viola/pubs/detect/violajones_ijcv.pdf
 
-===Paper:===
- * http://www.cs.bu.edu/fac/betke/papers/ShugrinaBetkeCollomosse-2006.pdf
+==Empathic Painting==
+ ===For images and video:===
+  * http://www.cs.bu.edu/fac/betke/research/empathic-painting.html
+  * http://www.cs.bath.ac.uk/~vision/empaint/
+
+ ===Paper:===
+  * http://www.cs.bu.edu/fac/betke/papers/ShugrinaBetkeCollomosse-2006.pdf
