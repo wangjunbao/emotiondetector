@@ -1,4 +1,4 @@
-#summary Ideas for the project.
+#summary Ideas and things to do
 
 =Brainstorm!=
 
