@@ -2,6 +2,10 @@
 
 =References=
 
+==Face Images==
+ * With Expressions https://pal.utdallas.edu/facedb/request/index
+ * Average Face http://www.faceresearch.org/demos/average
+
 ==OpenCV Face Detection==
  * http://www.cs.princeton.edu/courses/archive/fall08/cos429/CourseMaterials/Precept1/facedetect.pdf
  * http://nashruddin.com/OpenCV_Face_Detection
