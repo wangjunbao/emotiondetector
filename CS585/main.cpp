@@ -15,15 +15,15 @@ void detectFaces( IplImage *img );
 
 int main( int argc, char** argv )
 {
-	//bool isVideo = true;
-	bool isVideo = false; //image
+	bool isVideo = true;
+	//bool isVideo = false; //image
 
 	//is image
 	if(isVideo == false)
 	{
-		  CvCapture *capture;
+		  //CvCapture *capture;
 		  IplImage  *img;
-		  int       key;
+		  //int       key;
 		  //char      *filename = "haarcascade_frontalface_alt_tree.xml";
 		  char      *filename = "haarcascade_frontalface_default.xml";
 		  //char      *imgfilename = "HowellFace50.jpg";
@@ -52,7 +52,7 @@ int main( int argc, char** argv )
 	{
 		CvCapture *capture;
 		IplImage  *frame;
-		int       key;
+		int       key = ' ';
 		//char      *filename = "haarcascade_eye.xml";
 		char      *filename = "haarcascade_frontalface_default.xml";
 		//char      *filename = "haarcascade_frontalface_alt.xml";
@@ -112,7 +112,7 @@ void resizeFeatureTemplate(string filename, double oldFeatureWidth, double oldFe
 
 	//Mat *resizedFeatureImg = new Mat;//();
 	
-	resize(*featureImg, resizedFeatureImg, Size(newFeatureWidth,newFeatureHeight));
+	resize(*featureImg, resizedFeatureImg, Size((int)newFeatureWidth,(int)newFeatureHeight));
 	//resize(*featureImg, *resizedFeatureImg, Size(newFeatureWidth,newFeatureHeight));
 	//imwrite("resizedTemplates/"+filename,*resizedFeatureImg);
 	//delete resizedFeatureImg;//(resizedFeatureImg);
