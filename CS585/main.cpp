@@ -6,11 +6,18 @@
 #include <cv.h>
 #include "highgui.h"
 #include <iostream>
+
+#include <vector>
+#include "Face.h"
+
 using namespace cv; //ADDED
 
 CvHaarClassifierCascade *cascade;
 CvMemStorage            *storage;
- 
+
+
+vector<Face*> oldFaces;
+
 void detectFaces( IplImage *img );
 
 int main( int argc, char** argv )
@@ -182,6 +189,8 @@ void detectFaces( IplImage *img )
 		Mat tpl;
 		resizeFeatureTemplate("lefteye.jpg",61,34,newFaceWidth,newFaceHeight,tpl);
 
+		//resizeFeatureTemplate("mouth.jpg",95,53,newFaceWidth,newFaceHeight,tpl);
+
 		//eyes
 		
 		//cvMatchTemplate(
@@ -195,7 +204,8 @@ void detectFaces( IplImage *img )
 
 		 
 		CvRect rect = cvRect(r->x, r->y, r->width/2, r->height/2);
-		 
+		//CvRect rect = cvRect(r->x, r->y, r->width, r->height); //mouth
+
 		cvSetImageROI(img, rect);
 		 
 		/*
@@ -231,15 +241,27 @@ void detectFaces( IplImage *img )
 		if(maxval > 0.5)
 		{
 
+
 			
 			rectangle(Mat(img),maxloc,Point(maxloc.x + tpl.cols, maxloc.y + tpl.rows),CV_RGB(0, 255, 0), 1, 0, 0 );
 			std::cout << "max: " << "(" << maxloc.x << "," << maxloc.y << "): " << maxval << std::endl;
 
+
+
+			Face *currentFace = new Face();
+			currentFace->setLeftEye(tpl);
+
+
 			cvResetImageROI(img);
+			
 			cvRectangle( img,
 				cvPoint( r->x, r->y ),
 				cvPoint( r->x + r->width, r->y + r->height ),
 				CV_RGB( 255, 0, 0 ), 1, 8, 0 );
+
+
+
+
 		}
 		else
 		{
