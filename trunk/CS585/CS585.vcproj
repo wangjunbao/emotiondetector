@@ -195,6 +195,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Face.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Image.h"
 				>
 			</File>

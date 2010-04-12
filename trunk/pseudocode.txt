@@ -1,3 +1,8 @@
+#summary Pseudo-code for algorithms
+
+=Main Algorithm=
+
+{{{
 /*Main Algorithm*/
 for (each frame in video)
 {
@@ -5,26 +10,36 @@ for (each frame in video)
     run Viola-Jones -> faceSequence
     allocate memory for newFaces
     
-    for (each face in faceSequence)
+    for (each faceRect in faceSequence)
     {
-        if (face.coordinates does NOT match any coordinates in oldFaces)
+        
+        if (faceRect.coordinates does NOT match any coordinates in oldFaces)
         {
-            resize eye template
-            run NCC -> ncc
-            if (ncc > thresh)
+            Face *face = new Face()
+            
+            if(isValidFace(newFaceCoords,leftEyeTemplate))
             {
-                create face object
-                crop all templates for face
+                face.updateSubFeatureLocations(newFaceCoords,
+                    doResize=true,doCrop=true,frame#)
+                
                 do Emotion Detection -> store it
+                
                 add value to output
                 add face to newFaces
             }
+            else
+            {
+                delete face
+            }
         }
-        else if (face.coordinates matches an oldFace within some buffer)
+        else if (faceRect.coordinates matches an oldFace within some buffer)
         {
-                update coordinates of face
-                update all template images
+                face = oldFace with best match
+                face.updateSubFeatureLocations(newFaceCoords,
+                    doResize=true,doCrop=false,frame#)
+                
                 do Emotion Detection -> store it
+                
                 add value to output
                 add oldFace to newFaces
                 delete oldFace from oldFaces
@@ -35,6 +50,11 @@ for (each frame in video)
     return output
 }
 
+}}}
+
+
+=Face class=
+{{{
 
 /*Face class*/
 //templates:
@@ -72,8 +92,80 @@ Mat mouthBottom
 
 //getter and setter for coordinates
 
+
+Face(cropped out face image and coordinates, frame #)
+
+void runNCC(feature, searchSpaceCoordinates, maxval, maxloc)
+{
+    run NCC on feature in searchSpace
+    update maxval and maxloc
+}
+
+void updateSubFeatureLocations(newFaceCoords, boolean doResize, boolean doCrop, int frame #)
+{
+    store face coords
+    
+    //typically doResize and doCrop are true at same time
+    
+    //for now always resize
+    if(doResize == true or frame # is mod something)
+    {
+        resize templates based on new face coords
+    }
+    
+    for (all sub features)
+    {
+    
+        if(subfeature has no previous coordinates, i.e. == -1)
+        {
+            look at parent feature coords for search space
+        }
+        else
+        {
+            search space = previous loc + buffer + midpt to opposite feature
+        }
+    
+        runNCC(search space)
+        store new maxloc
+    }
+    
+    if(doCrop == true or frame # is mod something)
+    {
+        crop out new template images based on stored locations
+    }
+
+}
+
+//when creating a face
+boolean isValidFace(newFaceCoords, leftEyeTemplate)
+{
+    resize left eye template
+    
+    maxval, maxloc
+    leftEyeSearchLocation = upper left box
+    runNCC(leftEye, leftEyeSearchLocation, &maxval, &maxloc)
+    
+    if maxval < thresh
+    {
+        return false
+    }
+    else
+    {
+        resize each parent feature (except left eye)
+        
+        //each parent feature has specific search space (area of face)
+        run NCC on parent feature (except left eye) to get search space for sub features
+        
+        return true
+    }
+}
+
+
 void cleanup()
 {
     delete all allocated memory
 }
 
+
+
+}}}
