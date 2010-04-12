@@ -153,7 +153,10 @@ void detectFaces( IplImage *img )
 	double oldFaceWidth = 228;
 	double oldFaceHeight = 228;
 
-    for( i = 0 ; i < ( faces ? faces->total : 0 ) ; i++ ) {
+    for( i = 0 ; i < ( faces ? faces->total : 0 ) ; i++ ) 
+	{
+		for( int j=0; j<18; j++)
+		{
         CvRect *r = ( CvRect* )cvGetSeqElem( faces, i );
         
 		/*
@@ -203,7 +206,8 @@ void detectFaces( IplImage *img )
 		
 
 		 
-		CvRect rect = cvRect(r->x, r->y, r->width/2, r->height/2);
+		//CvRect rect = cvRect(r->x, r->y, r->width/2, r->height/2);
+		CvRect rect = cvRect((r->x), (r->y + r->height/4), r->width/2, r->height/2);
 		//CvRect rect = cvRect(r->x, r->y, r->width, r->height); //mouth
 
 		cvSetImageROI(img, rect);
@@ -244,7 +248,7 @@ void detectFaces( IplImage *img )
 
 			
 			rectangle(Mat(img),maxloc,Point(maxloc.x + tpl.cols, maxloc.y + tpl.rows),CV_RGB(0, 255, 0), 1, 0, 0 );
-			std::cout << "max: " << "(" << maxloc.x << "," << maxloc.y << "): " << maxval << std::endl;
+			//std::cout << "max: " << "(" << maxloc.x << "," << maxloc.y << "): " << maxval << std::endl;
 
 
 
@@ -271,7 +275,7 @@ void detectFaces( IplImage *img )
 		
 		//std::cout << "max: " << "(" << maxloc.x << "," << maxloc.y << "): " << maxval << std::endl;
 
-
+	}//end 18 test
     }
 
 	
