@@ -222,7 +222,7 @@ void detectFaces( IplImage *img )
 
 		 
 		//CvRect rect = cvRect(r->x, r->y, r->width/2, r->height/2);
-		CvRect rect = cvRect((r->x), (r->y + r->height/4), r->width/2, r->height/4);
+		CvRect rect = cvRect((r->x), (r->y + r->height/4), r->width/2, (int)((3.0/8.0)*r->height));
 		rectangle(Mat(processedImg),Point(rect.x,rect.y),Point(rect.x+rect.width, rect.y+rect.height),CV_RGB(0, 0, 255), 1, 0, 0 );
 		//CvRect rect = cvRect(r->x, r->y, r->width, r->height); //mouth
 
@@ -261,7 +261,7 @@ void detectFaces( IplImage *img )
 		//std::cout << "max: " << "(" << maxloc.x << "," << maxloc.y << "): " << maxval << std::endl;
 
 		//cvResetImageROI(img);
-		if(maxval > 0.6)//if(maxval > 0.5) //above .6 reduces eyebrow noise a little
+		if(maxval > 0.55) //above .6 reduces eyebrow noise a little
 		{
 
 
