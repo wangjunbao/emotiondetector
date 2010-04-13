@@ -22,8 +22,8 @@ void detectFaces( IplImage *img );
 
 int main( int argc, char** argv )
 {
-	//bool isVideo = true; //video
-	bool isVideo = false; //image
+	bool isVideo = true; //video
+	//bool isVideo = false; //image
 
 	//is image
 	if(isVideo == false)
@@ -34,8 +34,8 @@ int main( int argc, char** argv )
 		  //char      *filename = "haarcascade_frontalface_alt.xml";
 		  //char      *imgfilename = "HowellFace50.jpg";
 		  //char      *imgfilename = "grouppic2.jpg";
-		  char      *imgfilename = "ChrisFace.jpg";
-		  //char      *imgfilename = "templates/face.jpg";
+		  //char      *imgfilename = "ChrisFace.jpg";
+		  char      *imgfilename = "templates/face.jpg";
 
 		  cascade = ( CvHaarClassifierCascade* )cvLoad( filename, 0, 0, 0 );
 		  storage = cvCreateMemStorage( 0 );
@@ -44,9 +44,14 @@ int main( int argc, char** argv )
 		  assert( cascade && storage && img );
 
 		  cvNamedWindow( "video", 1 );
+		  cvNamedWindow( "processed", 1 );
+
 		  detectFaces( img );
 		  cvWaitKey( 0 );
+
 		  cvDestroyWindow( "video" );
+		  cvDestroyWindow( "processed" );
+		  
 		  cvReleaseImage( &img );
 		  cvReleaseHaarClassifierCascade( &cascade );
 		  cvReleaseMemStorage( &storage );
@@ -57,6 +62,8 @@ int main( int argc, char** argv )
 	{
 		CvCapture *capture;
 		IplImage  *frame;
+		//IplImage  *processedFrame;
+
 		int       key = ' ';
 		char      *filename = "haarcascade_frontalface_default.xml";
 		//char      *filename = "haarcascade_frontalface_alt.xml";
@@ -77,6 +84,7 @@ int main( int argc, char** argv )
 	 
 		/* create a window */
 		cvNamedWindow( "video", 1 );
+		cvNamedWindow( "processed", 1 );
 	 
 		while( key != 'q' ) {
 			// get a frame */
@@ -88,6 +96,7 @@ int main( int argc, char** argv )
 			// 'fix' frame */
 			//cvFlip( frame, frame, -1 );
 			frame->origin = 0;
+			//processedFrame=cvCloneImage(frame);
 	 
 			// detect faces and display video */
 			detectFaces( frame );
@@ -124,7 +133,10 @@ void resizeFeatureTemplate(string filename, double oldFeatureWidth, double oldFe
  
 void detectFaces( IplImage *img )
 {
-    int i;
+    IplImage *processedImg;
+	processedImg = cvCloneImage(img);
+
+	int i;
  
     /* detect faces */
 	//http://opencv.willowgarage.com/documentation/c/object_detection.html?highlight=cvhaardetectobjects
@@ -151,7 +163,7 @@ void detectFaces( IplImage *img )
 	{
 	
 	//performance estimation:
-	for( int j=0; j<18; j++)
+	for( int j=0; j<3; j++)
 	{
         CvRect *r = ( CvRect* )cvGetSeqElem( faces, i );
 
@@ -192,6 +204,7 @@ void detectFaces( IplImage *img )
 		Mat tpl;
 		resizeFeatureTemplate("lefteye.jpg",61,34,newFaceWidth,newFaceHeight,tpl);
 
+		std::cout << "tpl: " << tpl.cols << "," << tpl.rows << std::endl;
 
 
 		//resizeFeatureTemplate("mouth.jpg",95,53,newFaceWidth,newFaceHeight,tpl);
@@ -209,10 +222,12 @@ void detectFaces( IplImage *img )
 
 		 
 		//CvRect rect = cvRect(r->x, r->y, r->width/2, r->height/2);
-		CvRect rect = cvRect((r->x), (r->y + r->height/4), r->width/2, r->height/2);
+		CvRect rect = cvRect((r->x), (r->y + r->height/4), r->width/2, r->height/4);
+		rectangle(Mat(processedImg),Point(rect.x,rect.y),Point(rect.x+rect.width, rect.y+rect.height),CV_RGB(0, 0, 255), 1, 0, 0 );
 		//CvRect rect = cvRect(r->x, r->y, r->width, r->height); //mouth
 
 		cvSetImageROI(img, rect);
+		cvSetImageROI(processedImg, rect);
 		 
 		/*
 		IplImage *res = cvCreateImage(cvSize(rect.width  - tpl->width  + 1,
@@ -230,7 +245,8 @@ void detectFaces( IplImage *img )
 		/* find best matches location */
 		//CvPoint    minloc, maxloc;
 		Point minloc, maxloc;
-		double    minval, maxval;
+		double minval = 0.0;
+		double maxval = 0.0;
 
 		//cvMinMaxLoc(res, &minval, &maxval, &minloc, &maxloc, 0);
 		minMaxLoc(res, &minval, &maxval, &minloc, &maxloc); 
@@ -242,6 +258,7 @@ void detectFaces( IplImage *img )
 		//			CV_RGB(255, 0, 0), 1, 0, 0 );
 
 
+		//std::cout << "max: " << "(" << maxloc.x << "," << maxloc.y << "): " << maxval << std::endl;
 
 		//cvResetImageROI(img);
 		if(maxval > 0.6)//if(maxval > 0.5) //above .6 reduces eyebrow noise a little
@@ -249,18 +266,19 @@ void detectFaces( IplImage *img )
 
 
 			
-			rectangle(Mat(img),maxloc,Point(maxloc.x + tpl.cols, maxloc.y + tpl.rows),CV_RGB(0, 255, 0), 1, 0, 0 );
+			rectangle(Mat(processedImg),maxloc,Point(maxloc.x + tpl.cols, maxloc.y + tpl.rows),CV_RGB(0, 255, 0), 1, 0, 0 );
 			std::cout << "max: " << "(" << maxloc.x << "," << maxloc.y << "): " << maxval << std::endl;
 
 
 
-			Face *currentFace = new Face();
-			currentFace->setLeftEye(tpl);
+			//Face *currentFace = new Face();
+			//currentFace->setLeftEye(tpl);
 
 
 			cvResetImageROI(img);
+			cvResetImageROI(processedImg);
 			
-			cvRectangle( img,
+			cvRectangle( processedImg,
 				cvPoint( r->x, r->y ),
 				cvPoint( r->x + r->width, r->y + r->height ),
 				CV_RGB( 255, 0, 0 ), 1, 8, 0 );
@@ -272,18 +290,24 @@ void detectFaces( IplImage *img )
 		else
 		{
 			cvResetImageROI(img);
+			cvResetImageROI(processedImg);
 		}
 		
 		
 		//std::cout << "max: " << "(" << maxloc.x << "," << maxloc.y << "): " << maxval << std::endl;
 
+
+			//write out image for debuging
+			imwrite("image.jpg",Mat(processedImg));
+
 	}//end 18 test performance evaluation
     
 	}
 
-	
+
  
     /* display video */
     cvShowImage( "video", img );
+	cvShowImage( "processed", processedImg );
 }
  
