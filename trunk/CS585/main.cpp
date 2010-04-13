@@ -22,17 +22,16 @@ void detectFaces( IplImage *img );
 
 int main( int argc, char** argv )
 {
-	bool isVideo = true;
-	//bool isVideo = false; //image
+	//bool isVideo = true; //video
+	bool isVideo = false; //image
 
 	//is image
 	if(isVideo == false)
 	{
 		  //CvCapture *capture;
 		  IplImage  *img;
-		  //int       key;
-		  //char      *filename = "haarcascade_frontalface_alt_tree.xml";
 		  char      *filename = "haarcascade_frontalface_default.xml";
+		  //char      *filename = "haarcascade_frontalface_alt.xml";
 		  //char      *imgfilename = "HowellFace50.jpg";
 		  //char      *imgfilename = "grouppic2.jpg";
 		  char      *imgfilename = "ChrisFace.jpg";
@@ -40,7 +39,6 @@ int main( int argc, char** argv )
 
 		  cascade = ( CvHaarClassifierCascade* )cvLoad( filename, 0, 0, 0 );
 		  storage = cvCreateMemStorage( 0 );
-		  //img     = cvLoadImage( argv[1], 1 );
 		  img     = cvLoadImage( imgfilename, 1 );
 
 		  assert( cascade && storage && img );
@@ -60,7 +58,6 @@ int main( int argc, char** argv )
 		CvCapture *capture;
 		IplImage  *frame;
 		int       key = ' ';
-		//char      *filename = "haarcascade_eye.xml";
 		char      *filename = "haarcascade_frontalface_default.xml";
 		//char      *filename = "haarcascade_frontalface_alt.xml";
 	 
@@ -114,18 +111,15 @@ void resizeFeatureTemplate(string filename, double oldFeatureWidth, double oldFe
 	double oldFaceHeight = 228;
 	double newFeatureWidth = newFaceWidth * (oldFeatureWidth/oldFaceWidth);
 	double newFeatureHeight = newFaceHeight * (oldFeatureHeight/oldFaceHeight);
-	Mat *featureImg = new Mat;//();
+	
+	Mat *featureImg = new Mat;
 	*featureImg = imread( "templates/"+filename, 1 );
-
-	//Mat *resizedFeatureImg = new Mat;//();
 	
 	resize(*featureImg, resizedFeatureImg, Size((int)newFeatureWidth,(int)newFeatureHeight));
-	//resize(*featureImg, *resizedFeatureImg, Size(newFeatureWidth,newFeatureHeight));
-	//imwrite("resizedTemplates/"+filename,*resizedFeatureImg);
-	//delete resizedFeatureImg;//(resizedFeatureImg);
-	delete featureImg;
 
-	//return resizedFeatureImg;
+	//imwrite("resizedTemplates/"+filename,resizedFeatureImg);
+	
+	delete featureImg;
 }
  
 void detectFaces( IplImage *img )
@@ -155,10 +149,16 @@ void detectFaces( IplImage *img )
 
     for( i = 0 ; i < ( faces ? faces->total : 0 ) ; i++ ) 
 	{
-		for( int j=0; j<18; j++)
-		{
+	
+	//performance estimation:
+	for( int j=0; j<18; j++)
+	{
         CvRect *r = ( CvRect* )cvGetSeqElem( faces, i );
-        
+
+		////performance estimation:
+		//for( int j=0; j<18; j++)
+		//{
+
 		/*
 		cvRectangle( img,
                      cvPoint( r->x, r->y ),
@@ -191,6 +191,8 @@ void detectFaces( IplImage *img )
 		
 		Mat tpl;
 		resizeFeatureTemplate("lefteye.jpg",61,34,newFaceWidth,newFaceHeight,tpl);
+
+
 
 		//resizeFeatureTemplate("mouth.jpg",95,53,newFaceWidth,newFaceHeight,tpl);
 
@@ -242,13 +244,13 @@ void detectFaces( IplImage *img )
 
 
 		//cvResetImageROI(img);
-		if(maxval > 0.5)
+		if(maxval > 0.6)//if(maxval > 0.5) //above .6 reduces eyebrow noise a little
 		{
 
 
 			
 			rectangle(Mat(img),maxloc,Point(maxloc.x + tpl.cols, maxloc.y + tpl.rows),CV_RGB(0, 255, 0), 1, 0, 0 );
-			//std::cout << "max: " << "(" << maxloc.x << "," << maxloc.y << "): " << maxval << std::endl;
+			std::cout << "max: " << "(" << maxloc.x << "," << maxloc.y << "): " << maxval << std::endl;
 
 
 
@@ -275,8 +277,9 @@ void detectFaces( IplImage *img )
 		
 		//std::cout << "max: " << "(" << maxloc.x << "," << maxloc.y << "): " << maxval << std::endl;
 
-	}//end 18 test
-    }
+	}//end 18 test performance evaluation
+    
+	}
 
 	
  
