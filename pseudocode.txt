@@ -58,35 +58,37 @@ for (each frame in video)
 
 /*Face class*/
 //templates:
-Mat leftEye
-Mat leftEyeLeft
-Mat leftEyeRight
-Mat leftEyeTop
-Mat leftEyeBottom
 
-Mat rightEye
-Mat rightEyeLeft
-Mat rightEyeRight
-Mat rightEyeTop
-Mat rightEyeBottom
+/* Left eye */
+//locations
+Point leftEyePt
+Point leftEyeLeftPt
+Point leftEyeRightPt
+Point leftEyeTopPt
+Point leftEyeBottomPt
 
-Mat leftBrow
-Mat leftBrowLeft
-Mat leftBrowRight
-Mat leftBrowTop
-Mat leftBrowBottom
+//templates
+Mat leftEyeLeftTpl
+Mat leftEyeRightTpl
+Mat leftEyeTopTpl
+Mat leftEyeBottomTpl
 
-Mat rightBrow
-Mat rightBrowLeft
-Mat rightBrowRight
-Mat rightBrowTop
-Mat rightBrowBottom
 
-Mat mouth
-Mat mouthLeft
-Mat mouthRight
-Mat mouthTop
-Mat mouthBottom
+/* Left eye */
+//locations
+Point leftEyePt
+Point leftEyeLeftPt
+Point leftEyeRightPt
+Point leftEyeTopPt
+Point leftEyeBottomPt
+
+//templates
+Mat leftEyeLeftTpl
+Mat leftEyeRightTpl
+Mat leftEyeTopTpl
+Mat leftEyeBottomTpl
+
+
 
 //getters and setters for templates
 
