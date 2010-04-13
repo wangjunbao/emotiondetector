@@ -1,5 +1,29 @@
 #summary Pseudo-code for algorithms
 
+
+boolean matchesOldFace(Point curTopLeft, Point curBottomRight, Point oldTopLeft, Point oldBottomRight)
+{
+    HORIZ_THRESH = 0.1;
+    VERT_THRESH = 0.1;
+    
+    Point currentBestMatch = (-1,-1);
+    
+    for all faces in oldFaces
+    {
+        double currentXDiff = abs(curTopPoint.x - oldTopPoint.x)
+        
+        
+        if( abs(curTopPoint.x - oldTopPoint.x) < HORIZ_THRESH
+            &&
+            abs(curTopPoint.y - oldTopPoint.y) < VERT_THRESH
+            &&
+            
+            
+    }
+
+}
+
+
 =Main Algorithm=
 
 {{{
