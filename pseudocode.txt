@@ -1,24 +1,35 @@
 #summary Pseudo-code for algorithms
 
 
-boolean matchesOldFace(Point curTopLeft, Point curBottomRight, Point oldTopLeft, Point oldBottomRight)
+boolean matchesOldFace(Point curTopLeft, Face &oldFace)
 {
-    HORIZ_THRESH = 0.1;
-    VERT_THRESH = 0.1;
+    NOT_FOUND_VAL = 999
+    SUM_THRESH = 0.2;
     
-    Point currentBestMatch = (-1,-1);
-    
-    for all faces in oldFaces
+    double minSumDiff = NOT_FOUND_VAL
+
+    for (each face in oldFaces)
     {
+        //L-distance btn top left coords of face and old face
         double currentXDiff = abs(curTopPoint.x - oldTopPoint.x)
+        double currentYDiff = abs(curTopPoint.y - oldTopPoint.y)
+        double currentSumDiff = currentXDiff + currentYDiff
         
-        
-        if( abs(curTopPoint.x - oldTopPoint.x) < HORIZ_THRESH
-            &&
-            abs(curTopPoint.y - oldTopPoint.y) < VERT_THRESH
-            &&
-            
-            
+        if( currentSumDiff < SUM_THRESH 
+            && currentSumDiff < minSumDiff)
+        {
+            minSumDiff = currentSumDiff
+            oldFace = face
+        }
+    }
+    
+    if(minSumDiff == NOT_FOUND_VAL)
+    {
+        return false
+    }
+    else
+    {
+        return true
     }
 
 }
@@ -36,10 +47,12 @@ for (each frame in video)
     
     for (each faceRect in faceSequence)
     {
+        Face *face = null;
+        boolean isFaceOld = matchesOldFace(Point(faceRect.x,faceRect.y), *face);
         
-        if (faceRect.coordinates does NOT match any coordinates in oldFaces)
+        if (isFaceOld == false)
         {
-            Face *face = new Face()
+            face = new Face()
             
             if(isValidFace(newFaceCoords,leftEyeTemplate))
             {
@@ -56,9 +69,9 @@ for (each frame in video)
                 delete face
             }
         }
-        else if (faceRect.coordinates matches an oldFace within some buffer)
+        else if (isFaceOld == true)
         {
-                face = oldFace with best match
+                //face = oldFace with best match
                 face.updateSubFeatureLocations(newFaceCoords,
                     doResize=true,doCrop=false,frame#)
                 
