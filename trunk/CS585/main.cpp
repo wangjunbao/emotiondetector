@@ -397,12 +397,39 @@ void detectFaces( IplImage *img )
 	//std::cout << "oldFaces after swap: " << oldFaces.size() << std::endl;
 	//std::cout << "newFaces after swap: " << newFaces.size() << std::endl;
 
+	//before object delete
+	std::cout << "$$$Vector before object delete" << std::endl;
+	for(int z=0; z<(int)newFaces.size(); z++)
+	{
+		std::cout << "(" << newFaces.at(z)->getTopLeftPoint().x << std::endl;
+	}
+
+
 	//are we actually deleting the face objects or just the pointers?
 	for(int i=0; i<(int)newFaces.size(); i++)
 	{
 		delete newFaces.at(i);
 	}
+
+
+	//after object delete and before clear
+	std::cout << "$$$Vector after object delete and before clear" << std::endl;
+	for(int z=0; z<(int)newFaces.size(); z++)
+	{
+		std::cout << "(" << newFaces.at(z)->getTopLeftPoint().x << std::endl;
+	}
+
 	newFaces.clear(); //new faces now contains old faces that were unfound
+
+
+
+	//after clear
+	std::cout << "$$$Vector after clear" << std::endl;
+	for(int z=0; z<(int)newFaces.size(); z++)
+	{
+		std::cout << "(" << newFaces.at(z)->getTopLeftPoint().x << std::endl;
+	}
+
 
 	//std::cout << "oldFaces after clear: " << oldFaces.size() << std::endl;
 	//std::cout << "newFaces after clear: " << newFaces.size() << std::endl;
