@@ -6,6 +6,11 @@ class Face
 {
 
 public:
+	Face()
+	{
+
+	}
+	
 	Face(CvRect r) 
 	{
 		this->r = r;
