@@ -132,7 +132,8 @@ void resizeFeatureTemplate(string filename, double oldFeatureWidth, double oldFe
 	delete featureImg;
 }
  
-bool matchesOldFace(Point curTopLeftPoint, Face *matchedFace)
+//bool matchesOldFace(Point curTopLeftPoint, Face &matchedFace)
+bool matchesOldFace(Point curTopLeftPoint, Face* matchedFace)
 {
 	std::cout << "\n===entering matchesOldFace===" << std::endl;
 
@@ -177,7 +178,9 @@ bool matchesOldFace(Point curTopLeftPoint, Face *matchedFace)
             && currentSumDiff < minSumDiff)
         {
             minSumDiff = currentSumDiff;
-			matchedFace = oldFaces.at(i); //((Face*)(oldFaces.at(i)));
+			//matchedFace = *(oldFaces.at(i)); //((Face*)(oldFaces.at(i)));
+			//matchedFace = oldFaces.at(i);
+			*matchedFace = *oldFaces.at(i);
 			matchedFaceIndex = i;
 			std::cout << "i: " << i << std::endl;
         }
@@ -251,7 +254,10 @@ void detectFaces( IplImage *img )
 	{
         CvRect *r = ( CvRect* )cvGetSeqElem( faces, i );
 
-		Face *face = NULL;
+		//Face *face = NULL;
+		
+		Face *face = new Face();
+		
 		bool isOldFace = false;
 		
 		if(!oldFaces.empty())
@@ -267,6 +273,7 @@ void detectFaces( IplImage *img )
 				std::cout << "Top Left Point: " << oldFaces.at(0)->getTopLeftPoint().x << "," << oldFaces.at(0)->getTopLeftPoint().y << std::endl;
 			
 				isOldFace = matchesOldFace(Point(r->x,r->y), face);
+				//isOldFace = matchesOldFace(Point(r->x,r->y), *face);
 			}
 		}
 		else
