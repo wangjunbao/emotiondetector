@@ -6,16 +6,26 @@ class Face
 {
 
 public:
+	Face(CvRect r) 
+	{
+		this->r = r;
+	}
+	
+	/*
 	Face( Point topLeftPoint, Point bottomRightPoint ) {
 		this->topLeftPoint = topLeftPoint;
 		this->bottomRightPoint = bottomRightPoint;
 	}
+	*/
 
+	
 	Point getTopLeftPoint()
 	{
-		return topLeftPoint;
+		return Point(r.x,r.y);
 	}
+	
 
+	/*
 	void setTopLeftPoint(Point topLeftPoint)
 	{
 		this->topLeftPoint = topLeftPoint;
@@ -30,6 +40,8 @@ public:
 	{
 		this->bottomRightPoint = bottomRightPoint;
 	}
+	*/
+
 
 
 
@@ -75,10 +87,12 @@ public:
 		delete featureImg;
 	}
 
-//when creating a face
-	boolean isValidFace(IplImage *img, IplImage *processedImg, double newFaceWidth, double newFaceHeight)
+
+	//when creating a face
+	boolean isValidFace(IplImage *img, IplImage *processedImg, CvRect *r, double newFaceWidth, double newFaceHeight)
 	{
 		double THRESH = 0.50;
+		boolean result = false;
 		Mat tpl;
 		resizeFeatureTemplate("lefteye.jpg",61,34,newFaceWidth,newFaceHeight,tpl);
 		
@@ -86,11 +100,10 @@ public:
 
 		//http://nashruddin.com/OpenCV_Region_of_Interest_(ROI)
 		
-		//CvRect rect = cvRect((r->x), (r->y + r->height/4), r->width/2, (int)((3.0/8.0)*r->height));
-	
-
-
-		CvRect rect = cvRect((topLeftPoint.x), (topLeftPoint.y + (bottomRightPoint.y - topLeftPoint.y)/4), (bottomRightPoint.x-topLeftPoint.x)/2, (int)((3.0/8.0)*(bottomRightPoint.y - topLeftPoint.y)));
+		CvRect rect = cvRect((r->x), (r->y + r->height/4), r->width/2, (int)((3.0/8.0)*r->height));
+		//CvRect rect = cvRect((topLeftPoint.x), (topLeftPoint.y + (bottomRightPoint.y - topLeftPoint.y)/4), (bottomRightPoint.x-topLeftPoint.x)/2, (int)((3.0/8.0)*(bottomRightPoint.y - topLeftPoint.y)));
+		
+		//blue box
 		rectangle(Mat(processedImg),Point(rect.x,rect.y),Point(rect.x+rect.width, rect.y+rect.height),CV_RGB(0, 0, 255), 1, 0, 0 );
 
 		cvSetImageROI(img, rect);
@@ -108,38 +121,49 @@ public:
 
 		minMaxLoc(res, &minval, &maxval, &minloc, &maxloc); 
 
+
+
 		if (maxval <= THRESH)
 		{
-			return false;
+			result = false;
 		}
 		else
 		{
-			//resize each parent feature (except left eye)
-	  //      
-			////each parent feature has specific search space (area of face)
+			//resize each parent feature (except left eye)      
+			//each parent feature has specific search space (area of face)
 			//run NCC on parent feature (except left eye) to get search space for sub features
 	        
+
+			//green box
 			rectangle(Mat(processedImg),maxloc,Point(maxloc.x + tpl.cols, maxloc.y + tpl.rows),CV_RGB(0, 255, 0), 1, 0, 0 );
 			std::cout << "max: " << "(" << maxloc.x << "," << maxloc.y << "): " << maxval << std::endl;
 
-
-						//cvResetImageROI(img);
-			//cvResetImageROI(processedImg);
-			
-
-
-			return true;
+			result = true;
 		}
+			
+		cvResetImageROI(img);
+		cvResetImageROI(processedImg);
+
+		if(result == true)
+		{
+			//red box
+			cvRectangle( processedImg,
+				cvPoint( r->x, r->y ),
+				cvPoint( r->x + r->width, r->y + r->height ),
+				CV_RGB( 255, 0, 0 ), 1, 8, 0 );
+		}
+
+		return result;
 
 	}
 private:
 	//templates:
-	
+	CvRect r;
 	Mat face;
 	
 	Mat leftEye;
 
-	Point topLeftPoint;
-	Point bottomRightPoint;
+	//Point topLeftPoint;
+	//Point bottomRightPoint;
 	
 };

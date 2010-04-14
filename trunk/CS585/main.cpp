@@ -143,7 +143,9 @@ boolean matchesOldFace(Point curTopLeftPoint, Face &matchedFace)
     {
         //L-distance btn top left coords of face and old face
 		Point oldTopLeftPoint = ((Face*)(oldFaces.at(i)))->getTopLeftPoint();
-        double currentXDiff = abs(curTopLeftPoint.x - oldTopLeftPoint.x);
+        //Point oldTopLeftPoint = Point( ((Face*)(oldFaces.at(i)))->getR().x, ((Face*)(oldFaces.at(i)))->getR().y );
+        
+		double currentXDiff = abs(curTopLeftPoint.x - oldTopLeftPoint.x);
         double currentYDiff = abs(curTopLeftPoint.y - oldTopLeftPoint.y);
         double currentSumDiff = currentXDiff + currentYDiff;
         
@@ -198,7 +200,7 @@ void detectFaces( IplImage *img )
 	{
 	
 	//performance estimation:
-	for( int j=0; j<3; j++)
+	for( int j=0; j<1; j++)
 	{
         CvRect *r = ( CvRect* )cvGetSeqElem( faces, i );
 	
@@ -215,53 +217,26 @@ void detectFaces( IplImage *img )
 		double newFaceWidth = r->width;
 		double newFaceHeight = r->height;
 
-		Face *face = new Face(Point(r->x,r->y),Point(r->x+r->width,r->y+r->height));
-
-		/* draw rectangle */
-		//cvRectangle(img,
-		//			cvPoint(minloc.x, minloc.y),
-		//			cvPoint(minloc.x + tpl->width, minloc.y + tpl->height),
-		//			CV_RGB(255, 0, 0), 1, 0, 0 );
+		//Face *face = new Face(Point(r->x,r->y),Point(r->x+r->width,r->y+r->height));
+		Face *face = new Face(*r);
 
 
 		//std::cout << "max: " << "(" << maxloc.x << "," << maxloc.y << "): " << maxval << std::endl;
 
 		//cvResetImageROI(img);
-		if( face->isValidFace(img,processedImg,newFaceWidth,newFaceHeight) ) //above .6 reduces eyebrow noise a little
+		if( face->isValidFace(img,processedImg,r,newFaceWidth,newFaceHeight) ) //above .6 reduces eyebrow noise a little
 		{
+			/*cvResetImageROI(img);
+			cvResetImageROI(processedImg);*/
 
-
-			
-			/*rectangle(Mat(processedImg),maxloc,Point(maxloc.x + tpl.cols, maxloc.y + tpl.rows),CV_RGB(0, 255, 0), 1, 0, 0 );
-			std::cout << "max: " << "(" << maxloc.x << "," << maxloc.y << "): " << maxval << std::endl;*/
-
-
-
-			//Face *currentFace = new Face();
-			//currentFace->setLeftEye(tpl);
-
-
-			cvResetImageROI(img);
-			cvResetImageROI(processedImg);
-			//
-			//cvRectangle( processedImg,
-			//	cvPoint( r->x, r->y ),
-			//	cvPoint( r->x + r->width, r->y + r->height ),
-			//	CV_RGB( 255, 0, 0 ), 1, 8, 0 );
-
-
-						cvRectangle( processedImg,
-				cvPoint( r->x, r->y ),
-				cvPoint( r->x + r->width, r->y + r->height ),
-				CV_RGB( 255, 0, 0 ), 1, 8, 0 );
-
-
+			/*
+			cvRectangle( processedImg,
+			cvPoint( r->x, r->y ),
+			cvPoint( r->x + r->width, r->y + r->height ),
+			CV_RGB( 255, 0, 0 ), 1, 8, 0 );
+			*/
 		}
-		else
-		{
-			cvResetImageROI(img);
-			cvResetImageROI(processedImg);
-		}
+
 		
 		
 		//std::cout << "max: " << "(" << maxloc.x << "," << maxloc.y << "): " << maxval << std::endl;
