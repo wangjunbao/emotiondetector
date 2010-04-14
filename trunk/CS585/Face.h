@@ -89,10 +89,14 @@ public:
 
 
 	//when creating a face
-	boolean isValidFace(IplImage *img, IplImage *processedImg, CvRect *r, double newFaceWidth, double newFaceHeight)
+	boolean isValidFace(IplImage *img, IplImage *processedImg, CvRect *r)
 	{
 		double THRESH = 0.50;
-		boolean result = false;
+		bool result = false;
+		
+		double newFaceWidth = r->width;
+		double newFaceHeight = r->height;
+		
 		Mat tpl;
 		resizeFeatureTemplate("lefteye.jpg",61,34,newFaceWidth,newFaceHeight,tpl);
 		

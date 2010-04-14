@@ -203,53 +203,20 @@ void detectFaces( IplImage *img )
 	for( int j=0; j<1; j++)
 	{
         CvRect *r = ( CvRect* )cvGetSeqElem( faces, i );
-	
-		/*
-		std::cout << "top left:" << r->x << "," << r->y << std::endl;
-		std::cout << "bottom left:" << r->x + r->width << "," << r->y + r->height << std::endl;
 
-		std::cout << "width: " << r->width << std::endl;
-		std::cout << "height: " << r->height << std::endl;
-
-		std::cout << "area: " << r->width * r->height << std::endl;
-		*/
-
-		double newFaceWidth = r->width;
-		double newFaceHeight = r->height;
-
-		//Face *face = new Face(Point(r->x,r->y),Point(r->x+r->width,r->y+r->height));
 		Face *face = new Face(*r);
 
-
-		//std::cout << "max: " << "(" << maxloc.x << "," << maxloc.y << "): " << maxval << std::endl;
-
-		//cvResetImageROI(img);
-		if( face->isValidFace(img,processedImg,r,newFaceWidth,newFaceHeight) ) //above .6 reduces eyebrow noise a little
+		if( face->isValidFace(img,processedImg,r) )
 		{
-			/*cvResetImageROI(img);
-			cvResetImageROI(processedImg);*/
-
-			/*
-			cvRectangle( processedImg,
-			cvPoint( r->x, r->y ),
-			cvPoint( r->x + r->width, r->y + r->height ),
-			CV_RGB( 255, 0, 0 ), 1, 8, 0 );
-			*/
+			//logic here!
 		}
 
-		
-		
-		//std::cout << "max: " << "(" << maxloc.x << "," << maxloc.y << "): " << maxval << std::endl;
-
-
-			//write out image for debuging
-			imwrite("image.jpg",Mat(processedImg));
+		//write out image for debuging
+		//imwrite("image.jpg",Mat(processedImg));
 
 	}//end 18 test performance evaluation
     
-	}
-
-
+	}//end for faces
  
     /* display video */
     cvShowImage( "video", img );
