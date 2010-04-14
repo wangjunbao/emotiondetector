@@ -17,6 +17,7 @@ CvMemStorage            *storage;
 
 
 vector<Face*> oldFaces;
+vector<Face*> newFaces;
 
 void detectFaces( IplImage *img );
 
@@ -131,6 +132,40 @@ void resizeFeatureTemplate(string filename, double oldFeatureWidth, double oldFe
 	delete featureImg;
 }
  
+boolean matchesOldFace(Point curTopLeftPoint, Face &matchedFace)
+{
+    double NOT_FOUND_VAL = 999.0;
+    double SUM_THRESH = 0.2;
+    
+    double minSumDiff = NOT_FOUND_VAL;
+
+	for(int i=0; i<(int)(oldFaces.size()); i++)
+    {
+        //L-distance btn top left coords of face and old face
+		Point oldTopLeftPoint = ((Face*)(oldFaces.at(i)))->getTopLeftPoint();
+        double currentXDiff = abs(curTopLeftPoint.x - oldTopLeftPoint.x);
+        double currentYDiff = abs(curTopLeftPoint.y - oldTopLeftPoint.y);
+        double currentSumDiff = currentXDiff + currentYDiff;
+        
+        if( currentSumDiff < SUM_THRESH 
+            && currentSumDiff < minSumDiff)
+        {
+            minSumDiff = currentSumDiff;
+			matchedFace = *((Face*)(oldFaces.at(i)));
+        }
+    }
+    
+    if(minSumDiff == NOT_FOUND_VAL)
+    {
+        return false;
+    }
+    else
+    {
+        return true;
+    }
+}
+
+
 void detectFaces( IplImage *img )
 {
     IplImage *processedImg;
@@ -166,26 +201,7 @@ void detectFaces( IplImage *img )
 	for( int j=0; j<3; j++)
 	{
         CvRect *r = ( CvRect* )cvGetSeqElem( faces, i );
-
-		////performance estimation:
-		//for( int j=0; j<18; j++)
-		//{
-
-		/*
-		cvRectangle( img,
-                     cvPoint( r->x, r->y ),
-                     cvPoint( r->x + r->width, r->y + r->height ),
-                     CV_RGB( 255, 0, 0 ), 1, 8, 0 );
-					 */
-
-		CvFont font;
-		double hScale=1.0;
-		double vScale=1.0;
-		int    lineWidth=1;
-		cvInitFont(&font,CV_FONT_HERSHEY_SIMPLEX|CV_FONT_ITALIC, hScale,vScale,0,lineWidth);
-
-		//cvPutText (img,"",cvPoint(100,100), &font, cvScalar(255,255,0));
-
+	
 		/*
 		std::cout << "top left:" << r->x << "," << r->y << std::endl;
 		std::cout << "bottom left:" << r->x + r->width << "," << r->y + r->height << std::endl;
@@ -199,57 +215,7 @@ void detectFaces( IplImage *img )
 		double newFaceWidth = r->width;
 		double newFaceHeight = r->height;
 
-		//resizeFeatureTemplate("mouth.jpg",95,53,newFaceWidth,newFaceHeight);
-		
-		Mat tpl;
-		resizeFeatureTemplate("lefteye.jpg",61,34,newFaceWidth,newFaceHeight,tpl);
-
-		std::cout << "tpl: " << tpl.cols << "," << tpl.rows << std::endl;
-
-
-		//resizeFeatureTemplate("mouth.jpg",95,53,newFaceWidth,newFaceHeight,tpl);
-
-		//eyes
-		
-		//cvMatchTemplate(
-
-		//http://nashruddin.com/OpenCV_Region_of_Interest_(ROI)
-
-		//IplImage *img = cvLoadImage("myphoto.jpg", 1);
-		//IplImage *tpl = //cvLoadImage("eye.jpg", 1);
-		
-		
-
-		 
-		//CvRect rect = cvRect(r->x, r->y, r->width/2, r->height/2);
-		CvRect rect = cvRect((r->x), (r->y + r->height/4), r->width/2, (int)((3.0/8.0)*r->height));
-		rectangle(Mat(processedImg),Point(rect.x,rect.y),Point(rect.x+rect.width, rect.y+rect.height),CV_RGB(0, 0, 255), 1, 0, 0 );
-		//CvRect rect = cvRect(r->x, r->y, r->width, r->height); //mouth
-
-		cvSetImageROI(img, rect);
-		cvSetImageROI(processedImg, rect);
-		 
-		/*
-		IplImage *res = cvCreateImage(cvSize(rect.width  - tpl->width  + 1,
-											 rect.height - tpl->height + 1),
-									  IPL_DEPTH_32F, 1);
-									  */
-
-		//Mat res(Size(rect.width - tpl.cols + 1, rect.height - tpl.rows + 1), IPL_DEPTH_32F, 1);
-		Mat res;
-		 
-		/* perform template matching */
-		//cvMatchTemplate(img, tpl, res, CV_TM_SQDIFF);
-		matchTemplate(Mat(img), tpl, res, CV_TM_CCOEFF_NORMED);
-		 
-		/* find best matches location */
-		//CvPoint    minloc, maxloc;
-		Point minloc, maxloc;
-		double minval = 0.0;
-		double maxval = 0.0;
-
-		//cvMinMaxLoc(res, &minval, &maxval, &minloc, &maxloc, 0);
-		minMaxLoc(res, &minval, &maxval, &minloc, &maxloc); 
+		Face *face = new Face(Point(r->x,r->y),Point(r->x+r->width,r->y+r->height));
 
 		/* draw rectangle */
 		//cvRectangle(img,
@@ -261,13 +227,13 @@ void detectFaces( IplImage *img )
 		//std::cout << "max: " << "(" << maxloc.x << "," << maxloc.y << "): " << maxval << std::endl;
 
 		//cvResetImageROI(img);
-		if(maxval > 0.55) //above .6 reduces eyebrow noise a little
+		if( face->isValidFace(img,processedImg,newFaceWidth,newFaceHeight) ) //above .6 reduces eyebrow noise a little
 		{
 
 
 			
-			rectangle(Mat(processedImg),maxloc,Point(maxloc.x + tpl.cols, maxloc.y + tpl.rows),CV_RGB(0, 255, 0), 1, 0, 0 );
-			std::cout << "max: " << "(" << maxloc.x << "," << maxloc.y << "): " << maxval << std::endl;
+			/*rectangle(Mat(processedImg),maxloc,Point(maxloc.x + tpl.cols, maxloc.y + tpl.rows),CV_RGB(0, 255, 0), 1, 0, 0 );
+			std::cout << "max: " << "(" << maxloc.x << "," << maxloc.y << "): " << maxval << std::endl;*/
 
 
 
@@ -277,13 +243,17 @@ void detectFaces( IplImage *img )
 
 			cvResetImageROI(img);
 			cvResetImageROI(processedImg);
-			
-			cvRectangle( processedImg,
+			//
+			//cvRectangle( processedImg,
+			//	cvPoint( r->x, r->y ),
+			//	cvPoint( r->x + r->width, r->y + r->height ),
+			//	CV_RGB( 255, 0, 0 ), 1, 8, 0 );
+
+
+						cvRectangle( processedImg,
 				cvPoint( r->x, r->y ),
 				cvPoint( r->x + r->width, r->y + r->height ),
 				CV_RGB( 255, 0, 0 ), 1, 8, 0 );
-
-
 
 
 		}
