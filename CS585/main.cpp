@@ -202,11 +202,38 @@ bool matchesOldFace(Point curTopLeftPoint, Face* matchedFace)
 
 		std::cout << "size before delete:" << oldFaces.size() <<std::endl;
 
+
+
 		//delete the best matched face from oldFaces
 		//to reduce search space for next call
 		if(matchedFaceIndex >= 0 && matchedFaceIndex < (int)oldFaces.size())
 		{
+			//does it delete the pointer or the actual object?
+			Face *objDelCheck;
+			objDelCheck = oldFaces.at(matchedFaceIndex); //both pointing to face obj
+			
+			
+			if(objDelCheck == NULL)
+			{
+				std::cout << "******************before erase, IS NULL" << std::endl;
+			}
+			else
+			{
+				std::cout << "******************before erase, NOT NULL" << std::endl;
+				std::cout << "******************before erase" << objDelCheck->getTopLeftPoint().x << "," << objDelCheck->getTopLeftPoint().y << std::endl;
+			}
+
 			oldFaces.erase(oldFaces.begin()+matchedFaceIndex);
+
+			if(objDelCheck == NULL)
+			{
+				std::cout << "******************after erase, IS NULL" << std::endl;
+			}
+			else
+			{
+				std::cout << "******************after erase, NOT NULL" << std::endl;
+				std::cout << "******************after erase" << objDelCheck->getTopLeftPoint().x << "," << objDelCheck->getTopLeftPoint().y << std::endl;
+			}
 		}
 
 		std::cout << "size after delete:" << oldFaces.size() <<std::endl;
@@ -256,8 +283,9 @@ void detectFaces( IplImage *img )
 
 		//Face *face = NULL;
 		
-		Face *face = new Face();
-		
+		//Face *face = new Face();
+		Face *face = new Face(*r);
+
 		bool isOldFace = false;
 		
 		if(!oldFaces.empty())
@@ -284,7 +312,7 @@ void detectFaces( IplImage *img )
 
 		if(isOldFace == false)
 		{
-			face = new Face(*r);
+			//face = new Face(*r);
 			if( face->isValidFace(img,processedImg,r) )
 			{
 				std::cout << "face IS valid" << std::endl;
@@ -336,21 +364,21 @@ void detectFaces( IplImage *img )
 	//oldFaces = newFaces; //store faces found in this frame for next frame
 
 
-	std::cout << "oldFaces before swap: " << oldFaces.size() << std::endl;
-	std::cout << "newFaces before swap: " << newFaces.size() << std::endl;
+	//std::cout << "oldFaces before swap: " << oldFaces.size() << std::endl;
+	//std::cout << "newFaces before swap: " << newFaces.size() << std::endl;
 
 
 	oldFaces.swap(newFaces);
 	
-	std::cout << "oldFaces after swap: " << oldFaces.size() << std::endl;
-	std::cout << "newFaces after swap: " << newFaces.size() << std::endl;
+	//std::cout << "oldFaces after swap: " << oldFaces.size() << std::endl;
+	//std::cout << "newFaces after swap: " << newFaces.size() << std::endl;
 
 	
 	newFaces.clear(); //new faces now contains old faces that were unfound
 
-	std::cout << "oldFaces after clear: " << oldFaces.size() << std::endl;
-	std::cout << "newFaces after clear: " << newFaces.size() << std::endl;
-	std::cout << "\n" << std::endl;
+	//std::cout << "oldFaces after clear: " << oldFaces.size() << std::endl;
+	//std::cout << "newFaces after clear: " << newFaces.size() << std::endl;
+	//std::cout << "\n" << std::endl;
  
     /* display video */
     cvShowImage( "video", img );
