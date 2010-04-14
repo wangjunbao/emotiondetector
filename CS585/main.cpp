@@ -213,26 +213,50 @@ bool matchesOldFace(Point curTopLeftPoint, Face* matchedFace)
 			objDelCheck = oldFaces.at(matchedFaceIndex); //both pointing to face obj
 			
 			
-			if(objDelCheck == NULL)
-			{
-				std::cout << "******************before erase, IS NULL" << std::endl;
-			}
-			else
+			//if(objDelCheck == NULL)
+			if(objDelCheck)
 			{
 				std::cout << "******************before erase, NOT NULL" << std::endl;
 				std::cout << "******************before erase" << objDelCheck->getTopLeftPoint().x << "," << objDelCheck->getTopLeftPoint().y << std::endl;
 			}
-
-			oldFaces.erase(oldFaces.begin()+matchedFaceIndex);
-
-			if(objDelCheck == NULL)
-			{
-				std::cout << "******************after erase, IS NULL" << std::endl;
-			}
 			else
+			{
+				std::cout << "******************before erase, IS NULL" << std::endl;
+			}
+
+			//vector before erase
+			std::cout << "###Vector before erase" << std::endl;
+			for(int z=0; z<(int)oldFaces.size(); z++)
+			{
+				std::cout << "(" << oldFaces.at(z)->getTopLeftPoint().x << std::endl;
+			}
+
+
+			//object to erase
+			std::cout << "###to erase:(" << oldFaces.at(matchedFaceIndex)->getTopLeftPoint().x << std::endl;
+
+			delete oldFaces.at(matchedFaceIndex); //delete actual object
+			oldFaces.erase(oldFaces.begin()+matchedFaceIndex); //delete pointer to object from oldFaces vector
+
+
+			//vector after erase
+			std::cout << "###Vector after erase" << std::endl;
+			for(int z=0; z<(int)oldFaces.size(); z++)
+			{
+				std::cout << "(" << oldFaces.at(z)->getTopLeftPoint().x << std::endl;
+			}
+
+			//if(objDelCheck == NULL)
+			//objDelCheck = NULL;
+
+			if(objDelCheck)
 			{
 				std::cout << "******************after erase, NOT NULL" << std::endl;
 				std::cout << "******************after erase" << objDelCheck->getTopLeftPoint().x << "," << objDelCheck->getTopLeftPoint().y << std::endl;
+			}
+			else
+			{
+				std::cout << "******************after erase, IS NULL" << std::endl;
 			}
 		}
 
@@ -373,7 +397,11 @@ void detectFaces( IplImage *img )
 	//std::cout << "oldFaces after swap: " << oldFaces.size() << std::endl;
 	//std::cout << "newFaces after swap: " << newFaces.size() << std::endl;
 
-	
+	//are we actually deleting the face objects or just the pointers?
+	for(int i=0; i<(int)newFaces.size(); i++)
+	{
+		delete newFaces.at(i);
+	}
 	newFaces.clear(); //new faces now contains old faces that were unfound
 
 	//std::cout << "oldFaces after clear: " << oldFaces.size() << std::endl;
