@@ -132,37 +132,84 @@ void resizeFeatureTemplate(string filename, double oldFeatureWidth, double oldFe
 	delete featureImg;
 }
  
-boolean matchesOldFace(Point curTopLeftPoint, Face &matchedFace)
+bool matchesOldFace(Point curTopLeftPoint, Face *matchedFace)
 {
+	std::cout << "\n===entering matchesOldFace===" << std::endl;
+
     double NOT_FOUND_VAL = 999.0;
     double SUM_THRESH = 0.2;
     
     double minSumDiff = NOT_FOUND_VAL;
+	int matchedFaceIndex = -1;
+
+	if(!oldFaces.empty())
+	{
 
 	for(int i=0; i<(int)(oldFaces.size()); i++)
     {
         //L-distance btn top left coords of face and old face
-		Point oldTopLeftPoint = ((Face*)(oldFaces.at(i)))->getTopLeftPoint();
-        //Point oldTopLeftPoint = Point( ((Face*)(oldFaces.at(i)))->getR().x, ((Face*)(oldFaces.at(i)))->getR().y );
-        
+		//Point oldTopLeftPoint = ((Face*)(oldFaces.at(i)))->getTopLeftPoint();
+		std::cout << "\n!!!before getting TopLeftPoint" << std::endl;
+		
+		//if(!oldFaces.at(i))
+		//{
+			//std::cout << "Top left is null! " << i << std::endl;
+		//}
+		//else
+		//{
+			Point oldTopLeftPoint = oldFaces.at(i)->getTopLeftPoint();
+			std::cout << "Top Left Point: " << oldTopLeftPoint.x << "," << oldTopLeftPoint.y << std::endl;
+		
+		//Point oldTopLeftPoint = oldFaces.at(i)->getTopLeftPoint();
+        //Point oldTopLeftPoint = Point(50,50);
+
+		//Point oldTopLeftPoint = Point( ((Face*)(oldFaces.at(i)))->getR().x, ((Face*)(oldFaces.at(i)))->getR().y );
+		//std::cout << "Top Left Point: " << oldTopLeftPoint.x << "," << oldTopLeftPoint.y << std::endl;
+		std::cout << "\n!!!after getting TopLeftPoint" << std::endl;
+
 		double currentXDiff = abs(curTopLeftPoint.x - oldTopLeftPoint.x);
         double currentYDiff = abs(curTopLeftPoint.y - oldTopLeftPoint.y);
         double currentSumDiff = currentXDiff + currentYDiff;
+
+		std::cout << "currentSumDiff: " << currentSumDiff << std::endl;
         
         if( currentSumDiff < SUM_THRESH 
             && currentSumDiff < minSumDiff)
         {
             minSumDiff = currentSumDiff;
-			matchedFace = *((Face*)(oldFaces.at(i)));
+			matchedFace = oldFaces.at(i); //((Face*)(oldFaces.at(i)));
+			matchedFaceIndex = i;
+			std::cout << "i: " << i << std::endl;
         }
+
+		//}//end else for null
     }
+
+	}//end if
     
     if(minSumDiff == NOT_FOUND_VAL)
     {
-        return false;
+        std::cout << "===leaving matchesOldFace===\n" << std::endl;
+
+		return false;
     }
     else
     {
+		std::cout << "deleting face" << std::endl;
+
+		std::cout << "size before delete:" << oldFaces.size() <<std::endl;
+
+		//delete the best matched face from oldFaces
+		//to reduce search space for next call
+		if(matchedFaceIndex >= 0 && matchedFaceIndex < (int)oldFaces.size())
+		{
+			oldFaces.erase(oldFaces.begin()+matchedFaceIndex);
+		}
+
+		std::cout << "size after delete:" << oldFaces.size() <<std::endl;
+
+		std::cout << "===leaving matchesOldFace===\n" << std::endl;
+
         return true;
     }
 }
@@ -204,19 +251,99 @@ void detectFaces( IplImage *img )
 	{
         CvRect *r = ( CvRect* )cvGetSeqElem( faces, i );
 
-		Face *face = new Face(*r);
-
-		if( face->isValidFace(img,processedImg,r) )
+		Face *face = NULL;
+		bool isOldFace = false;
+		
+		if(!oldFaces.empty())
 		{
-			//logic here!
+			std::cout << "\nold faces NOT empty " << oldFaces.size() << std::endl;
+			
+			if(oldFaces.at(0) == NULL)
+			{
+				std::cout << "Top Left Point is NULL" << std::endl;
+			}
+			else
+			{
+				std::cout << "Top Left Point: " << oldFaces.at(0)->getTopLeftPoint().x << "," << oldFaces.at(0)->getTopLeftPoint().y << std::endl;
+			
+				isOldFace = matchesOldFace(Point(r->x,r->y), face);
+			}
+		}
+		else
+		{
+			std::cout << "\nold faces IS empty" << std::endl;
+			//isOldFace = false;
 		}
 
+		if(isOldFace == false)
+		{
+			face = new Face(*r);
+			if( face->isValidFace(img,processedImg,r) )
+			{
+				std::cout << "face IS valid" << std::endl;
+				//update sub features
+
+				//do Emotion Detection -> store it
+                
+                //add value to output
+
+                //add face to newFaces
+				std::cout << "ADDING from isOldFace == false" << std::endl;
+				std::cout << "face top left: " << face->getTopLeftPoint().x <<"," << face->getTopLeftPoint().y << std::endl;
+				newFaces.push_back(face);
+			}
+			else
+			{
+				std::cout << "face NOT valid" << std::endl;
+				delete face;
+			}
+		}
+		else if(isOldFace == true)
+		{
+			std::cout << "old face" << std::endl;
+
+			//update sub features
+			
+			//do Emotion Detection -> store it
+                
+            //add value to output
+
+			//add oldFace to newFaces
+			
+			std::cout << "ADDING from isOldFace == true" << std::endl;
+			std::cout << "face top left: " << face->getTopLeftPoint().x <<"," << face->getTopLeftPoint().y << std::endl;
+			newFaces.push_back(face);
+
+			
+		}
 		//write out image for debuging
 		//imwrite("image.jpg",Mat(processedImg));
+
+
 
 	}//end 18 test performance evaluation
     
 	}//end for faces
+
+	//oldFaces.clear(); //remove remaining unfound faces from prev frame
+	//oldFaces = newFaces; //store faces found in this frame for next frame
+
+
+	std::cout << "oldFaces before swap: " << oldFaces.size() << std::endl;
+	std::cout << "newFaces before swap: " << newFaces.size() << std::endl;
+
+
+	oldFaces.swap(newFaces);
+	
+	std::cout << "oldFaces after swap: " << oldFaces.size() << std::endl;
+	std::cout << "newFaces after swap: " << newFaces.size() << std::endl;
+
+	
+	newFaces.clear(); //new faces now contains old faces that were unfound
+
+	std::cout << "oldFaces after clear: " << oldFaces.size() << std::endl;
+	std::cout << "newFaces after clear: " << newFaces.size() << std::endl;
+	std::cout << "\n" << std::endl;
  
     /* display video */
     cvShowImage( "video", img );

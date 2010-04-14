@@ -9,6 +9,8 @@ public:
 	Face(CvRect r) 
 	{
 		this->r = r;
+		this->topLeftPoint.x = r.x;
+		this->topLeftPoint.y = r.y;
 	}
 	
 	/*
@@ -21,7 +23,8 @@ public:
 	
 	Point getTopLeftPoint()
 	{
-		return Point(r.x,r.y);
+		//return Point(r.x,r.y);
+		return topLeftPoint;
 	}
 	
 
@@ -167,7 +170,7 @@ private:
 	
 	Mat leftEye;
 
-	//Point topLeftPoint;
+	Point topLeftPoint;
 	//Point bottomRightPoint;
 	
 };
