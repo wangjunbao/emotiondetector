@@ -96,7 +96,7 @@ public:
 	}
 
 
-	//when creating a face
+	/* Check if a face found by Haar is valid (has a left eye) */
 	boolean isValidFace(IplImage *img, IplImage *processedImg, CvRect *r)
 	{
 		double THRESH = 0.50;
@@ -148,7 +148,7 @@ public:
 
 			//green box
 			rectangle(Mat(processedImg),maxloc,Point(maxloc.x + tpl.cols, maxloc.y + tpl.rows),CV_RGB(0, 255, 0), 1, 0, 0 );
-			std::cout << "max: " << "(" << maxloc.x << "," << maxloc.y << "): " << maxval << std::endl;
+			//std::cout << "max: " << "(" << maxloc.x << "," << maxloc.y << "): " << maxval << std::endl;
 
 			result = true;
 		}
