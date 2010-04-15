@@ -96,6 +96,16 @@ public:
 	}
 
 
+	/* Draw a box around an existing face */
+	void drawBox(IplImage *img, IplImage *processedImg, CvRect *r)
+	{
+		//yellow box
+		cvRectangle( processedImg,
+			cvPoint( r->x, r->y ),
+			cvPoint( r->x + r->width, r->y + r->height ),
+			CV_RGB( 255, 255, 0 ), 1, 8, 0 );
+	}
+
 	/* Check if a face found by Haar is valid (has a left eye) */
 	boolean isValidFace(IplImage *img, IplImage *processedImg, CvRect *r)
 	{

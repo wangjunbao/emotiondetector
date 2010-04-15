@@ -133,25 +133,23 @@ void resizeFeatureTemplate(string filename, double oldFeatureWidth, double oldFe
 }
  
 /* Checks if a face found in current frame matches an existing face */
-bool matchesOldFace(Point curTopLeftPoint, Face* matchedFace)
+bool matchesOldFace(Point curTopLeftPoint, int width, int height, Face* matchedFace)
 {
     double NOT_FOUND_VAL = 999.0;
-    //double SUM_THRESH = 0.2;
-	double SUM_THRESH = 5.0;
+	double SUM_THRESH = 0.1; //calc: 2/50 + 2/50 = 0.08 
     
     double minSumDiff = NOT_FOUND_VAL;
 	int matchedFaceIndex = -1;
 
+	//loop will not execute if oldFaces is empty and false will be returned
 	for(int i=0; i<(int)(oldFaces.size()); i++)
     {
 		assert (oldFaces.at(i)); //face from oldFaces should not be null
 		Point oldTopLeftPoint = oldFaces.at(i)->getTopLeftPoint();
 
-		//L-distance btn top left coords of face and old face
-		//these should be in percentages!
-		//not abs pixels
-		double currentXDiff = abs(curTopLeftPoint.x - oldTopLeftPoint.x);
-        double currentYDiff = abs(curTopLeftPoint.y - oldTopLeftPoint.y);
+		//L-distance percentages btn top left coords of face and old face
+		double currentXDiff = (double)abs(curTopLeftPoint.x - oldTopLeftPoint.x) / (double)width;
+        double currentYDiff = (double)abs(curTopLeftPoint.y - oldTopLeftPoint.y) / (double)height;
         double currentSumDiff = currentXDiff + currentYDiff;
 
 		//std::cout << "currentSumDiff: " << currentSumDiff << std::endl;
@@ -233,10 +231,10 @@ void detectFaces( IplImage *img )
 		bool isOldFace = false;
 		
 		//try to match this face with an old face
-		if(!oldFaces.empty())
-		{
-			isOldFace = matchesOldFace(Point(r->x,r->y), face);
-		}
+		//if(!oldFaces.empty())
+		//{
+			isOldFace = matchesOldFace(Point(r->x,r->y), r->width, r->height, face);
+		//}
 
 		if(isOldFace == false)
 		{
@@ -276,6 +274,7 @@ void detectFaces( IplImage *img )
 			//std::cout << "ADDING from isOldFace == true" << std::endl;
 			//std::cout << "face top left: " << face->getTopLeftPoint().x <<"," << face->getTopLeftPoint().y << std::endl;
 			newFaces.push_back(face);
+			face->drawBox(img,processedImg,r);
 		}
 		//write out image for debuging
 		//imwrite("image.jpg",Mat(processedImg));
