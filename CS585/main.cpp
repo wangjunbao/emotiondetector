@@ -228,20 +228,15 @@ void detectFaces( IplImage *img )
 		//if it is found to match an old face, it will take on the old face's values
 		Face *face = new Face(*r);
 
-		bool isOldFace = false;
-		
 		//try to match this face with an old face
-		//if(!oldFaces.empty())
-		//{
-			isOldFace = matchesOldFace(Point(r->x,r->y), r->width, r->height, face);
-		//}
+		bool isOldFace = matchesOldFace(Point(r->x,r->y), r->width, r->height, face);
 
 		if(isOldFace == false)
 		{
 			if( face->isValidFace(img,processedImg,r) )
 			{
-				std::cout << "new valid face" << std::endl;
-				//std::cout << "face IS valid" << std::endl;
+				std::cout << "new valid face at: (" << face->getTopLeftPoint().x <<"," << face->getTopLeftPoint().y << ")" << std::endl;
+
 				//update sub features
 
 				//do Emotion Detection -> store it
@@ -249,19 +244,16 @@ void detectFaces( IplImage *img )
                 //add value to output
 
                 //add face to newFaces
-				//std::cout << "ADDING from isOldFace == false" << std::endl;
-				//std::cout << "face top left: " << face->getTopLeftPoint().x <<"," << face->getTopLeftPoint().y << std::endl;
 				newFaces.push_back(face);
 			}
-			else
+			else //face is not valid, delete the object
 			{
-				//std::cout << "face NOT valid" << std::endl;
 				delete face;
 			}
 		}
 		else if(isOldFace == true)
 		{
-			std::cout << "old face" << std::endl;
+			std::cout << "old face matched at: (" << face->getTopLeftPoint().x << "," << face->getTopLeftPoint().y << ")" << std::endl;
 
 			//update sub features
 			
@@ -270,23 +262,22 @@ void detectFaces( IplImage *img )
             //add value to output
 
 			//add oldFace to newFaces
-			
-			//std::cout << "ADDING from isOldFace == true" << std::endl;
-			//std::cout << "face top left: " << face->getTopLeftPoint().x <<"," << face->getTopLeftPoint().y << std::endl;
 			newFaces.push_back(face);
+
+			//draw a box on faces matched with old faces
 			face->drawBox(img,processedImg,r);
 		}
 		//write out image for debuging
 		//imwrite("image.jpg",Mat(processedImg));
 
-	}//end 18 test performance evaluation
+	}//end of for loop for performance test
     
 	}//end for faces
 
 	//newFaces vector becomes oldFaces vector for next frame
 	oldFaces.swap(newFaces);
 	
-	//delete all the unmatched old faces (now in newFaces vector)
+	//delete all the unmatched old faces (now in newFaces vector):
 
 	//delete all the face objects first
 	for(int i=0; i<(int)newFaces.size(); i++)
