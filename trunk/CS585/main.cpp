@@ -87,7 +87,12 @@ int main( int argc, char** argv )
 		cvNamedWindow( "video", 1 );
 		cvNamedWindow( "processed", 1 );
 	 
+		int frameCount = 0;
 		while( key != 'q' ) {
+			
+			frameCount++;
+			std::cout << frameCount << ": ";
+			
 			// get a frame */
 			frame = cvQueryFrame( capture );
 	 
