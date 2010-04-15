@@ -132,143 +132,58 @@ void resizeFeatureTemplate(string filename, double oldFeatureWidth, double oldFe
 	delete featureImg;
 }
  
-//bool matchesOldFace(Point curTopLeftPoint, Face &matchedFace)
+/* Checks if a face found in current frame matches an existing face */
 bool matchesOldFace(Point curTopLeftPoint, Face* matchedFace)
 {
-	std::cout << "\n===entering matchesOldFace===" << std::endl;
-
     double NOT_FOUND_VAL = 999.0;
-    double SUM_THRESH = 0.2;
+    //double SUM_THRESH = 0.2;
+	double SUM_THRESH = 5.0;
     
     double minSumDiff = NOT_FOUND_VAL;
 	int matchedFaceIndex = -1;
 
-	if(!oldFaces.empty())
-	{
-
 	for(int i=0; i<(int)(oldFaces.size()); i++)
     {
-        //L-distance btn top left coords of face and old face
-		//Point oldTopLeftPoint = ((Face*)(oldFaces.at(i)))->getTopLeftPoint();
-		std::cout << "\n!!!before getting TopLeftPoint" << std::endl;
-		
-		//if(!oldFaces.at(i))
-		//{
-			//std::cout << "Top left is null! " << i << std::endl;
-		//}
-		//else
-		//{
-			Point oldTopLeftPoint = oldFaces.at(i)->getTopLeftPoint();
-			std::cout << "Top Left Point: " << oldTopLeftPoint.x << "," << oldTopLeftPoint.y << std::endl;
-		
-		//Point oldTopLeftPoint = oldFaces.at(i)->getTopLeftPoint();
-        //Point oldTopLeftPoint = Point(50,50);
+		assert (oldFaces.at(i)); //face from oldFaces should not be null
+		Point oldTopLeftPoint = oldFaces.at(i)->getTopLeftPoint();
 
-		//Point oldTopLeftPoint = Point( ((Face*)(oldFaces.at(i)))->getR().x, ((Face*)(oldFaces.at(i)))->getR().y );
-		//std::cout << "Top Left Point: " << oldTopLeftPoint.x << "," << oldTopLeftPoint.y << std::endl;
-		std::cout << "\n!!!after getting TopLeftPoint" << std::endl;
-
+		//L-distance btn top left coords of face and old face
+		//these should be in percentages!
+		//not abs pixels
 		double currentXDiff = abs(curTopLeftPoint.x - oldTopLeftPoint.x);
         double currentYDiff = abs(curTopLeftPoint.y - oldTopLeftPoint.y);
         double currentSumDiff = currentXDiff + currentYDiff;
 
-		std::cout << "currentSumDiff: " << currentSumDiff << std::endl;
+		//std::cout << "currentSumDiff: " << currentSumDiff << std::endl;
         
         if( currentSumDiff < SUM_THRESH 
             && currentSumDiff < minSumDiff)
         {
             minSumDiff = currentSumDiff;
-			//matchedFace = *(oldFaces.at(i)); //((Face*)(oldFaces.at(i)));
-			//matchedFace = oldFaces.at(i);
-			*matchedFace = *oldFaces.at(i);
+			*matchedFace = *oldFaces.at(i); //now matchedFace and oldFace[i] point two distinct objects of same value
 			matchedFaceIndex = i;
-			std::cout << "i: " << i << std::endl;
         }
-
-		//}//end else for null
     }
-
-	}//end if
     
     if(minSumDiff == NOT_FOUND_VAL)
     {
-        std::cout << "===leaving matchesOldFace===\n" << std::endl;
-
 		return false;
     }
     else
     {
-		std::cout << "deleting face" << std::endl;
-
-		std::cout << "size before delete:" << oldFaces.size() <<std::endl;
-
-
-
 		//delete the best matched face from oldFaces
 		//to reduce search space for next call
 		if(matchedFaceIndex >= 0 && matchedFaceIndex < (int)oldFaces.size())
 		{
-			//does it delete the pointer or the actual object?
-			Face *objDelCheck;
-			objDelCheck = oldFaces.at(matchedFaceIndex); //both pointing to face obj
-			
-			
-			//if(objDelCheck == NULL)
-			if(objDelCheck)
-			{
-				std::cout << "******************before erase, NOT NULL" << std::endl;
-				std::cout << "******************before erase" << objDelCheck->getTopLeftPoint().x << "," << objDelCheck->getTopLeftPoint().y << std::endl;
-			}
-			else
-			{
-				std::cout << "******************before erase, IS NULL" << std::endl;
-			}
-
-			//vector before erase
-			std::cout << "###Vector before erase" << std::endl;
-			for(int z=0; z<(int)oldFaces.size(); z++)
-			{
-				std::cout << "(" << oldFaces.at(z)->getTopLeftPoint().x << std::endl;
-			}
-
-
-			//object to erase
-			std::cout << "###to erase:(" << oldFaces.at(matchedFaceIndex)->getTopLeftPoint().x << std::endl;
-
 			delete oldFaces.at(matchedFaceIndex); //delete actual object
 			oldFaces.erase(oldFaces.begin()+matchedFaceIndex); //delete pointer to object from oldFaces vector
-
-
-			//vector after erase
-			std::cout << "###Vector after erase" << std::endl;
-			for(int z=0; z<(int)oldFaces.size(); z++)
-			{
-				std::cout << "(" << oldFaces.at(z)->getTopLeftPoint().x << std::endl;
-			}
-
-			//if(objDelCheck == NULL)
-			//objDelCheck = NULL;
-
-			if(objDelCheck)
-			{
-				std::cout << "******************after erase, NOT NULL" << std::endl;
-				std::cout << "******************after erase" << objDelCheck->getTopLeftPoint().x << "," << objDelCheck->getTopLeftPoint().y << std::endl;
-			}
-			else
-			{
-				std::cout << "******************after erase, IS NULL" << std::endl;
-			}
 		}
-
-		std::cout << "size after delete:" << oldFaces.size() <<std::endl;
-
-		std::cout << "===leaving matchesOldFace===\n" << std::endl;
 
         return true;
     }
 }
 
-
+/* Find all possible face objects in the current frame */
 void detectFaces( IplImage *img )
 {
     IplImage *processedImg;
@@ -292,7 +207,6 @@ void detectFaces( IplImage *img )
             //cvSize( 40, 40 ) );
 			cvSize( 50, 50 ) ); //30 by 30 good for grouppic.jpg
  
-    /* for each face found, draw a red box */
 	
 	double oldFaceWidth = 228;
 	double oldFaceHeight = 228;
@@ -305,41 +219,31 @@ void detectFaces( IplImage *img )
 	{
         CvRect *r = ( CvRect* )cvGetSeqElem( faces, i );
 
-		//Face *face = NULL;
-		
-		//Face *face = new Face();
+
+		//white box for all faces found by Haar but not necessarily true faces
+		cvRectangle( processedImg,
+			cvPoint( r->x, r->y ),
+			cvPoint( r->x + r->width, r->y + r->height ),
+			CV_RGB( 255, 255, 255 ), 1, 8, 0 );
+
+		//create a new face object
+		//if it is found to match an old face, it will take on the old face's values
 		Face *face = new Face(*r);
 
 		bool isOldFace = false;
 		
+		//try to match this face with an old face
 		if(!oldFaces.empty())
 		{
-			std::cout << "\nold faces NOT empty " << oldFaces.size() << std::endl;
-			
-			if(oldFaces.at(0) == NULL)
-			{
-				std::cout << "Top Left Point is NULL" << std::endl;
-			}
-			else
-			{
-				std::cout << "Top Left Point: " << oldFaces.at(0)->getTopLeftPoint().x << "," << oldFaces.at(0)->getTopLeftPoint().y << std::endl;
-			
-				isOldFace = matchesOldFace(Point(r->x,r->y), face);
-				//isOldFace = matchesOldFace(Point(r->x,r->y), *face);
-			}
-		}
-		else
-		{
-			std::cout << "\nold faces IS empty" << std::endl;
-			//isOldFace = false;
+			isOldFace = matchesOldFace(Point(r->x,r->y), face);
 		}
 
 		if(isOldFace == false)
 		{
-			//face = new Face(*r);
 			if( face->isValidFace(img,processedImg,r) )
 			{
-				std::cout << "face IS valid" << std::endl;
+				std::cout << "new valid face" << std::endl;
+				//std::cout << "face IS valid" << std::endl;
 				//update sub features
 
 				//do Emotion Detection -> store it
@@ -347,13 +251,13 @@ void detectFaces( IplImage *img )
                 //add value to output
 
                 //add face to newFaces
-				std::cout << "ADDING from isOldFace == false" << std::endl;
-				std::cout << "face top left: " << face->getTopLeftPoint().x <<"," << face->getTopLeftPoint().y << std::endl;
+				//std::cout << "ADDING from isOldFace == false" << std::endl;
+				//std::cout << "face top left: " << face->getTopLeftPoint().x <<"," << face->getTopLeftPoint().y << std::endl;
 				newFaces.push_back(face);
 			}
 			else
 			{
-				std::cout << "face NOT valid" << std::endl;
+				//std::cout << "face NOT valid" << std::endl;
 				delete face;
 			}
 		}
@@ -369,71 +273,30 @@ void detectFaces( IplImage *img )
 
 			//add oldFace to newFaces
 			
-			std::cout << "ADDING from isOldFace == true" << std::endl;
-			std::cout << "face top left: " << face->getTopLeftPoint().x <<"," << face->getTopLeftPoint().y << std::endl;
+			//std::cout << "ADDING from isOldFace == true" << std::endl;
+			//std::cout << "face top left: " << face->getTopLeftPoint().x <<"," << face->getTopLeftPoint().y << std::endl;
 			newFaces.push_back(face);
-
-			
 		}
 		//write out image for debuging
 		//imwrite("image.jpg",Mat(processedImg));
-
-
 
 	}//end 18 test performance evaluation
     
 	}//end for faces
 
-	//oldFaces.clear(); //remove remaining unfound faces from prev frame
-	//oldFaces = newFaces; //store faces found in this frame for next frame
-
-
-	//std::cout << "oldFaces before swap: " << oldFaces.size() << std::endl;
-	//std::cout << "newFaces before swap: " << newFaces.size() << std::endl;
-
-
+	//newFaces vector becomes oldFaces vector for next frame
 	oldFaces.swap(newFaces);
 	
-	//std::cout << "oldFaces after swap: " << oldFaces.size() << std::endl;
-	//std::cout << "newFaces after swap: " << newFaces.size() << std::endl;
+	//delete all the unmatched old faces (now in newFaces vector)
 
-	//before object delete
-	std::cout << "$$$Vector before object delete" << std::endl;
-	for(int z=0; z<(int)newFaces.size(); z++)
-	{
-		std::cout << "(" << newFaces.at(z)->getTopLeftPoint().x << std::endl;
-	}
-
-
-	//are we actually deleting the face objects or just the pointers?
+	//delete all the face objects first
 	for(int i=0; i<(int)newFaces.size(); i++)
 	{
 		delete newFaces.at(i);
 	}
 
-
-	//after object delete and before clear
-	std::cout << "$$$Vector after object delete and before clear" << std::endl;
-	for(int z=0; z<(int)newFaces.size(); z++)
-	{
-		std::cout << "(" << newFaces.at(z)->getTopLeftPoint().x << std::endl;
-	}
-
-	newFaces.clear(); //new faces now contains old faces that were unfound
-
-
-
-	//after clear
-	std::cout << "$$$Vector after clear" << std::endl;
-	for(int z=0; z<(int)newFaces.size(); z++)
-	{
-		std::cout << "(" << newFaces.at(z)->getTopLeftPoint().x << std::endl;
-	}
-
-
-	//std::cout << "oldFaces after clear: " << oldFaces.size() << std::endl;
-	//std::cout << "newFaces after clear: " << newFaces.size() << std::endl;
-	//std::cout << "\n" << std::endl;
+	//delete all the face pointers from the vector
+	newFaces.clear();
  
     /* display video */
     cvShowImage( "video", img );
