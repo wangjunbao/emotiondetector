@@ -79,20 +79,24 @@ public:
 		this->leftEye = leftEye;
 	}
 
-	void resizeFeatureTemplate(string filename, double oldFeatureWidth, double oldFeatureHeight, double newFaceWidth, double newFaceHeight, Mat &resizedFeatureImg ) {
+	void resizeFeatureTemplate(Mat& oldFeatureTemplateImg, double newFaceWidth, double newFaceHeight, Mat &resizedFeatureImg ) {
+	//void resizeFeatureTemplate(string filename, double newFaceWidth, double newFaceHeight, Mat &resizedFeatureImg ) {
+	//void resizeFeatureTemplate(string filename, double oldFeatureWidth, double oldFeatureHeight, double newFaceWidth, double newFaceHeight, Mat &resizedFeatureImg ) {
+		
+		double oldFeatureWidth = (double)oldFeatureTemplateImg.cols;
+		double oldFeatureHeight = (double)oldFeatureTemplateImg.rows;
+		
+		std::cout << "width: " << oldFeatureWidth << std::endl;
+		std::cout << "height: " << oldFeatureHeight << std::endl;
+
 		double oldFaceWidth = 228;
 		double oldFaceHeight = 228;
+			
 		double newFeatureWidth = newFaceWidth * (oldFeatureWidth/oldFaceWidth);
 		double newFeatureHeight = newFaceHeight * (oldFeatureHeight/oldFaceHeight);
-		
-		Mat *featureImg = new Mat;
-		*featureImg = imread( "templates/"+filename, 1 );
-		
-		resize(*featureImg, resizedFeatureImg, Size((int)newFeatureWidth,(int)newFeatureHeight));
+	
+		resize(oldFeatureTemplateImg, resizedFeatureImg, Size((int)newFeatureWidth,(int)newFeatureHeight));
 
-		//imwrite("resizedTemplates/"+filename,resizedFeatureImg);
-		
-		delete featureImg;
 	}
 
 
@@ -172,8 +176,11 @@ public:
 		double newFaceHeight = r->height;
 		
 		//look for left eye in face
+		Mat oldLeftEyeTpl = imread("templates/leftEye.jpg",1);
 		Mat leftEyeTpl;
-		resizeFeatureTemplate("leftEye.jpg",61,34,newFaceWidth,newFaceHeight,leftEyeTpl);
+		resizeFeatureTemplate(oldLeftEyeTpl,newFaceWidth,newFaceHeight,leftEyeTpl);
+		//resizeFeatureTemplate("leftEye.jpg",61,34,newFaceWidth,newFaceHeight,leftEyeTpl);
+		//resizeFeatureTemplate("leftEye.jpg",newFaceWidth,newFaceHeight,leftEyeTpl);
 		CvRect leftEyeSearchSpace = cvRect((r->x), (r->y + r->height/4), r->width/2, (int)((3.0/8.0)*r->height));
 		CvRect leftEyeSubSearchSpace;
 		bool leftEyeFound = getSearchSpace(img,processedImg,r,leftEyeTpl,leftEyeSearchSpace,leftEyeSubSearchSpace);
@@ -190,24 +197,30 @@ public:
 
 
 			//left eye left
+			Mat oldLeftEyeLeftTpl = imread("templates/leftEyeLeft.jpg",1);
 			Mat leftEyeLeftTpl;
-			resizeFeatureTemplate("leftEyeLeft.jpg",10,13,newFaceWidth,newFaceHeight,leftEyeLeftTpl);
+			resizeFeatureTemplate(oldLeftEyeLeftTpl,newFaceWidth,newFaceHeight,leftEyeLeftTpl);
+			//resizeFeatureTemplate("leftEyeLeft.jpg",10,13,newFaceWidth,newFaceHeight,leftEyeLeftTpl);
 			CvRect leftEyeLeftSearchSpace = cvRect(leftEyeSubSearchSpace.x,leftEyeSubSearchSpace.y,
 				leftEyeSubSearchSpace.width/2,leftEyeSubSearchSpace.height);
 			CvRect leftEyeLeftSubSearchSpace;
 			bool leftEyeLeftFound = getSearchSpace(img,processedImg,r,leftEyeLeftTpl,leftEyeLeftSearchSpace,leftEyeLeftSubSearchSpace);
 
 			//left eye right
+			Mat oldLeftEyeRightTpl = imread("templates/leftEyeRight.jpg",1);
 			Mat leftEyeRightTpl;
-			resizeFeatureTemplate("leftEyeRight.jpg",7,12,newFaceWidth,newFaceHeight,leftEyeRightTpl);	
+			resizeFeatureTemplate(oldLeftEyeRightTpl,newFaceWidth,newFaceHeight,leftEyeRightTpl);	
+			//resizeFeatureTemplate("leftEyeRight.jpg",7,12,newFaceWidth,newFaceHeight,leftEyeRightTpl);	
 			CvRect leftEyeRightSearchSpace = cvRect((leftEyeSubSearchSpace.x + leftEyeSubSearchSpace.width/2),leftEyeSubSearchSpace.y,
 				leftEyeSubSearchSpace.width/2,leftEyeSubSearchSpace.height);
 			CvRect leftEyeRightSubSearchSpace;
 			bool leftEyeRightFound = getSearchSpace(img,processedImg,r,leftEyeRightTpl,leftEyeRightSearchSpace,leftEyeRightSubSearchSpace);
 
 			//left eye top
+			Mat oldLeftEyeTopTpl = imread("templates/leftEyeTop.jpg",1);
 			Mat leftEyeTopTpl;
-			resizeFeatureTemplate("leftEyeTop.jpg",9,5,newFaceWidth,newFaceHeight,leftEyeTopTpl);	
+			resizeFeatureTemplate(oldLeftEyeTopTpl,newFaceWidth,newFaceHeight,leftEyeTopTpl);
+			//resizeFeatureTemplate("leftEyeTop.jpg",9,5,newFaceWidth,newFaceHeight,leftEyeTopTpl);	
 			
 			CvRect leftEyeTopSearchSpace = cvRect((leftEyeSubSearchSpace.x),(leftEyeSubSearchSpace.y),
 				leftEyeSubSearchSpace.width,leftEyeSubSearchSpace.height/2);
@@ -216,8 +229,11 @@ public:
 			bool leftEyeTopFound = getSearchSpace(img,processedImg,r,leftEyeTopTpl,leftEyeTopSearchSpace,leftEyeTopSubSearchSpace);
 
 			//left eye bottom
+			Mat oldLeftEyeBottomTpl = imread("templates/leftEyeBottom.jpg",1);
 			Mat leftEyeBottomTpl;
-			resizeFeatureTemplate("leftEyeBottom.jpg",9,5,newFaceWidth,newFaceHeight,leftEyeBottomTpl);	
+			
+			resizeFeatureTemplate(oldLeftEyeBottomTpl,newFaceWidth,newFaceHeight,leftEyeBottomTpl);
+			//resizeFeatureTemplate("leftEyeBottom.jpg",9,5,newFaceWidth,newFaceHeight,leftEyeBottomTpl);	
 			
 			CvRect leftEyeBottomSearchSpace = cvRect((leftEyeSubSearchSpace.x),(leftEyeSubSearchSpace.y + leftEyeSubSearchSpace.height/2),
 				leftEyeSubSearchSpace.width,leftEyeSubSearchSpace.height/2);
@@ -227,29 +243,37 @@ public:
 
 
 			//right eye
+			Mat oldRightEyeTpl = imread("templates/rightEye.jpg",1);
 			Mat rightEyeTpl;
-			resizeFeatureTemplate("rightEye.jpg",65,37,newFaceWidth,newFaceHeight,rightEyeTpl);
+			resizeFeatureTemplate(oldRightEyeTpl,newFaceWidth,newFaceHeight,rightEyeTpl);
+			//resizeFeatureTemplate("rightEye.jpg",65,37,newFaceWidth,newFaceHeight,rightEyeTpl);
 			CvRect rightEyeSearchSpace = cvRect((r->x + r->width/2), (r->y + r->height/4), r->width/2, (int)((3.0/8.0)*r->height));
 			CvRect rightEyeSubSearchSpace;
 			bool rightEyeFound = getSearchSpace(img,processedImg,r,rightEyeTpl,rightEyeSearchSpace,rightEyeSubSearchSpace);
 
 			//left eyebrow
+			Mat oldLeftEyebrowTpl = imread("templates/leftEyebrow.jpg",1);
 			Mat leftEyebrowTpl;
-			resizeFeatureTemplate("leftEyebrow.jpg",73,29,newFaceWidth,newFaceHeight,leftEyebrowTpl);
+			resizeFeatureTemplate(oldLeftEyebrowTpl,newFaceWidth,newFaceHeight,leftEyebrowTpl);
+			//resizeFeatureTemplate("leftEyebrow.jpg",73,29,newFaceWidth,newFaceHeight,leftEyebrowTpl);
 			CvRect leftEyebrowSearchSpace = cvRect(r->x, r->y, r->width/2, (int)((3.0/8.0)*r->height));
 			CvRect leftEyebrowSubSearchSpace;
 			bool leftEyebrowFound = getSearchSpace(img,processedImg,r,leftEyebrowTpl,leftEyebrowSearchSpace,leftEyebrowSubSearchSpace);
 
 			//right eyebrow
+			Mat oldRightEyebrowTpl = imread("templates/rightEyebrow.jpg",1);
 			Mat rightEyebrowTpl;
-			resizeFeatureTemplate("rightEyebrow.jpg",74,35,newFaceWidth,newFaceHeight,rightEyebrowTpl);
+			resizeFeatureTemplate(oldRightEyebrowTpl,newFaceWidth,newFaceHeight,rightEyebrowTpl);
+			//resizeFeatureTemplate("rightEyebrow.jpg",74,35,newFaceWidth,newFaceHeight,rightEyebrowTpl);
 			CvRect rightEyebrowSearchSpace = cvRect((r->x + r->width/2),r->y, r->width/2, (int)((3.0/8.0)*r->height));
 			CvRect rightEyebrowSubSearchSpace;
 			bool rightEyebrowFound = getSearchSpace(img,processedImg,r,rightEyebrowTpl,rightEyebrowSearchSpace,rightEyebrowSubSearchSpace);
 
 			//mouth
+			Mat oldMouthTpl = imread("templates/mouth.jpg",1);
 			Mat mouthTpl;
-			resizeFeatureTemplate("mouth.jpg",95,53,newFaceWidth,newFaceHeight,mouthTpl);
+			resizeFeatureTemplate(oldMouthTpl,newFaceWidth,newFaceHeight,mouthTpl);
+			//resizeFeatureTemplate("mouth.jpg",95,53,newFaceWidth,newFaceHeight,mouthTpl);
 			CvRect mouthSearchSpace = cvRect(r->x, (r->y +  (int)((3.0/8.0)*r->height)), r->width, (int)((5.0/8.0)*r->height));
 			CvRect mouthSubSearchSpace;
 			bool mouthFound = getSearchSpace(img,processedImg,r,mouthTpl,mouthSearchSpace,mouthSubSearchSpace);
