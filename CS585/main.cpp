@@ -2,7 +2,6 @@
  * Display video from webcam and detect faces
  */
 #include <stdio.h>
-//#include "cv.h"
 #include <cv.h>
 #include "highgui.h"
 #include <iostream>
@@ -10,11 +9,10 @@
 #include <vector>
 #include "Face.h"
 
-using namespace cv; //ADDED
+using namespace cv;
 
 CvHaarClassifierCascade *cascade;
 CvMemStorage            *storage;
-
 
 vector<Face*> oldFaces;
 vector<Face*> newFaces;
@@ -61,25 +59,29 @@ int main( int argc, char** argv )
 	}
 	else //video
 	{
-		CvCapture *capture;
-		IplImage  *frame;
-		//IplImage  *processedFrame;
+		//CvCapture *capture;
+		VideoCapture cap(0); // open the default camera
+		if(!cap.isOpened())  // check if we succeeded
+			return -1;
+		
+		//IplImage  *frame;
+		Mat frame;
 
 		int       key = ' ';
 		char      *filename = "haarcascade_frontalface_default.xml";
 		//char      *filename = "haarcascade_frontalface_alt.xml";
-	 
+
 		///* load the classifier
 		//   note that I put the file in the same directory with
 		//   this code */
 		cascade = ( CvHaarClassifierCascade* )cvLoad( filename, 0, 0, 0 );
-	 //
+	 
 		///* setup memory buffer; needed by the face detector */
-		//storage = cvCreateMemStorage( 0 );
-	 //
+		storage = cvCreateMemStorage( 0 );
+	 
 		///* initialize camera */
-		capture = cvCaptureFromCAM( 0 );
-	 //
+		//capture = cvCaptureFromCAM( 0 );
+
 		///* always check */
 		//assert( cascade && storage && capture );
 	 
@@ -89,57 +91,38 @@ int main( int argc, char** argv )
 	 
 		int frameCount = 0;
 		while( key != 'q' ) {
-
-					/* load the classifier
-		   note that I put the file in the same directory with
-		   this code */
-		//cascade = ( CvHaarClassifierCascade* )cvLoad( filename, 0, 0, 0 );
-	 
-		/* setup memory buffer; needed by the face detector */
-		storage = cvCreateMemStorage( 0 );
-	 
-		/* initialize camera */
-		//capture = cvCaptureFromCAM( 0 );
-	 
-		/* always check */
-		assert( cascade && storage && capture );
 			
 			frameCount++;
 			std::cout << frameCount << ": ";
-			
+
 			// get a frame */
-			frame = cvQueryFrame( capture );
+			//frame = cvQueryFrame( capture );
 	 
+			cap >> frame; // get a new frame from camera
+
 			// always check */
-			if( !frame ) break;
-	 
-			// 'fix' frame */
-			//cvFlip( frame, frame, -1 );
-			frame->origin = 0;
-			//processedFrame=cvCloneImage(frame);
+			//if( !frame ) break;
+	
+			//frame->origin = 0;
 	 
 			// detect faces and display video */
-			detectFaces( frame );
-	 
+			detectFaces( &IplImage(frame) );
+
 			// quit if user press 'q' */
 			key = cvWaitKey( 10 );
-
-					// free memory */
-		//cvReleaseCapture( &capture );
-		//cvDestroyWindow( "video" );
-		//cvReleaseHaarClassifierCascade( &cascade );
-		cvReleaseMemStorage( &storage );
 		}
 	 
 		//// free memory */
-		cvReleaseCapture( &capture );
-		cvDestroyWindow( "video" );
-		cvReleaseHaarClassifierCascade( &cascade );
-		//cvReleaseMemStorage( &storage );
 
-		cvReleaseImage( &frame );
-		//cvReleaseImage( &processedImg );
-	 
+		cvDestroyWindow( "video" );
+		cvDestroyWindow( "processed" );
+
+		//cvReleaseImage( &frame );
+		//cvReleaseCapture( &capture );
+		
+		cvReleaseHaarClassifierCascade( &cascade );
+		cvReleaseMemStorage( &storage );
+
 		return 0;
 	}//end else
 }

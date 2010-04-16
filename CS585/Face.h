@@ -122,6 +122,7 @@ public:
 
 		//http://nashruddin.com/OpenCV_Region_of_Interest_(ROI)
 		
+		//defining search space
 		CvRect rect = cvRect((r->x), (r->y + r->height/4), r->width/2, (int)((3.0/8.0)*r->height));
 		//CvRect rect = cvRect((topLeftPoint.x), (topLeftPoint.y + (bottomRightPoint.y - topLeftPoint.y)/4), (bottomRightPoint.x-topLeftPoint.x)/2, (int)((3.0/8.0)*(bottomRightPoint.y - topLeftPoint.y)));
 		
@@ -178,6 +179,10 @@ public:
 		return result;
 
 	}
+
+
+
+
 private:
 	//templates:
 	CvRect r;
