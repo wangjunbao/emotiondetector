@@ -281,6 +281,7 @@ void detectFaces( IplImage *img )
 		}
 		//write out image for debuging
 		//imwrite("image.jpg",Mat(processedImg));
+
 		
 	}//end of for loop for performance test
     
