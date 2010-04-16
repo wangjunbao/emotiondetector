@@ -69,19 +69,19 @@ int main( int argc, char** argv )
 		char      *filename = "haarcascade_frontalface_default.xml";
 		//char      *filename = "haarcascade_frontalface_alt.xml";
 	 
-		/* load the classifier
-		   note that I put the file in the same directory with
-		   this code */
+		///* load the classifier
+		//   note that I put the file in the same directory with
+		//   this code */
 		cascade = ( CvHaarClassifierCascade* )cvLoad( filename, 0, 0, 0 );
-	 
-		/* setup memory buffer; needed by the face detector */
-		storage = cvCreateMemStorage( 0 );
-	 
-		/* initialize camera */
+	 //
+		///* setup memory buffer; needed by the face detector */
+		//storage = cvCreateMemStorage( 0 );
+	 //
+		///* initialize camera */
 		capture = cvCaptureFromCAM( 0 );
-	 
-		/* always check */
-		assert( cascade && storage && capture );
+	 //
+		///* always check */
+		//assert( cascade && storage && capture );
 	 
 		/* create a window */
 		cvNamedWindow( "video", 1 );
@@ -89,6 +89,20 @@ int main( int argc, char** argv )
 	 
 		int frameCount = 0;
 		while( key != 'q' ) {
+
+					/* load the classifier
+		   note that I put the file in the same directory with
+		   this code */
+		//cascade = ( CvHaarClassifierCascade* )cvLoad( filename, 0, 0, 0 );
+	 
+		/* setup memory buffer; needed by the face detector */
+		storage = cvCreateMemStorage( 0 );
+	 
+		/* initialize camera */
+		//capture = cvCaptureFromCAM( 0 );
+	 
+		/* always check */
+		assert( cascade && storage && capture );
 			
 			frameCount++;
 			std::cout << frameCount << ": ";
@@ -109,16 +123,25 @@ int main( int argc, char** argv )
 	 
 			// quit if user press 'q' */
 			key = cvWaitKey( 10 );
+
+					// free memory */
+		//cvReleaseCapture( &capture );
+		//cvDestroyWindow( "video" );
+		//cvReleaseHaarClassifierCascade( &cascade );
+		cvReleaseMemStorage( &storage );
 		}
 	 
-		// free memory */
+		//// free memory */
 		cvReleaseCapture( &capture );
 		cvDestroyWindow( "video" );
 		cvReleaseHaarClassifierCascade( &cascade );
-		cvReleaseMemStorage( &storage );
+		//cvReleaseMemStorage( &storage );
+
+		cvReleaseImage( &frame );
+		//cvReleaseImage( &processedImg );
 	 
 		return 0;
-	}
+	}//end else
 }
 
 void resizeFeatureTemplate(string filename, double oldFeatureWidth, double oldFeatureHeight, double newFaceWidth, double newFaceHeight, Mat &resizedFeatureImg ) {
@@ -274,7 +297,7 @@ void detectFaces( IplImage *img )
 		}
 		//write out image for debuging
 		//imwrite("image.jpg",Mat(processedImg));
-		delete r;
+		
 	}//end of for loop for performance test
     
 	}//end for faces
@@ -296,5 +319,7 @@ void detectFaces( IplImage *img )
     /* display video */
     cvShowImage( "video", img );
 	cvShowImage( "processed", processedImg );
+
+	cvReleaseImage( &processedImg );
 }
  
