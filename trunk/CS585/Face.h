@@ -192,7 +192,6 @@ public:
 			//left eye left
 			Mat leftEyeLeftTpl;
 			resizeFeatureTemplate("leftEyeLeft.jpg",10,13,newFaceWidth,newFaceHeight,leftEyeLeftTpl);
-			//CvRect leftEyeLeftSearchSpace = cvRect((r->x), (r->y + r->height/4), r->width/2, (int)((3.0/8.0)*r->height));
 			CvRect leftEyeLeftSearchSpace = cvRect(leftEyeSubSearchSpace.x,leftEyeSubSearchSpace.y,
 				leftEyeSubSearchSpace.width/2,leftEyeSubSearchSpace.height);
 			CvRect leftEyeLeftSubSearchSpace;
@@ -205,6 +204,26 @@ public:
 				leftEyeSubSearchSpace.width/2,leftEyeSubSearchSpace.height);
 			CvRect leftEyeRightSubSearchSpace;
 			bool leftEyeRightFound = getSearchSpace(img,processedImg,r,leftEyeRightTpl,leftEyeRightSearchSpace,leftEyeRightSubSearchSpace);
+
+			//left eye top
+			Mat leftEyeTopTpl;
+			resizeFeatureTemplate("leftEyeTop.jpg",9,5,newFaceWidth,newFaceHeight,leftEyeTopTpl);	
+			
+			CvRect leftEyeTopSearchSpace = cvRect((leftEyeSubSearchSpace.x),(leftEyeSubSearchSpace.y),
+				leftEyeSubSearchSpace.width,leftEyeSubSearchSpace.height/2);
+			
+			CvRect leftEyeTopSubSearchSpace;
+			bool leftEyeTopFound = getSearchSpace(img,processedImg,r,leftEyeTopTpl,leftEyeTopSearchSpace,leftEyeTopSubSearchSpace);
+
+			//left eye bottom
+			Mat leftEyeBottomTpl;
+			resizeFeatureTemplate("leftEyeBottom.jpg",9,5,newFaceWidth,newFaceHeight,leftEyeBottomTpl);	
+			
+			CvRect leftEyeBottomSearchSpace = cvRect((leftEyeSubSearchSpace.x),(leftEyeSubSearchSpace.y + leftEyeSubSearchSpace.height/2),
+				leftEyeSubSearchSpace.width,leftEyeSubSearchSpace.height/2);
+			
+			CvRect leftEyeBottomSubSearchSpace;
+			bool leftEyeBottomFound = getSearchSpace(img,processedImg,r,leftEyeBottomTpl,leftEyeBottomSearchSpace,leftEyeBottomSubSearchSpace);
 
 
 			//right eye

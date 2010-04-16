@@ -33,8 +33,8 @@ int main( int argc, char** argv )
 		  //char      *filename = "haarcascade_frontalface_alt.xml";
 		  //char      *imgfilename = "HowellFace50.jpg";
 		  //char      *imgfilename = "grouppic2.jpg";
-		  char      *imgfilename = "ChrisFace.jpg";
-		  //char      *imgfilename = "templates/face.jpg";
+		  //char      *imgfilename = "ChrisFace.jpg";
+		  char      *imgfilename = "templates/face.jpg";
 
 		  cascade = ( CvHaarClassifierCascade* )cvLoad( filename, 0, 0, 0 );
 		  storage = cvCreateMemStorage( 0 );
@@ -147,7 +147,7 @@ void resizeFeatureTemplate(string filename, double oldFeatureWidth, double oldFe
 bool matchesOldFace(Point curTopLeftPoint, int width, int height, Face* matchedFace)
 {
     double NOT_FOUND_VAL = 999.0;
-	double SUM_THRESH = 0.1; //calc: 2/50 + 2/50 = 0.08 
+	double SUM_THRESH = 0.2; //calc: 2/50 + 2/50 = 0.08 
     
     double minSumDiff = NOT_FOUND_VAL;
 	int matchedFaceIndex = -1;
