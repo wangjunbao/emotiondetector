@@ -33,8 +33,8 @@ int main( int argc, char** argv )
 		  //char      *filename = "haarcascade_frontalface_alt.xml";
 		  //char      *imgfilename = "HowellFace50.jpg";
 		  //char      *imgfilename = "grouppic2.jpg";
-		  //char      *imgfilename = "ChrisFace.jpg";
-		  char      *imgfilename = "templates/face.jpg";
+		  char      *imgfilename = "ChrisFace.jpg";
+		  //char      *imgfilename = "templates/face.jpg";
 
 		  cascade = ( CvHaarClassifierCascade* )cvLoad( filename, 0, 0, 0 );
 		  storage = cvCreateMemStorage( 0 );
