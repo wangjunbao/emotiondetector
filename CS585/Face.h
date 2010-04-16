@@ -106,35 +106,26 @@ public:
 			CV_RGB( 255, 255, 0 ), 1, 8, 0 );
 	}
 
-	/* Check if a face found by Haar is valid (has a left eye) */
-	boolean isValidFace(IplImage *img, IplImage *processedImg, CvRect *r)
+
+
+
+	bool getSearchSpace(IplImage *img, IplImage *processedImg, CvRect *r, Mat& tpl, CvRect& inputSearchSpace, CvRect& outputSearchSpace)
 	{
-		double THRESH = 0.50;
+
 		bool result = false;
-		
-		double newFaceWidth = r->width;
-		double newFaceHeight = r->height;
-		
-		Mat tpl;
-		resizeFeatureTemplate("lefteye.jpg",61,34,newFaceWidth,newFaceHeight,tpl);
-		
-		//std::cout << "tpl: " << tpl.cols << "," << tpl.rows << std::endl;
+		double THRESH = 0.50;
 
 		//http://nashruddin.com/OpenCV_Region_of_Interest_(ROI)
 		
-		//defining search space
-		CvRect rect = cvRect((r->x), (r->y + r->height/4), r->width/2, (int)((3.0/8.0)*r->height));
-		//CvRect rect = cvRect((topLeftPoint.x), (topLeftPoint.y + (bottomRightPoint.y - topLeftPoint.y)/4), (bottomRightPoint.x-topLeftPoint.x)/2, (int)((3.0/8.0)*(bottomRightPoint.y - topLeftPoint.y)));
 		
 		//blue box
-		rectangle(Mat(processedImg),Point(rect.x,rect.y),Point(rect.x+rect.width, rect.y+rect.height),CV_RGB(0, 0, 255), 1, 0, 0 );
+		rectangle(Mat(processedImg),Point(inputSearchSpace.x,inputSearchSpace.y),Point(inputSearchSpace.x+inputSearchSpace.width, inputSearchSpace.y+inputSearchSpace.height),CV_RGB(0, 0, 255), 1, 0, 0 );
 
-		cvSetImageROI(img, rect);
-		cvSetImageROI(processedImg, rect);
-		
-		Mat res;
-		 
+		cvSetImageROI(img, inputSearchSpace);
+		cvSetImageROI(processedImg, inputSearchSpace);
+
 		/* perform template matching */
+		Mat res;
 		matchTemplate(Mat(img), tpl, res, CV_TM_CCOEFF_NORMED);
 		 
 		/* find best matches location */
@@ -144,28 +135,15 @@ public:
 
 		minMaxLoc(res, &minval, &maxval, &minloc, &maxloc); 
 
+		//green box
+		rectangle(Mat(processedImg),maxloc,Point(maxloc.x + tpl.cols, maxloc.y + tpl.rows),CV_RGB(0, 255, 0), 1, 0, 0 );
+		////std::cout << "max: " << "(" << maxloc.x << "," << maxloc.y << "): " << maxval << std::endl;
 
-
-		if (maxval <= THRESH)
-		{
-			result = false;
-		}
-		else
-		{
-			//resize each parent feature (except left eye)      
-			//each parent feature has specific search space (area of face)
-			//run NCC on parent feature (except left eye) to get search space for sub features
-	        
-
-			//green box
-			rectangle(Mat(processedImg),maxloc,Point(maxloc.x + tpl.cols, maxloc.y + tpl.rows),CV_RGB(0, 255, 0), 1, 0, 0 );
-			//std::cout << "max: " << "(" << maxloc.x << "," << maxloc.y << "): " << maxval << std::endl;
-
-			result = true;
-		}
-			
 		cvResetImageROI(img);
 		cvResetImageROI(processedImg);
+
+
+		result = maxval > THRESH;
 
 		if(result == true)
 		{
@@ -176,8 +154,72 @@ public:
 				CV_RGB( 255, 0, 0 ), 1, 8, 0 );
 		}
 
+
 		return result;
 
+	}
+
+
+
+	/* Check if a face found by Haar is valid (has a left eye) */
+	boolean isValidFace(IplImage *img, IplImage *processedImg, CvRect *r)
+	{
+		bool result = false;
+		
+		double newFaceWidth = r->width;
+		double newFaceHeight = r->height;
+		
+		//look for left eye in face
+		Mat leftEyeTpl;
+		resizeFeatureTemplate("lefteye.jpg",61,34,newFaceWidth,newFaceHeight,leftEyeTpl);
+		CvRect leftEyeSearchSpace = cvRect((r->x), (r->y + r->height/4), r->width/2, (int)((3.0/8.0)*r->height));
+		CvRect leftEyeSubSearchSpace;
+		bool leftEyeFound = getSearchSpace(img,processedImg,r,leftEyeTpl,leftEyeSearchSpace,leftEyeSubSearchSpace);
+
+		if(!leftEyeFound)
+		{
+			result = false;
+		}
+		else
+		{
+			//resize each parent feature (except left eye)      
+			//each parent feature has specific search space (area of face)
+			//run NCC on parent feature (except left eye) to get search space for sub features
+
+			//right eye
+			Mat rightEyeTpl;
+			resizeFeatureTemplate("righteye.jpg",65,37,newFaceWidth,newFaceHeight,rightEyeTpl);
+			CvRect rightEyeSearchSpace = cvRect((r->x + r->width/2), (r->y + r->height/4), r->width/2, (int)((3.0/8.0)*r->height));
+			CvRect rightEyeSubSearchSpace;
+			bool rightEyeFound = getSearchSpace(img,processedImg,r,rightEyeTpl,rightEyeSearchSpace,rightEyeSubSearchSpace);
+
+			//left eyebrow
+			Mat leftEyebrowTpl;
+			resizeFeatureTemplate("lefteyebrow.jpg",73,29,newFaceWidth,newFaceHeight,leftEyebrowTpl);
+			CvRect leftEyebrowSearchSpace = cvRect(r->x, r->y, r->width/2, (int)((3.0/8.0)*r->height));
+			CvRect leftEyebrowSubSearchSpace;
+			bool leftEyebrowFound = getSearchSpace(img,processedImg,r,leftEyebrowTpl,leftEyebrowSearchSpace,leftEyebrowSubSearchSpace);
+
+			//right eyebrow
+			Mat rightEyebrowTpl;
+			resizeFeatureTemplate("righteyebrow.jpg",74,35,newFaceWidth,newFaceHeight,rightEyebrowTpl);
+			CvRect rightEyebrowSearchSpace = cvRect((r->x + r->width/2),r->y, r->width/2, (int)((3.0/8.0)*r->height));
+			CvRect rightEyebrowSubSearchSpace;
+			bool rightEyebrowFound = getSearchSpace(img,processedImg,r,rightEyebrowTpl,rightEyebrowSearchSpace,rightEyebrowSubSearchSpace);
+
+			//mouth
+			Mat mouthTpl;
+			resizeFeatureTemplate("mouth.jpg",95,53,newFaceWidth,newFaceHeight,mouthTpl);
+			CvRect mouthSearchSpace = cvRect(r->x, (r->y +  (int)((3.0/8.0)*r->height)), r->width, (int)((5.0/8.0)*r->height));
+			CvRect mouthSubSearchSpace;
+			bool mouthFound = getSearchSpace(img,processedImg,r,mouthTpl,mouthSearchSpace,mouthSubSearchSpace);
+
+
+
+			result = true;
+		}
+
+		return result;
 	}
 
 
