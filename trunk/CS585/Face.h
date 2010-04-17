@@ -140,12 +140,13 @@ public:
 
 		//green box
 		rectangle(Mat(processedImg),maxloc,Point(maxloc.x + tpl.cols, maxloc.y + tpl.rows),CV_RGB(0, 255, 0), 1, 0, 0 );
-		////std::cout << "max: " << "(" << maxloc.x << "," << maxloc.y << "): " << maxval << std::endl;
+		//std::cout << "max: " << "(" << maxloc.x << "," << maxloc.y << "): " << maxval << std::endl;
 
 		outputSearchSpace = cvRect(inputSearchSpace.x + maxloc.x, inputSearchSpace.y + maxloc.y, tpl.cols, tpl.rows);
 
 		cvResetImageROI(img);
 		cvResetImageROI(processedImg);
+
 
 
 		result = maxval > THRESH;
@@ -159,6 +160,8 @@ public:
 				CV_RGB( 255, 0, 0 ), 1, 8, 0 );
 		}
 
+
+		std::cout << "max: " << "(" << inputSearchSpace.x + maxloc.x << "," << inputSearchSpace.y + maxloc.y << "): " << maxval << std::endl;
 
 		return result;
 
@@ -294,7 +297,8 @@ public:
 		Mat leftEyeTpl;
 		resizeFeatureTemplate(oldTopEyeTpl,newFaceWidth,newFaceHeight,leftEyeTpl);
 		//CvRect leftEyeSearchSpace = cvRect((r->x), (r->y + r->height/4), r->width/2, (int)((3.0/8.0)*r->height));
-		CvRect leftEyeSearchSpace = cvRect((r->x), (r->y + (int)((2.5/8.0)*r->height)), r->width/2, (int)((2.5/8.0)*r->height));
+		//CvRect leftEyeSearchSpace = cvRect((r->x), (r->y + (int)((2.5/8.0)*r->height)), r->width/2, (int)((2.5/8.0)*r->height));
+		CvRect leftEyeSearchSpace = cvRect((r->x), (r->y + (int)((2.5/8.0)*r->height)), r->width/2, (int)((2.0/8.0)*r->height));
 		CvRect leftEyeSubSearchSpace;
 		bool leftEyeFound = getSearchSpace(img,processedImg,r,leftEyeTpl,leftEyeSearchSpace,leftEyeSubSearchSpace);
 		
@@ -310,7 +314,7 @@ public:
 			//run NCC on parent feature (except left eye) to get search space for sub features
 			
 			//void updateSubFeatureLocations(IplImage *img, IplImage *processedImg, double newFaceWidth, double newFaceHeight, CvRect& parentLoc)
-			updateSubFeatureLocations(img, processedImg, r->width, r->height, leftEyeSubSearchSpace);
+			//updateSubFeatureLocations(img, processedImg, r->width, r->height, leftEyeSubSearchSpace);
 
 			////left eye left
 			//Mat oldLeftEyeLeftTpl = imread("templates/leftEyeLeft.jpg",1);
@@ -329,6 +333,8 @@ public:
 			//	leftEyeSubSearchSpace.width/2,leftEyeSubSearchSpace.height);
 			//CvRect leftEyeRightSubSearchSpace;
 			//bool leftEyeRightFound = getSearchSpace(img,processedImg,r,leftEyeRightTpl,leftEyeRightSearchSpace,leftEyeRightSubSearchSpace);
+
+			//uncomment starting here:
 
 			//left eye top
 			Mat oldLeftEyeTopTpl = imread("templates/leftEyeTop.jpg",1);
@@ -354,7 +360,8 @@ public:
 			Mat rightEyeTpl;
 			resizeFeatureTemplate(oldRightEyeTpl,newFaceWidth,newFaceHeight,rightEyeTpl);
 			//CvRect rightEyeSearchSpace = cvRect((r->x + r->width/2), (r->y + r->height/4), r->width/2, (int)((3.0/8.0)*r->height));
-			CvRect rightEyeSearchSpace = cvRect((r->x + r->width/2), (r->y + (int)((2.5/8.0)*r->height)), r->width/2, (int)((2.5/8.0)*r->height));
+			//CvRect rightEyeSearchSpace = cvRect((r->x + r->width/2), (r->y + (int)((2.5/8.0)*r->height)), r->width/2, (int)((2.5/8.0)*r->height));
+			CvRect rightEyeSearchSpace = cvRect((r->x + r->width/2), (r->y + (int)((2.5/8.0)*r->height)), r->width/2, (int)((2.0/8.0)*r->height));
 			CvRect rightEyeSubSearchSpace;
 			bool rightEyeFound = getSearchSpace(img,processedImg,r,rightEyeTpl,rightEyeSearchSpace,rightEyeSubSearchSpace);
 
