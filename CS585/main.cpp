@@ -215,7 +215,8 @@ void detectFaces( IplImage *img )
             2,//3,
             CV_HAAR_DO_CANNY_PRUNING /*0*/ /*CV_HAAR_DO_CANNY_PRUNING*/, //pruning may speed up processing
             //cvSize( 40, 40 ) );
-			cvSize( 50, 50 ) ); //30 by 30 good for grouppic.jpg
+			//cvSize( 50, 50 ) ); //30 by 30 good for grouppic.jpg
+			cvSize( 75, 75 ) );
  
 	
 	double oldFaceWidth = 228;
