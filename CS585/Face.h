@@ -134,11 +134,14 @@ public:
 
 
 	bool getSearchSpace(IplImage *img, IplImage *processedImg, CvRect *r, Mat& tpl, CvRect& inputSearchSpace, CvRect& outputSearchSpace)
+	//bool getSearchSpace(IplImage *img, IplImage *processedImg, CvRect& r, Mat& tpl, CvRect& inputSearchSpace, CvRect& outputSearchSpace)
 	{
+		/*
 		if(tpl.empty() == true)
 			std::cout << "********************************************TPL IS EMPTY" << std::endl;
 		else if (tpl.empty() ==false)
 			std::cout << "TPL IS NOT EMPTY" << std::endl;
+		*/
 		bool result = false;
 		double THRESH = 0.50;
 
@@ -146,7 +149,7 @@ public:
 		
 		
 		//blue box
-		rectangle(Mat(processedImg),Point(inputSearchSpace.x,inputSearchSpace.y),Point(inputSearchSpace.x+inputSearchSpace.width, inputSearchSpace.y+inputSearchSpace.height),CV_RGB(0, 0, 255), 1, 0, 0 );
+		//rectangle(Mat(processedImg),Point(inputSearchSpace.x,inputSearchSpace.y),Point(inputSearchSpace.x+inputSearchSpace.width, inputSearchSpace.y+inputSearchSpace.height),CV_RGB(0, 0, 255), 1, 0, 0 );
 
 		cvSetImageROI(img, inputSearchSpace);
 		cvSetImageROI(processedImg, inputSearchSpace);
@@ -182,6 +185,11 @@ public:
 				cvPoint( r->x, r->y ),
 				cvPoint( r->x + r->width, r->y + r->height ),
 				CV_RGB( 255, 0, 0 ), 1, 8, 0 );
+
+			//cvRectangle( processedImg,
+			//	cvPoint( r.x, r.y ),
+			//	cvPoint( r.x + r.width, r.y + r.height ),
+			//	CV_RGB( 255, 0, 0 ), 1, 8, 0 );
 		}
 
 
@@ -207,7 +215,14 @@ public:
 		CvRect bottomSearchSpace;
 		
 		Mat testMat;
-		std::cout << "left rows: " << leftEyeTopTpl.rows << std::endl;
+		/*
+		std::cout << "left top rows: " << leftEyeTopTpl.rows << std::endl;
+		std::cout << "left top cols: " << leftEyeTopTpl.cols << std::endl;
+		std::cout << "left bottom rows: " << leftEyeBottomTpl.rows << std::endl;
+		std::cout << "left bottom cols: " << leftEyeBottomTpl.cols << std::endl;
+		*/
+
+		std::cout << "parent: " << parentLoc.x << ", " << parentLoc.y << std::endl;
 
 		//if(testMat.empty())
 		//if(subfeature has no previous coordinates, i.e. == -1)
@@ -226,9 +241,22 @@ public:
 			Mat oldTopTpl = imread("templates/leftEyeTop.jpg",1);
 			//Mat topTpl; 
 			//resizeFeatureTemplate(oldTopTpl,newFaceWidth,newFaceHeight,topTpl);
+			
+			std::cout << "before: oldTopTpl rows: " << oldTopTpl.rows << std::endl;
+			std::cout << "before: leftEyeTopTpl rows: " << this->leftEyeTopTpl.rows << std::endl;
+			
 			resizeFeatureTemplate(oldTopTpl,newFaceWidth,newFaceHeight,this->leftEyeTopTpl);
 			
+			std::cout << "after: oldTopTpl rows: " << oldTopTpl.rows << std::endl;
+			std::cout << "after: leftEyeTopTpl rows: " << this->leftEyeTopTpl.rows << std::endl;
+
 			topSearchSpace = cvRect(parentLoc.x, parentLoc.y,parentLoc.width, parentLoc.height/2);
+			
+			
+			rectangle(Mat(processedImg),Point(topSearchSpace.x,topSearchSpace.y),
+				Point(topSearchSpace.x+topSearchSpace.width,topSearchSpace.y+topSearchSpace.height),
+				CV_RGB(255,255,0),1,0,0);
+
 
 			//bottom subtemplate
 			//Mat oldBottomTpl = imread(featureFilename+"Bottom.jpg",1);
@@ -238,6 +266,10 @@ public:
 			resizeFeatureTemplate(oldBottomTpl,newFaceWidth,newFaceHeight,this->leftEyeBottomTpl);
 			
 			bottomSearchSpace = cvRect(parentLoc.x, parentLoc.y + parentLoc.height/2, parentLoc.width, parentLoc.height/2);
+
+			rectangle(Mat(processedImg),Point(bottomSearchSpace.x,bottomSearchSpace.y),
+				Point(bottomSearchSpace.x+bottomSearchSpace.width,bottomSearchSpace.y+bottomSearchSpace.height),
+				CV_RGB(255,0,255),1,0,0);
 
 			//uncomment above:
 		}
@@ -291,12 +323,16 @@ public:
 		
 		//uncomment below:
 		//bool topFound = getSearchSpace(img,processedImg,&r,leftEyeTopTpl,topSearchSpace,topLoc);
+		//bool topFound = getSearchSpace(img,processedImg,this->r,this->leftEyeTopTpl,topSearchSpace,topLoc);
 		//
-		////update coordinates
-		//this->leftEyeTopLoc.x = topLoc.x;
-		//this->leftEyeTopLoc.y = topLoc.y;
+
 		//uncomment above:
 
+		//update coordinates
+		this->leftEyeTopLoc.x = topLoc.x;
+		this->leftEyeTopLoc.y = topLoc.y;
+		
+		
 		//this->leftEyeTopLoc.x = 50;
 		//this->leftEyeTopLoc.y = 50;
 
