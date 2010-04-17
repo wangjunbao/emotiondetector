@@ -162,71 +162,114 @@ public:
 
 	/* Update locations of subfeatures by running NCC on them*/
 	//void updateSubFeatureLocations(string featureFilename, newFaceCoords, boolean doResize, boolean doCrop, int frame #)
-	//{
-	//	//store face coords
-	//	//for now always resize
-	//	if(doResize == true or frame # is mod something)
-	//	{
-	//		resize templates based on new face coords
-	//	}
-	//	//typically doResize and doCrop are true at same time
-	//	for (all sub features)
-	//	{
-	//		CvRect leftLoc;			
-	//		CvRect rightLoc;
+	void updateSubFeatureLocations(IplImage *img, IplImage *processedImg, double newFaceWidth, double newFaceHeight, CvRect& parentLoc)
+	{
 
-	//		CvRect leftSearchSpace;		// with lrBuffer
-	//		CvRect rightSearchSpace;
-	//		
-	//		if(subfeature has no previous coordinates, i.e. == -1)
-	//		{
-	//			//look at parent feature coords for search space
-	//			
-	//			//left subtemplate
-	//			Mat oldLeftTpl = imread(featureFilename+"Left.jpg",1);
-	//			Mat leftTpl; 
-	//			resizeFeatureTemplate(oldLeftTpl,newFaceWidth,newFaceHeight,leftTpl);
-	//			
-	//			leftSearchSpace = cvRect(leftParentLoc.x,leftParentLoc.y,
-	//				leftParentLoc.width/2,leftParentLoc.height);
+		//store face coords
+		
+		//typically doResize and doCrop are true at same time
+		CvRect topLoc;			
+		CvRect bottomLoc;
 
-	//			//right subtemplate
-	//			Mat oldRightTpl = imread(featureFilename+"Right.jpg",1);
-	//			Mat rightTpl; 
-	//			resizeFeatureTemplate(oldRightTpl,newFaceWidth,newFaceHeight,rightTpl);
-	//			
-	//			rightSearchSpace = cvRect(rightParentLoc.x,rightParentLoc.y,
-	//				rightParentLoc.width/2,rightParentLoc.height);
-	//		}
-	//		else
-	//		{
-	//			//search space = previous loc + lrBuffer + lrMidpt to opposite feature
-	//			double lrMidpt = (double)(leftLoc.x + rightLoc.x) / 2.0;
-	//			double lrBuffer = lrMidpt / 2.0;
-	//			
-	//			//dont have checks for boundary conditions
-	//			//using only x difference for lrBuffer
-	//			leftSearchSpace = cvRect(leftLoc.x - lrBuffer, leftLoc.y - lrBuffer, 
-	//				leftLoc.width + 2*lrBuffer, leftLoc.height + 2*lrBuffer);
+		CvRect topSearchSpace;		// with lrBuffer
+		CvRect bottomSearchSpace;
+		
+		//if(subfeature has no previous coordinates, i.e. == -1)
+		if(leftEyeTopTpl.empty() || leftEyeBottomTpl.empty())
+		//if(true)
+		{
+			//look at parent feature coords for search space
+			
+			//top subtemplate
+			//Mat oldTopTpl = imread(featureFilename+"Top.jpg",1);
+			Mat oldTopTpl = imread("templates/leftEyeTop.jpg",1);
+			//Mat topTpl; 
+			//resizeFeatureTemplate(oldTopTpl,newFaceWidth,newFaceHeight,topTpl);
+			resizeFeatureTemplate(oldTopTpl,newFaceWidth,newFaceHeight,this->leftEyeTopTpl);
+			
+			topSearchSpace = cvRect(parentLoc.x, parentLoc.y,parentLoc.width, parentLoc.height/2);
 
-	//			rightSearchSpace = cvRect(rightLoc.x - lrBuffer, rightLoc.y - lrBuffer, 
-	//				rightLoc.width + 2*lrBuffer, rightLoc.height + 2*lrBuffer);
-	//		}
-	//		//runNCC(search space) and store new maxloc
-	//		
-	//		//CvRect leftLoc;
-	//		bool leftFound = getSearchSpace(img,processedImg,r,leftTpl,leftSearchSpace,leftLoc);
-	//		
-	//		//CvRect rightLoc;
-	//		bool rightFound = getSearchSpace(img,processedImg,r,rightTpl,rightSearchSpace,rightLoc);
-	//	}
-	//    
-	//	if(doCrop == true or frame # is mod something)
-	//	{
-	//		crop out new template images based on stored locations
-	//	}
+			//bottom subtemplate
+			//Mat oldBottomTpl = imread(featureFilename+"Bottom.jpg",1);
+			Mat oldBottomTpl = imread("templates/leftEyeBottom.jpg",1);
+			//Mat bottomTpl; 
+			//resizeFeatureTemplate(oldBottomTpl,newFaceWidth,newFaceHeight,bottomTpl);
+			resizeFeatureTemplate(oldBottomTpl,newFaceWidth,newFaceHeight,this->leftEyeBottomTpl);
+			
+			bottomSearchSpace = cvRect(parentLoc.x, parentLoc.y + parentLoc.height/2, parentLoc.width, parentLoc.height/2);
+		}
+		else
+		{
+			//resize sub feature templates and search space based on new face width and height
+			double oldFaceWidth = r.width;
+			double oldFaceHeight = r.height;
 
-	//}//end updateSubFeatureLocations
+			//top
+			double oldTopTplWidth = leftEyeTopTpl.cols;
+			double newTopTplWidth = (oldTopTplWidth / oldFaceWidth) * newFaceWidth;
+
+			double oldTopTplHeight = leftEyeTopTpl.rows;
+			double newTopTplHeight = (oldTopTplHeight / oldFaceHeight) * newFaceHeight;
+
+			resize(leftEyeTopTpl,leftEyeTopTpl,Size((int)newTopTplWidth,(int)newTopTplHeight));
+
+
+			//bottom
+			double oldBottomTplWidth = leftEyeBottomTpl.cols;
+			double newBottomTplWidth = (oldBottomTplWidth / oldFaceWidth) * newFaceWidth;
+
+			double oldBottomTplHeight = leftEyeBottomTpl.rows;
+			double newBottomTplHeight = (oldBottomTplHeight / oldFaceHeight) * newFaceHeight;
+
+			resize(leftEyeBottomTpl,leftEyeBottomTpl,Size((int)newBottomTplWidth,(int)newBottomTplHeight));
+
+
+			//update search space for NCC
+			double newTopY = this->leftEyeTopLoc.y;
+			double newBottomY = this->leftEyeBottomLoc.y;
+
+			double newMidYDist = (newTopY + newBottomY) / 2.0;
+
+			int bufferRadius = (int)(newMidYDist / 2.0);
+
+			//we don't have boundary condition checks yet
+			topSearchSpace = cvRect(leftEyeTopLoc.x - bufferRadius, leftEyeTopLoc.y - bufferRadius, 
+				leftEyeTopTpl.cols + bufferRadius, leftEyeTopTpl.rows + bufferRadius);
+
+			bottomSearchSpace = cvRect(leftEyeBottomLoc.x - bufferRadius, leftEyeBottomLoc.y - bufferRadius, 
+				leftEyeBottomTpl.cols + bufferRadius, leftEyeBottomTpl.rows + bufferRadius);
+
+		}//end else
+
+
+		//update template image by running NCC
+		//runNCC(search space) and store new maxloc
+		//bool getSearchSpace(IplImage *img, IplImage *processedImg, CvRect *r, Mat& tpl, CvRect& inputSearchSpace, CvRect& outputSearchSpace)
+		
+		bool topFound = getSearchSpace(img,processedImg,&r,leftEyeTopTpl,topSearchSpace,topLoc);
+		
+		//update coordinates
+		this->leftEyeTopLoc.x = topLoc.x;
+		this->leftEyeTopLoc.y = topLoc.y;
+
+
+		//update template image
+
+		
+		////CvRect topLoc;
+		//bool topFound = getSearchSpace(img,processedImg,r,topTpl,topSearchSpace,topLoc);
+		//
+		////CvRect bottomLoc;
+		//bool bottomFound = getSearchSpace(img,processedImg,r,bottomTpl,bottomSearchSpace,bottomLoc);
+
+		//if(doCrop == true or frame # is mod something)
+		//{
+		//	crop out new template images based on stored locations
+		//}
+
+	}//end updateSubFeatureLocations
+
+
 
 
 	/* Check if a face found by Haar is valid (has a left eye) */
@@ -238,13 +281,14 @@ public:
 		double newFaceHeight = r->height;
 		
 		//look for left eye in face
-		Mat oldLeftEyeTpl = imread("templates/leftEye.jpg",1);
+		Mat oldTopEyeTpl = imread("templates/leftEye.jpg",1);
 		Mat leftEyeTpl;
-		resizeFeatureTemplate(oldLeftEyeTpl,newFaceWidth,newFaceHeight,leftEyeTpl);
+		resizeFeatureTemplate(oldTopEyeTpl,newFaceWidth,newFaceHeight,leftEyeTpl);
 		//CvRect leftEyeSearchSpace = cvRect((r->x), (r->y + r->height/4), r->width/2, (int)((3.0/8.0)*r->height));
 		CvRect leftEyeSearchSpace = cvRect((r->x), (r->y + (int)((2.5/8.0)*r->height)), r->width/2, (int)((2.5/8.0)*r->height));
 		CvRect leftEyeSubSearchSpace;
 		bool leftEyeFound = getSearchSpace(img,processedImg,r,leftEyeTpl,leftEyeSearchSpace,leftEyeSubSearchSpace);
+		
 
 		if(!leftEyeFound)
 		{
@@ -255,6 +299,9 @@ public:
 			//resize each parent feature (except left eye)      
 			//each parent feature has specific search space (area of face)
 			//run NCC on parent feature (except left eye) to get search space for sub features
+			
+			//void updateSubFeatureLocations(IplImage *img, IplImage *processedImg, double newFaceWidth, double newFaceHeight, CvRect& parentLoc)
+			updateSubFeatureLocations(img, processedImg, r->width, r->height, leftEyeSubSearchSpace);
 
 			////left eye left
 			//Mat oldLeftEyeLeftTpl = imread("templates/leftEyeLeft.jpg",1);
@@ -346,5 +393,11 @@ private:
 
 	Point topLeftPoint;
 	//Point bottomRightPoint;
+
+	Point leftEyeTopLoc;
+	Point leftEyeBottomLoc;
+
+	Mat leftEyeTopTpl;
+	Mat leftEyeBottomTpl;
 	
 };
