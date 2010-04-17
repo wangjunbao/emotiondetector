@@ -282,20 +282,25 @@ public:
 		}
 		else
 		{
+			//need to set search spaces here!!
 			topSearchSpace = cvRect(50,50,100,100);
 
-			////resize sub feature templates and search space based on new face width and height
-			//double oldFaceWidth = r.width;
-			//double oldFaceHeight = r.height;
+			//resize sub feature templates and search space based on new face width and height
+			double oldFaceWidth = (double)r.width;
+			double oldFaceHeight = (double)r.height;
 
-			////top
-			//double oldTopTplWidth = leftEyeTopTpl.cols;
-			//double newTopTplWidth = (oldTopTplWidth / oldFaceWidth) * newFaceWidth;
+			//top
+			double oldTopTplWidth = (double)leftEyeTopTpl.cols;
+			double newTopTplWidth = (oldTopTplWidth / oldFaceWidth) * newFaceWidth;
 
-			//double oldTopTplHeight = leftEyeTopTpl.rows;
-			//double newTopTplHeight = (oldTopTplHeight / oldFaceHeight) * newFaceHeight;
+			double oldTopTplHeight = (double)leftEyeTopTpl.rows;
+			double newTopTplHeight = (oldTopTplHeight / oldFaceHeight) * newFaceHeight;
 
+			//bug here!
+			Mat newLeftEyeTopTpl;
 			//resize(leftEyeTopTpl,leftEyeTopTpl,Size((int)newTopTplWidth,(int)newTopTplHeight));
+			resize(leftEyeTopTpl,newLeftEyeTopTpl,Size((int)newTopTplWidth,(int)newTopTplHeight));
+
 
 
 			////bottom
