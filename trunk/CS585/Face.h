@@ -1,23 +1,47 @@
-#pragma once
+//#pragma once
+#ifndef FACE
+#define FACE
 #include <cv.h>
 using namespace cv;
 
 class Face
 {
+private:
+	//templates:
+	CvRect r;
+	Mat face;
+	
+	Mat leftEye;
+
+	Point topLeftPoint;
+	//Point bottomRightPoint;
+
+	Point leftEyeTopLoc;
+	Point leftEyeBottomLoc;
+
+	Mat leftEyeTopTpl;
+	Mat leftEyeBottomTpl;
 
 public:
-	Face()
-	{
+	//Face()
+	//{
 
-	}
+	//}
 	
 	Face(CvRect r) 
 	{
 		this->r = r;
 		this->topLeftPoint.x = r.x;
 		this->topLeftPoint.y = r.y;
-		this->leftEyeTopTpl = imread("templates/leftEyeTop.jpg",1);
+		//this->leftEyeTopTpl = Mat(0,0,CV_8UC3);
+		//this->leftEyeBottomTpl = Mat(0,0,CV_8UC3);
+		
+		/*
+		std::cout << "left rows before: " << leftEyeTopTpl.rows << std::endl;
+		//this->leftEyeTopTpl = imread("templates/leftEyeTop.jpg",1);
+		std::cout << "left rows after: " << leftEyeTopTpl.rows << std::endl;
 		this->leftEyeBottomTpl = imread("templates/leftEyeBottom.jpg",1);
+		*/
 	}
 	
 	/*
@@ -182,11 +206,19 @@ public:
 		CvRect topSearchSpace;		// if condition is true, parent feature subsection, else subfeature location with Buffer
 		CvRect bottomSearchSpace;
 		
+		Mat testMat;
+		std::cout << "left rows: " << leftEyeTopTpl.rows << std::endl;
+
+		//if(testMat.empty())
 		//if(subfeature has no previous coordinates, i.e. == -1)
-		//if(leftEyeTopTpl.empty() || leftEyeBottomTpl.empty())
-		if(true)
+		if(leftEyeTopTpl.empty() || leftEyeBottomTpl.empty())
+		
+		//if(leftEyeTopTpl.rows == 0)
+		//if(true)
 		//if(leftEyeTopTpl.empty())
 		{
+			//uncomment below:
+
 			//look at parent feature coords for search space
 			
 			//top subtemplate
@@ -206,6 +238,8 @@ public:
 			resizeFeatureTemplate(oldBottomTpl,newFaceWidth,newFaceHeight,this->leftEyeBottomTpl);
 			
 			bottomSearchSpace = cvRect(parentLoc.x, parentLoc.y + parentLoc.height/2, parentLoc.width, parentLoc.height/2);
+
+			//uncomment above:
 		}
 		else
 		{
@@ -255,14 +289,17 @@ public:
 		//runNCC(search space) and store new maxloc
 		//bool getSearchSpace(IplImage *img, IplImage *processedImg, CvRect *r, Mat& tpl, CvRect& inputSearchSpace, CvRect& outputSearchSpace)
 		
-		bool topFound = getSearchSpace(img,processedImg,&r,leftEyeTopTpl,topSearchSpace,topLoc);
-		
-		//update coordinates
-		this->leftEyeTopLoc.x = topLoc.x;
-		this->leftEyeTopLoc.y = topLoc.y;
+		//uncomment below:
+		//bool topFound = getSearchSpace(img,processedImg,&r,leftEyeTopTpl,topSearchSpace,topLoc);
+		//
+		////update coordinates
+		//this->leftEyeTopLoc.x = topLoc.x;
+		//this->leftEyeTopLoc.y = topLoc.y;
+		//uncomment above:
 
 		//this->leftEyeTopLoc.x = 50;
 		//this->leftEyeTopLoc.y = 50;
+
 
 
 		//update template image
@@ -314,7 +351,7 @@ public:
 			//run NCC on parent feature (except left eye) to get search space for sub features
 			
 			//void updateSubFeatureLocations(IplImage *img, IplImage *processedImg, double newFaceWidth, double newFaceHeight, CvRect& parentLoc)
-			//updateSubFeatureLocations(img, processedImg, r->width, r->height, leftEyeSubSearchSpace);
+			updateSubFeatureLocations(img, processedImg, r->width, r->height, leftEyeSubSearchSpace);
 
 			////left eye left
 			//Mat oldLeftEyeLeftTpl = imread("templates/leftEyeLeft.jpg",1);
@@ -396,24 +433,7 @@ public:
 
 		return result;
 	}
-
-
-
-
-private:
-	//templates:
-	CvRect r;
-	Mat face;
-	
-	Mat leftEye;
-
-	Point topLeftPoint;
-	//Point bottomRightPoint;
-
-	Point leftEyeTopLoc;
-	Point leftEyeBottomLoc;
-
-	Mat leftEyeTopTpl;
-	Mat leftEyeBottomTpl;
 	
 };
+
+#endif
