@@ -16,6 +16,8 @@ public:
 		this->r = r;
 		this->topLeftPoint.x = r.x;
 		this->topLeftPoint.y = r.y;
+		this->leftEyeTopTpl = imread("templates/leftEyeTop.jpg",1);
+		this->leftEyeBottomTpl = imread("templates/leftEyeBottom.jpg",1);
 	}
 	
 	/*
@@ -109,7 +111,10 @@ public:
 
 	bool getSearchSpace(IplImage *img, IplImage *processedImg, CvRect *r, Mat& tpl, CvRect& inputSearchSpace, CvRect& outputSearchSpace)
 	{
-
+		if(tpl.empty() == true)
+			std::cout << "********************************************TPL IS EMPTY" << std::endl;
+		else if (tpl.empty() ==false)
+			std::cout << "TPL IS NOT EMPTY" << std::endl;
 		bool result = false;
 		double THRESH = 0.50;
 
@@ -171,12 +176,13 @@ public:
 		CvRect topLoc;			
 		CvRect bottomLoc;
 
-		CvRect topSearchSpace;		// with lrBuffer
+		CvRect topSearchSpace;		// if condition is true, parent feature subsection, else subfeature location with Buffer
 		CvRect bottomSearchSpace;
 		
 		//if(subfeature has no previous coordinates, i.e. == -1)
-		if(leftEyeTopTpl.empty() || leftEyeBottomTpl.empty())
-		//if(true)
+		//if(leftEyeTopTpl.empty() || leftEyeBottomTpl.empty())
+		if(true)
+		//if(leftEyeTopTpl.empty())
 		{
 			//look at parent feature coords for search space
 			
@@ -200,44 +206,44 @@ public:
 		}
 		else
 		{
-			//resize sub feature templates and search space based on new face width and height
-			double oldFaceWidth = r.width;
-			double oldFaceHeight = r.height;
+			////resize sub feature templates and search space based on new face width and height
+			//double oldFaceWidth = r.width;
+			//double oldFaceHeight = r.height;
 
-			//top
-			double oldTopTplWidth = leftEyeTopTpl.cols;
-			double newTopTplWidth = (oldTopTplWidth / oldFaceWidth) * newFaceWidth;
+			////top
+			//double oldTopTplWidth = leftEyeTopTpl.cols;
+			//double newTopTplWidth = (oldTopTplWidth / oldFaceWidth) * newFaceWidth;
 
-			double oldTopTplHeight = leftEyeTopTpl.rows;
-			double newTopTplHeight = (oldTopTplHeight / oldFaceHeight) * newFaceHeight;
+			//double oldTopTplHeight = leftEyeTopTpl.rows;
+			//double newTopTplHeight = (oldTopTplHeight / oldFaceHeight) * newFaceHeight;
 
-			resize(leftEyeTopTpl,leftEyeTopTpl,Size((int)newTopTplWidth,(int)newTopTplHeight));
-
-
-			//bottom
-			double oldBottomTplWidth = leftEyeBottomTpl.cols;
-			double newBottomTplWidth = (oldBottomTplWidth / oldFaceWidth) * newFaceWidth;
-
-			double oldBottomTplHeight = leftEyeBottomTpl.rows;
-			double newBottomTplHeight = (oldBottomTplHeight / oldFaceHeight) * newFaceHeight;
-
-			resize(leftEyeBottomTpl,leftEyeBottomTpl,Size((int)newBottomTplWidth,(int)newBottomTplHeight));
+			//resize(leftEyeTopTpl,leftEyeTopTpl,Size((int)newTopTplWidth,(int)newTopTplHeight));
 
 
-			//update search space for NCC
-			double newTopY = this->leftEyeTopLoc.y;
-			double newBottomY = this->leftEyeBottomLoc.y;
+			////bottom
+			//double oldBottomTplWidth = leftEyeBottomTpl.cols;
+			//double newBottomTplWidth = (oldBottomTplWidth / oldFaceWidth) * newFaceWidth;
 
-			double newMidYDist = (newTopY + newBottomY) / 2.0;
+			//double oldBottomTplHeight = leftEyeBottomTpl.rows;
+			//double newBottomTplHeight = (oldBottomTplHeight / oldFaceHeight) * newFaceHeight;
 
-			int bufferRadius = (int)(newMidYDist / 2.0);
+			//resize(leftEyeBottomTpl,leftEyeBottomTpl,Size((int)newBottomTplWidth,(int)newBottomTplHeight));
 
-			//we don't have boundary condition checks yet
-			topSearchSpace = cvRect(leftEyeTopLoc.x - bufferRadius, leftEyeTopLoc.y - bufferRadius, 
-				leftEyeTopTpl.cols + bufferRadius, leftEyeTopTpl.rows + bufferRadius);
 
-			bottomSearchSpace = cvRect(leftEyeBottomLoc.x - bufferRadius, leftEyeBottomLoc.y - bufferRadius, 
-				leftEyeBottomTpl.cols + bufferRadius, leftEyeBottomTpl.rows + bufferRadius);
+			////update search space for NCC
+			//double newTopY = this->leftEyeTopLoc.y;
+			//double newBottomY = this->leftEyeBottomLoc.y;
+
+			//double newMidYDist = (newTopY + newBottomY) / 2.0;
+
+			//int bufferRadius = (int)(newMidYDist / 2.0);
+
+			////we don't have boundary condition checks yet
+			//topSearchSpace = cvRect(leftEyeTopLoc.x - bufferRadius, leftEyeTopLoc.y - bufferRadius, 
+			//	leftEyeTopTpl.cols + bufferRadius, leftEyeTopTpl.rows + bufferRadius);
+
+			//bottomSearchSpace = cvRect(leftEyeBottomLoc.x - bufferRadius, leftEyeBottomLoc.y - bufferRadius, 
+			//	leftEyeBottomTpl.cols + bufferRadius, leftEyeBottomTpl.rows + bufferRadius);
 
 		}//end else
 
@@ -251,6 +257,9 @@ public:
 		//update coordinates
 		this->leftEyeTopLoc.x = topLoc.x;
 		this->leftEyeTopLoc.y = topLoc.y;
+
+		//this->leftEyeTopLoc.x = 50;
+		//this->leftEyeTopLoc.y = 50;
 
 
 		//update template image
