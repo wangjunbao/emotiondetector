@@ -242,13 +242,13 @@ public:
 			//Mat topTpl; 
 			//resizeFeatureTemplate(oldTopTpl,newFaceWidth,newFaceHeight,topTpl);
 			
-			std::cout << "before: oldTopTpl rows: " << oldTopTpl.rows << std::endl;
-			std::cout << "before: leftEyeTopTpl rows: " << this->leftEyeTopTpl.rows << std::endl;
+			//std::cout << "before: oldTopTpl rows: " << oldTopTpl.rows << std::endl;
+			//std::cout << "before: leftEyeTopTpl rows: " << this->leftEyeTopTpl.rows << std::endl;
 			
 			resizeFeatureTemplate(oldTopTpl,newFaceWidth,newFaceHeight,this->leftEyeTopTpl);
 			
-			std::cout << "after: oldTopTpl rows: " << oldTopTpl.rows << std::endl;
-			std::cout << "after: leftEyeTopTpl rows: " << this->leftEyeTopTpl.rows << std::endl;
+			//std::cout << "after: oldTopTpl rows: " << oldTopTpl.rows << std::endl;
+			//std::cout << "after: leftEyeTopTpl rows: " << this->leftEyeTopTpl.rows << std::endl;
 
 			topSearchSpace = cvRect(parentLoc.x, parentLoc.y,parentLoc.width, parentLoc.height/2);
 			
@@ -283,7 +283,7 @@ public:
 		else
 		{
 			//need to set search spaces here!!
-			topSearchSpace = cvRect(50,50,100,100);
+			//topSearchSpace = cvRect(50,50,100,100);
 
 			//resize sub feature templates and search space based on new face width and height
 			double oldFaceWidth = (double)r.width;
@@ -299,34 +299,42 @@ public:
 			//bug here!
 			Mat newLeftEyeTopTpl;
 			//resize(leftEyeTopTpl,leftEyeTopTpl,Size((int)newTopTplWidth,(int)newTopTplHeight));
-			resize(leftEyeTopTpl,newLeftEyeTopTpl,Size((int)newTopTplWidth,(int)newTopTplHeight));
+			resize(this->leftEyeTopTpl,newLeftEyeTopTpl,Size((int)newTopTplWidth,(int)newTopTplHeight));
+
+			//swap templates back
+			this->leftEyeTopTpl = newLeftEyeTopTpl;
 
 
+			//bottom
+			double oldBottomTplWidth = leftEyeBottomTpl.cols;
+			double newBottomTplWidth = (oldBottomTplWidth / oldFaceWidth) * newFaceWidth;
 
-			////bottom
-			//double oldBottomTplWidth = leftEyeBottomTpl.cols;
-			//double newBottomTplWidth = (oldBottomTplWidth / oldFaceWidth) * newFaceWidth;
-
-			//double oldBottomTplHeight = leftEyeBottomTpl.rows;
-			//double newBottomTplHeight = (oldBottomTplHeight / oldFaceHeight) * newFaceHeight;
+			double oldBottomTplHeight = leftEyeBottomTpl.rows;
+			double newBottomTplHeight = (oldBottomTplHeight / oldFaceHeight) * newFaceHeight;
 
 			//resize(leftEyeBottomTpl,leftEyeBottomTpl,Size((int)newBottomTplWidth,(int)newBottomTplHeight));
+			Mat newLeftEyeBottomTpl;
+			resize(this->leftEyeBottomTpl,newLeftEyeBottomTpl,Size((int)newBottomTplWidth,(int)newBottomTplHeight));
 
 
-			////update search space for NCC
-			//double newTopY = this->leftEyeTopLoc.y;
-			//double newBottomY = this->leftEyeBottomLoc.y;
+			//swap templates back
+			this->leftEyeBottomTpl = newLeftEyeBottomTpl;
 
-			//double newMidYDist = (newTopY + newBottomY) / 2.0;
 
-			//int bufferRadius = (int)(newMidYDist / 2.0);
+			//update search space for NCC
+			double newTopY = this->leftEyeTopLoc.y;
+			double newBottomY = this->leftEyeBottomLoc.y;
 
-			////we don't have boundary condition checks yet
-			//topSearchSpace = cvRect(leftEyeTopLoc.x - bufferRadius, leftEyeTopLoc.y - bufferRadius, 
-			//	leftEyeTopTpl.cols + bufferRadius, leftEyeTopTpl.rows + bufferRadius);
+			double newMidYDist = (newTopY + newBottomY) / 2.0;
 
-			//bottomSearchSpace = cvRect(leftEyeBottomLoc.x - bufferRadius, leftEyeBottomLoc.y - bufferRadius, 
-			//	leftEyeBottomTpl.cols + bufferRadius, leftEyeBottomTpl.rows + bufferRadius);
+			int bufferRadius = (int)(newMidYDist / 2.0);
+
+			//we don't have boundary condition checks yet
+			topSearchSpace = cvRect(leftEyeTopLoc.x - bufferRadius, leftEyeTopLoc.y - bufferRadius, 
+				leftEyeTopTpl.cols + bufferRadius, leftEyeTopTpl.rows + bufferRadius);
+
+			bottomSearchSpace = cvRect(leftEyeBottomLoc.x - bufferRadius, leftEyeBottomLoc.y - bufferRadius, 
+				leftEyeBottomTpl.cols + bufferRadius, leftEyeBottomTpl.rows + bufferRadius);
 
 		}//end else
 
@@ -341,6 +349,7 @@ public:
 
 		//CvRect topLoc;
 		bool topFound = getSearchSpace(img,processedImg,&r,leftEyeTopTpl,topSearchSpace,topLoc);
+		bool bottomFound = getSearchSpace(img,processedImg,&r,leftEyeBottomTpl,bottomSearchSpace,bottomLoc);
 		//bool topFound = getSearchSpace(img,processedImg,this->r,this->leftEyeTopTpl,topSearchSpace,topLoc);
 		//
 
@@ -350,7 +359,10 @@ public:
 		//update coordinates
 		//this->leftEyeTopLoc.x = topLoc.x;
 		//this->leftEyeTopLoc.y = topLoc.y;
-		
+		//
+		//this->leftEyeBottomLoc.x = bottomLoc.x;
+		//this->leftEyeBottomLoc.y = bottomLoc.y;
+		//
 		
 		//this->leftEyeTopLoc.x = 50;
 		//this->leftEyeTopLoc.y = 50;
