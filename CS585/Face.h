@@ -208,8 +208,8 @@ public:
 		//store face coords
 		
 		//typically doResize and doCrop are true at same time
-		CvRect topLoc;// = cvRect(0,0,0,0);			
-		CvRect bottomLoc;
+		CvRect topLoc = cvRect(0,0,0,0);			
+		CvRect bottomLoc = cvRect(0,0,0,0);
 
 		CvRect topSearchSpace;		// if condition is true, parent feature subsection, else subfeature location with Buffer
 		CvRect bottomSearchSpace;
@@ -330,11 +330,44 @@ public:
 			int bufferRadius = (int)(newMidYDist / 2.0);
 
 			//we don't have boundary condition checks yet
-			topSearchSpace = cvRect(leftEyeTopLoc.x - bufferRadius, leftEyeTopLoc.y - bufferRadius, 
-				leftEyeTopTpl.cols + bufferRadius, leftEyeTopTpl.rows + bufferRadius);
+			int topSearchSpaceX = leftEyeTopLoc.x - bufferRadius;
+			if(topSearchSpaceX < 0)
+			{
+				topSearchSpaceX = 0;
+			}
 
-			bottomSearchSpace = cvRect(leftEyeBottomLoc.x - bufferRadius, leftEyeBottomLoc.y - bufferRadius, 
-				leftEyeBottomTpl.cols + bufferRadius, leftEyeBottomTpl.rows + bufferRadius);
+			int topSearchSpaceY = leftEyeTopLoc.y - bufferRadius;
+			if(topSearchSpaceY < 0)
+			{
+				topSearchSpaceY = 0;
+			}
+
+
+			//topSearchSpace = cvRect(topSearchSpaceX, topSearchSpaceY, 
+			//	leftEyeTopTpl.cols + bufferRadius, leftEyeTopTpl.rows + bufferRadius);
+
+			topSearchSpace = cvRect(leftEyeTopLoc.x, leftEyeTopLoc.y, 
+				leftEyeTopTpl.cols, leftEyeTopTpl.rows);
+
+
+			int bottomSearchSpaceX = leftEyeBottomLoc.x - bufferRadius;
+			if(bottomSearchSpaceX < 0)
+			{
+				bottomSearchSpaceX = 0;
+			}
+
+			int bottomSearchSpaceY = leftEyeBottomLoc.y - bufferRadius;
+			if(bottomSearchSpaceY < 0)
+			{
+				bottomSearchSpaceY = 0;
+			}
+
+
+			//bottomSearchSpace = cvRect(bottomSearchSpaceX, bottomSearchSpaceY, 
+			//	leftEyeBottomTpl.cols + bufferRadius, leftEyeBottomTpl.rows + bufferRadius);
+
+			bottomSearchSpace = cvRect(leftEyeBottomLoc.x, leftEyeBottomLoc.y, 
+				leftEyeBottomTpl.cols, leftEyeBottomTpl.rows);
 
 		}//end else
 
@@ -348,8 +381,14 @@ public:
 		//std::cout << "before get search space topLoc: " << topLoc.x << ", " << topLoc.y << std::endl;
 
 		//CvRect topLoc;
-		bool topFound = getSearchSpace(img,processedImg,&r,leftEyeTopTpl,topSearchSpace,topLoc);
-		bool bottomFound = getSearchSpace(img,processedImg,&r,leftEyeBottomTpl,bottomSearchSpace,bottomLoc);
+		
+		
+		//error here about incorrect array dimensions!
+
+		//bool topFound = getSearchSpace(img,processedImg,&r,leftEyeTopTpl,topSearchSpace,topLoc);
+		//bool bottomFound = getSearchSpace(img,processedImg,&r,leftEyeBottomTpl,bottomSearchSpace,bottomLoc);
+		
+		
 		//bool topFound = getSearchSpace(img,processedImg,this->r,this->leftEyeTopTpl,topSearchSpace,topLoc);
 		//
 
@@ -357,12 +396,12 @@ public:
 		//uncomment above:
 
 		//update coordinates
-		//this->leftEyeTopLoc.x = topLoc.x;
-		//this->leftEyeTopLoc.y = topLoc.y;
-		//
-		//this->leftEyeBottomLoc.x = bottomLoc.x;
-		//this->leftEyeBottomLoc.y = bottomLoc.y;
-		//
+		this->leftEyeTopLoc.x = topLoc.x;
+		this->leftEyeTopLoc.y = topLoc.y;
+		
+		this->leftEyeBottomLoc.x = bottomLoc.x;
+		this->leftEyeBottomLoc.y = bottomLoc.y;
+		
 		
 		//this->leftEyeTopLoc.x = 50;
 		//this->leftEyeTopLoc.y = 50;
