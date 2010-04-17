@@ -208,7 +208,7 @@ public:
 		//store face coords
 		
 		//typically doResize and doCrop are true at same time
-		CvRect topLoc;			
+		CvRect topLoc;// = cvRect(0,0,0,0);			
 		CvRect bottomLoc;
 
 		CvRect topSearchSpace;		// if condition is true, parent feature subsection, else subfeature location with Buffer
@@ -252,6 +252,13 @@ public:
 
 			topSearchSpace = cvRect(parentLoc.x, parentLoc.y,parentLoc.width, parentLoc.height/2);
 			
+			//std::cout << "topLoc: " << topLoc.x << ", " << topLoc.y << std::endl; 
+
+
+			//initialize top loc
+			//topLoc = cvRect(0,0,0,0);
+
+			//std::cout << "topLoc: " << topLoc.x << ", " << topLoc.y << std::endl; 
 			
 			rectangle(Mat(processedImg),Point(topSearchSpace.x,topSearchSpace.y),
 				Point(topSearchSpace.x+topSearchSpace.width,topSearchSpace.y+topSearchSpace.height),
@@ -275,6 +282,8 @@ public:
 		}
 		else
 		{
+			topSearchSpace = cvRect(50,50,100,100);
+
 			////resize sub feature templates and search space based on new face width and height
 			//double oldFaceWidth = r.width;
 			//double oldFaceHeight = r.height;
@@ -322,15 +331,20 @@ public:
 		//bool getSearchSpace(IplImage *img, IplImage *processedImg, CvRect *r, Mat& tpl, CvRect& inputSearchSpace, CvRect& outputSearchSpace)
 		
 		//uncomment below:
-		//bool topFound = getSearchSpace(img,processedImg,&r,leftEyeTopTpl,topSearchSpace,topLoc);
+
+		//std::cout << "before get search space topLoc: " << topLoc.x << ", " << topLoc.y << std::endl;
+
+		//CvRect topLoc;
+		bool topFound = getSearchSpace(img,processedImg,&r,leftEyeTopTpl,topSearchSpace,topLoc);
 		//bool topFound = getSearchSpace(img,processedImg,this->r,this->leftEyeTopTpl,topSearchSpace,topLoc);
 		//
 
+		//std::cout << "after get search space topLoc: " << topLoc.x << ", " << topLoc.y << std::endl; 
 		//uncomment above:
 
 		//update coordinates
-		this->leftEyeTopLoc.x = topLoc.x;
-		this->leftEyeTopLoc.y = topLoc.y;
+		//this->leftEyeTopLoc.x = topLoc.x;
+		//this->leftEyeTopLoc.y = topLoc.y;
 		
 		
 		//this->leftEyeTopLoc.x = 50;
