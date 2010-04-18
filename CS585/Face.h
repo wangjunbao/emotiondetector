@@ -293,7 +293,8 @@ public:
 			////top
 			//double oldTopTplWidth = (double)leftEyeTopTpl.cols;
 			////double newTopTplWidth = (oldTopTplWidth / oldFaceWidth) * newFaceWidth;
-			//double newTopTplWidth = (oldTopTplWidth / this->oldFaceWidth) * newFaceWidth;
+			////double newTopTplWidth = (oldTopTplWidth / this->oldFaceWidth) * newFaceWidth;
+			//double newTopTplWidth = (oldTopTplWidth / this->oldFaceWidth) * r.width;
 
 			////std::cout << "newTopTplWidth: " << newTopTplWidth << std::endl;
 
@@ -306,7 +307,8 @@ public:
 
 			//double oldTopTplHeight = (double)leftEyeTopTpl.rows;
 			////double newTopTplHeight = (oldTopTplHeight / oldFaceHeight) * newFaceHeight;
-			//double newTopTplHeight = (oldTopTplHeight / this->oldFaceHeight) * newFaceHeight;
+			////double newTopTplHeight = (oldTopTplHeight / this->oldFaceHeight) * newFaceHeight;
+			//double newTopTplHeight = (oldTopTplHeight / this->oldFaceHeight) * r.height;
 			////std::cout << "newTopTplHeight: " << newTopTplHeight << std::endl;
 
 			////prevent against height <= 0
@@ -325,7 +327,8 @@ public:
 			////bottom
 			//double oldBottomTplWidth = (double)leftEyeBottomTpl.cols;
 			////double newBottomTplWidth = (oldBottomTplWidth / oldFaceWidth) * newFaceWidth;
-			//double newBottomTplWidth = (oldBottomTplWidth / this->oldFaceWidth) * newFaceWidth;
+			////double newBottomTplWidth = (oldBottomTplWidth / this->oldFaceWidth) * newFaceWidth;
+			//double newBottomTplWidth = (oldBottomTplWidth / this->oldFaceWidth) * r.width;
 
 
 			////std::cout << "newBottomTplWidth: " << newBottomTplWidth << std::endl;
@@ -339,7 +342,8 @@ public:
 
 			//double oldBottomTplHeight = (double)leftEyeBottomTpl.rows;
 			////double newBottomTplHeight = (oldBottomTplHeight / oldFaceHeight) * newFaceHeight;
-			//double newBottomTplHeight = (oldBottomTplHeight / this->oldFaceHeight) * newFaceHeight;
+			////double newBottomTplHeight = (oldBottomTplHeight / this->oldFaceHeight) * newFaceHeight;
+			//double newBottomTplHeight = (oldBottomTplHeight / this->oldFaceHeight) * r.height;
 			////std::cout << "newBottomTplHeight: " << newBottomTplHeight << std::endl;
 
 			////prevent against height <= 0
@@ -355,12 +359,16 @@ public:
 			//newLeftEyeBottomTpl.copyTo(this->leftEyeBottomTpl);
 
 
-			//end resize
+			////end resize
 
 
 			//update search space for NCC
-			double newMidYDist = (this->leftEyeTopLoc.y + this->leftEyeBottomLoc.y) / 2.0;
-			int bufferRadius = (int)(newMidYDist / 2.0);
+			//double newMidYDist = (this->leftEyeTopLoc.y + this->leftEyeBottomLoc.y) / 2.0;
+			double newMidYDist = (abs(this->leftEyeTopLoc.y - this->leftEyeBottomLoc.y)) / 2.0;
+			
+			//int bufferRadius = (int)(newMidYDist / 2.0);
+			int bufferRadius = (int)(newMidYDist);
+
 
 			//int bufferRadius = 5;
 
@@ -460,14 +468,15 @@ public:
 		//std::cout << "img: " << img->width << " by " << img->height << std::endl;
 		//std::cout << "processedImg: " << processedImg->width << " by " << processedImg->height << std::endl;
 		//std::cout << "r: " << r.width << " by " << r.height << std::endl;
-		std::cout << "leftEyeTopTpl: " << leftEyeTopTpl.cols << " by " << leftEyeTopTpl.rows << std::endl;
+		
+		/*std::cout << "leftEyeTopTpl: " << leftEyeTopTpl.cols << " by " << leftEyeTopTpl.rows << std::endl;
 		std::cout << "topSearchSpace: " << topSearchSpace.width << " by " << topSearchSpace.height << std::endl;
 		std::cout << "topLoc before: " << topLoc.width << " by " << topLoc.height << std::endl;
 
 
 		std::cout << "leftEyeBottomTpl: " << leftEyeBottomTpl.cols << " by " << leftEyeBottomTpl.rows << std::endl;
 		std::cout << "bottomSearchSpace: " << bottomSearchSpace.width << " by " << bottomSearchSpace.height << std::endl;
-		std::cout << "bottomLoc before: " << bottomLoc.width << " by " << bottomLoc.height << std::endl;
+		std::cout << "bottomLoc before: " << bottomLoc.width << " by " << bottomLoc.height << std::endl;*/
 
 
 
@@ -478,7 +487,8 @@ public:
 		std::cout << "bottomLoc after NCC: " << bottomLoc.width << " by " << bottomLoc.height << std::endl;
 		
 
-		//update coordinates
+		
+		//update coordinates because maybe it was only taking the greatest but not surpassing threshold
 		if(topFound && bottomFound)
 		{
 			std::cout << "^^^^^^^^^^^^^^^UPDATED" << std::endl;
@@ -492,6 +502,14 @@ public:
 			this->leftEyeTopTpl.release();
 			this->leftEyeBottomTpl.release();
 		}
+		
+
+		/*
+			this->leftEyeTopLoc.x = topLoc.x;
+			this->leftEyeTopLoc.y = topLoc.y;
+			this->leftEyeBottomLoc.x = bottomLoc.x;
+			this->leftEyeBottomLoc.y = bottomLoc.y;
+			*/
 		
 	
 		//update template image
