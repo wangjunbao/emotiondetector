@@ -16,7 +16,6 @@ CvMemStorage            *storage;
 
 vector<Face*> oldFaces;
 vector<Face*> newFaces;
-vector<Face*> oldFacesToDelete;
 
 void detectFaces( IplImage *img );
 
@@ -264,9 +263,7 @@ bool matchesOldFace(Point curTopLeftPoint, int width, int height, Face* matchedF
 		//to reduce search space for next call
 		if(matchedFaceIndex >= 0 && matchedFaceIndex < (int)oldFaces.size())
 		{
-			//delete oldFaces.at(matchedFaceIndex); //delete actual object
-			oldFacesToDelete.push_back(oldFaces.at(matchedFaceIndex)); //put pointer into to delete vector, object not deleted yet
-			
+			delete oldFaces.at(matchedFaceIndex); //delete actual object			
 			oldFaces.erase(oldFaces.begin()+matchedFaceIndex); //delete pointer to object from oldFaces vector
 		}
 
@@ -394,15 +391,6 @@ void detectFaces( IplImage *img )
 	}
 
 	newFaces.clear();	//delete all the face pointers from the vector
-
-	//delete all of the matched old faces
-	for(int i=0; i<(int)oldFacesToDelete.size(); i++)	//delete all the face objects first
-	{
-		delete oldFacesToDelete.at(i);
-	}
-
-	oldFacesToDelete.clear();	//delete all the face pointers from the vector
-
  
     /* display video */
     cvShowImage( "video", img );
