@@ -400,38 +400,45 @@ public:
 				topSearchSpaceHeight = ((int)((2.0/8.0)*this->currentFaceHeight));
 			}
 
-
 			topSearchSpace = cvRect(topSearchSpaceX, topSearchSpaceY, topSearchSpaceWidth, topSearchSpaceHeight);
 
 			rectangle(Mat(processedImg),Point(topSearchSpace.x,topSearchSpace.y),
 				Point(topSearchSpace.x + topSearchSpace.width, topSearchSpace.y + topSearchSpace.height),CV_RGB(0, 0, 0), 1, 0, 0 );
 
-			/*topSearchSpace = cvRect(leftEyeTopLoc.x, leftEyeTopLoc.y, 
-				leftEyeTopTpl.cols, leftEyeTopTpl.rows);*/
 
 
+
+			//use same boundaries as when searching for whole eye template in face
 			int bottomSearchSpaceX = leftEyeBottomLoc.x - bufferRadius;
-			//if(bottomSearchSpaceX < 0)
-			//{
-			//	bottomSearchSpaceX = 0;
-			//}
+			if(bottomSearchSpaceX < this->topLeftPoint.x)
+			{
+				bottomSearchSpaceX = this->topLeftPoint.x;
+			}
 
 			int bottomSearchSpaceY = leftEyeBottomLoc.y - bufferRadius;
-			//if(bottomSearchSpaceY < 0)
-			//{
-			//	bottomSearchSpaceY = 0;
-			//}
+			if(bottomSearchSpaceY < (this->topLeftPoint.y + (int)((2.5/8.0)*this->currentFaceHeight)) )
+			{
+				bottomSearchSpaceY = (this->topLeftPoint.y + (int)((2.5/8.0)*this->currentFaceHeight));
+			}
 
+			int bottomSearchSpaceWidth = this->leftEyeBottomTpl.cols + 2*bufferRadius;
+			if(bottomSearchSpaceWidth > (this->currentFaceWidth/2))
+			{
+				bottomSearchSpaceWidth = (this->currentFaceWidth/2);
+			}
 
-			bottomSearchSpace = cvRect(bottomSearchSpaceX, bottomSearchSpaceY, 
-				this->leftEyeBottomTpl.cols + 2*bufferRadius, this->leftEyeBottomTpl.rows + 2*bufferRadius);
+			//limit should be the min of where you look for the eye and the midpt btn the top and bottom buffers
+			int bottomSearchSpaceHeight = this->leftEyeBottomTpl.rows + 2*bufferRadius;
+			if(bottomSearchSpaceHeight > ((int)((2.0/8.0)*this->currentFaceHeight)) )
+			{
+				bottomSearchSpaceHeight = ((int)((2.0/8.0)*this->currentFaceHeight));
+			}
+
+			bottomSearchSpace = cvRect(bottomSearchSpaceX, bottomSearchSpaceY, bottomSearchSpaceWidth, bottomSearchSpaceHeight);
+
 
 			rectangle(Mat(processedImg),Point(bottomSearchSpace.x,bottomSearchSpace.y),
 				Point(bottomSearchSpace.x + bottomSearchSpace.width, bottomSearchSpace.y + bottomSearchSpace.height),CV_RGB(255, 255, 255), 1, 0, 0 );
-
-
-			//bottomSearchSpace = cvRect(leftEyeBottomLoc.x, leftEyeBottomLoc.y, 
-			//	leftEyeBottomTpl.cols, leftEyeBottomTpl.rows);
 
 		}//end else
 
