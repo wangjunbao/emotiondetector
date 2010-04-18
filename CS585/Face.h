@@ -267,17 +267,17 @@ public:
 
 
 			//bottom subtemplate
-			//Mat oldBottomTpl = imread(featureFilename+"Bottom.jpg",1);
-			Mat oldBottomTpl = imread("templates/leftEyeBottom.jpg",1);
-			//Mat bottomTpl; 
-			//resizeFeatureTemplate(oldBottomTpl,newFaceWidth,newFaceHeight,bottomTpl);
-			resizeFeatureTemplate(oldBottomTpl,newFaceWidth,newFaceHeight,this->leftEyeBottomTpl);
-			
-			bottomSearchSpace = cvRect(parentLoc.x, parentLoc.y + parentLoc.height/2, parentLoc.width, parentLoc.height/2);
+			////Mat oldBottomTpl = imread(featureFilename+"Bottom.jpg",1);
+			//Mat oldBottomTpl = imread("templates/leftEyeBottom.jpg",1);
+			////Mat bottomTpl; 
+			////resizeFeatureTemplate(oldBottomTpl,newFaceWidth,newFaceHeight,bottomTpl);
+			//resizeFeatureTemplate(oldBottomTpl,newFaceWidth,newFaceHeight,this->leftEyeBottomTpl);
+			//
+			//bottomSearchSpace = cvRect(parentLoc.x, parentLoc.y + parentLoc.height/2, parentLoc.width, parentLoc.height/2);
 
-			rectangle(Mat(processedImg),Point(bottomSearchSpace.x,bottomSearchSpace.y),
-				Point(bottomSearchSpace.x+bottomSearchSpace.width,bottomSearchSpace.y+bottomSearchSpace.height),
-				CV_RGB(255,0,255),1,0,0);
+			//rectangle(Mat(processedImg),Point(bottomSearchSpace.x,bottomSearchSpace.y),
+			//	Point(bottomSearchSpace.x+bottomSearchSpace.width,bottomSearchSpace.y+bottomSearchSpace.height),
+			//	CV_RGB(255,0,255),1,0,0);
 
 			//uncomment above:
 		}
@@ -290,8 +290,11 @@ public:
 			double oldFaceWidth = (double)r.width;
 			double oldFaceHeight = (double)r.height;
 
+			std::cout << "oldFace: " << oldFaceWidth << " by " << oldFaceHeight << std::endl;
+
 			//top
 			double oldTopTplWidth = (double)leftEyeTopTpl.cols;
+			std::cout << "oldTopTplWidth: " << oldTopTplWidth << std::endl;
 			double newTopTplWidth = (oldTopTplWidth / oldFaceWidth) * newFaceWidth;
 			//double newTopTplWidth = ceil( (oldTopTplWidth / oldFaceWidth) * newFaceWidth );
 			std::cout << "newTopTplWidth: " << newTopTplWidth << std::endl;
@@ -320,7 +323,8 @@ public:
 			std::cout << "leftEyeTopTpl before: " << leftEyeTopTpl.cols << " by " << leftEyeTopTpl.rows << std::endl;
 			std::cout << "newLeftEyeTopTpl before: " << newLeftEyeTopTpl.cols << " by " << newLeftEyeTopTpl.rows << std::endl;
 			
-			newLeftEyeTopTpl.copyTo(this->leftEyeTopTpl);
+			this->leftEyeTopTpl = newLeftEyeTopTpl;
+			//newLeftEyeTopTpl.copyTo(this->leftEyeTopTpl);
 
 			std::cout << "leftEyeTopTpl after: " << leftEyeTopTpl.cols << " by " << leftEyeTopTpl.rows << std::endl;
 			std::cout << "newLeftEyeTopTpl after: " << newLeftEyeTopTpl.cols << " by " << newLeftEyeTopTpl.rows << std::endl;
@@ -347,8 +351,8 @@ public:
 			
 
 			//swap templates back
-			//this->leftEyeBottomTpl = newLeftEyeBottomTpl;
-			newLeftEyeBottomTpl.copyTo(this->leftEyeBottomTpl);
+			this->leftEyeBottomTpl = newLeftEyeBottomTpl;
+			//newLeftEyeBottomTpl.copyTo(this->leftEyeBottomTpl);
 
 
 			//update search space for NCC
