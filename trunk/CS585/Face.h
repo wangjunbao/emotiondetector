@@ -171,6 +171,7 @@ public:
 		//std::cout << "max: " << "(" << maxloc.x << "," << maxloc.y << "): " << maxval << std::endl;
 
 		outputSearchSpace = cvRect(inputSearchSpace.x + maxloc.x, inputSearchSpace.y + maxloc.y, tpl.cols, tpl.rows);
+		std::cout << "**************outputSearchSpace: " << outputSearchSpace.width << " by " << outputSearchSpace.height << std::endl;
 
 		cvResetImageROI(img);
 		cvResetImageROI(processedImg);
@@ -225,183 +226,163 @@ public:
 
 		std::cout << "parent: " << parentLoc.x << ", " << parentLoc.y << std::endl;
 
-		//if(testMat.empty())
 		//if(subfeature has no previous coordinates, i.e. == -1)
 		if(leftEyeTopTpl.empty() || leftEyeBottomTpl.empty())
-		
-		//if(leftEyeTopTpl.rows == 0)
 		//if(true)
-		//if(leftEyeTopTpl.empty())
 		{
-			//uncomment below:
-
 			//look at parent feature coords for search space
 			
 			//top subtemplate
-			//Mat oldTopTpl = imread(featureFilename+"Top.jpg",1);
-			Mat oldTopTpl = imread("templates/leftEyeTop.jpg",1);
-			//Mat topTpl; 
-			//resizeFeatureTemplate(oldTopTpl,newFaceWidth,newFaceHeight,topTpl);
-			
-			//std::cout << "before: oldTopTpl rows: " << oldTopTpl.rows << std::endl;
-			//std::cout << "before: leftEyeTopTpl rows: " << this->leftEyeTopTpl.rows << std::endl;
-			
+			Mat oldTopTpl = imread("templates/leftEyeTop.jpg",1);			
 			resizeFeatureTemplate(oldTopTpl,newFaceWidth,newFaceHeight,this->leftEyeTopTpl);
 			
-			//std::cout << "after: oldTopTpl rows: " << oldTopTpl.rows << std::endl;
-			//std::cout << "after: leftEyeTopTpl rows: " << this->leftEyeTopTpl.rows << std::endl;
-
 			topSearchSpace = cvRect(parentLoc.x, parentLoc.y,parentLoc.width, parentLoc.height/2);
 			
-			//std::cout << "topLoc: " << topLoc.x << ", " << topLoc.y << std::endl; 
-
-
-			//initialize top loc
-			//topLoc = cvRect(0,0,0,0);
-
-			//std::cout << "topLoc: " << topLoc.x << ", " << topLoc.y << std::endl; 
-			
+			//draw search space
 			rectangle(Mat(processedImg),Point(topSearchSpace.x,topSearchSpace.y),
 				Point(topSearchSpace.x+topSearchSpace.width,topSearchSpace.y+topSearchSpace.height),
 				CV_RGB(255,255,0),1,0,0);
 
 
 			//bottom subtemplate
-			////Mat oldBottomTpl = imread(featureFilename+"Bottom.jpg",1);
-			//Mat oldBottomTpl = imread("templates/leftEyeBottom.jpg",1);
-			////Mat bottomTpl; 
-			////resizeFeatureTemplate(oldBottomTpl,newFaceWidth,newFaceHeight,bottomTpl);
-			//resizeFeatureTemplate(oldBottomTpl,newFaceWidth,newFaceHeight,this->leftEyeBottomTpl);
-			//
-			//bottomSearchSpace = cvRect(parentLoc.x, parentLoc.y + parentLoc.height/2, parentLoc.width, parentLoc.height/2);
+			Mat oldBottomTpl = imread("templates/leftEyeBottom.jpg",1);
+			resizeFeatureTemplate(oldBottomTpl,newFaceWidth,newFaceHeight,this->leftEyeBottomTpl);
+			
+			bottomSearchSpace = cvRect(parentLoc.x, parentLoc.y + parentLoc.height/2, parentLoc.width, parentLoc.height/2);
 
-			//rectangle(Mat(processedImg),Point(bottomSearchSpace.x,bottomSearchSpace.y),
-			//	Point(bottomSearchSpace.x+bottomSearchSpace.width,bottomSearchSpace.y+bottomSearchSpace.height),
-			//	CV_RGB(255,0,255),1,0,0);
+			//draw search space
+			rectangle(Mat(processedImg),Point(bottomSearchSpace.x,bottomSearchSpace.y),
+				Point(bottomSearchSpace.x+bottomSearchSpace.width,bottomSearchSpace.y+bottomSearchSpace.height),
+				CV_RGB(255,0,255),1,0,0);
 
-			//uncomment above:
 		}
 		else
 		{
-			//need to set search spaces here!!
-			//topSearchSpace = cvRect(50,50,100,100);
+			////resize sub feature templates and search space based on new face width and height
+			//double oldFaceWidth = (double)r.width;
+			//double oldFaceHeight = (double)r.height;
 
-			//resize sub feature templates and search space based on new face width and height
-			double oldFaceWidth = (double)r.width;
-			double oldFaceHeight = (double)r.height;
+			////top
+			//double oldTopTplWidth = (double)leftEyeTopTpl.cols;
+			//double newTopTplWidth = (oldTopTplWidth / oldFaceWidth) * newFaceWidth;
 
-			std::cout << "oldFace: " << oldFaceWidth << " by " << oldFaceHeight << std::endl;
+			////std::cout << "newTopTplWidth: " << newTopTplWidth << std::endl;
 
-			//top
-			double oldTopTplWidth = (double)leftEyeTopTpl.cols;
-			std::cout << "oldTopTplWidth: " << oldTopTplWidth << std::endl;
-			double newTopTplWidth = (oldTopTplWidth / oldFaceWidth) * newFaceWidth;
-			//double newTopTplWidth = ceil( (oldTopTplWidth / oldFaceWidth) * newFaceWidth );
-			std::cout << "newTopTplWidth: " << newTopTplWidth << std::endl;
-
-			if(newTopTplWidth < 1)
-				newTopTplWidth = 1;
+			////prevent against width <= 0
+			//if(newTopTplWidth < 1)
+			//{
+			//	newTopTplWidth = 1;
+			//}
 
 
-			double oldTopTplHeight = (double)leftEyeTopTpl.rows;
-			double newTopTplHeight = (oldTopTplHeight / oldFaceHeight) * newFaceHeight;
-			//double newTopTplHeight = ceil( (oldTopTplHeight / oldFaceHeight) * newFaceHeight );
-			std::cout << "newTopTplHeight: " << newTopTplHeight << std::endl;
+			//double oldTopTplHeight = (double)leftEyeTopTpl.rows;
+			//double newTopTplHeight = (oldTopTplHeight / oldFaceHeight) * newFaceHeight;
+			////std::cout << "newTopTplHeight: " << newTopTplHeight << std::endl;
 
-			if(newTopTplHeight < 1)
-				newTopTplHeight = 1;
+			////prevent against height <= 0
+			//if(newTopTplHeight < 1)
+			//{
+			//	newTopTplHeight = 1;
+			//}
 
+			//Mat newLeftEyeTopTpl;
+			//resize(this->leftEyeTopTpl,newLeftEyeTopTpl,Size((int)newTopTplWidth,(int)newTopTplHeight));
 
-			//bug here!
-			Mat newLeftEyeTopTpl;
-			//resize(leftEyeTopTpl,leftEyeTopTpl,Size((int)newTopTplWidth,(int)newTopTplHeight));
-			resize(this->leftEyeTopTpl,newLeftEyeTopTpl,Size((int)newTopTplWidth,(int)newTopTplHeight));
-
-
-			//swap templates back
-			//this->leftEyeTopTpl = newLeftEyeTopTpl;
-			std::cout << "leftEyeTopTpl before: " << leftEyeTopTpl.cols << " by " << leftEyeTopTpl.rows << std::endl;
-			std::cout << "newLeftEyeTopTpl before: " << newLeftEyeTopTpl.cols << " by " << newLeftEyeTopTpl.rows << std::endl;
-			
-			this->leftEyeTopTpl = newLeftEyeTopTpl;
+			////swap templates back			
 			//newLeftEyeTopTpl.copyTo(this->leftEyeTopTpl);
 
-			std::cout << "leftEyeTopTpl after: " << leftEyeTopTpl.cols << " by " << leftEyeTopTpl.rows << std::endl;
-			std::cout << "newLeftEyeTopTpl after: " << newLeftEyeTopTpl.cols << " by " << newLeftEyeTopTpl.rows << std::endl;
+
+			////bottom
+			//double oldBottomTplWidth = (double)leftEyeBottomTpl.cols;
+			//double newBottomTplWidth = (oldBottomTplWidth / oldFaceWidth) * newFaceWidth;
+
+			////std::cout << "newBottomTplWidth: " << newBottomTplWidth << std::endl;
+
+			////prevent against width <= 0
+			//if(newBottomTplWidth < 1)
+			//{
+			//	newBottomTplWidth = 1;
+			//}
 
 
-			//bottom
-			double oldBottomTplWidth = leftEyeBottomTpl.cols;
-			double newBottomTplWidth = (oldBottomTplWidth / oldFaceWidth) * newFaceWidth;
+			//double oldBottomTplHeight = (double)leftEyeBottomTpl.rows;
+			//double newBottomTplHeight = (oldBottomTplHeight / oldFaceHeight) * newFaceHeight;
+			////std::cout << "newBottomTplHeight: " << newBottomTplHeight << std::endl;
 
-			if(newBottomTplWidth < 1)
-				newBottomTplWidth = 1;
+			////prevent against height <= 0
+			//if(newBottomTplHeight < 1)
+			//{
+			//	newBottomTplHeight = 1;
+			//}
 
-			double oldBottomTplHeight = leftEyeBottomTpl.rows;
-			double newBottomTplHeight = (oldBottomTplHeight / oldFaceHeight) * newFaceHeight;
+			//Mat newLeftEyeBottomTpl;
+			//resize(this->leftEyeBottomTpl,newLeftEyeBottomTpl,Size((int)newBottomTplWidth,(int)newBottomTplHeight));
 
-
-			if(newBottomTplHeight < 1)
-				newBottomTplHeight = 1;
-
-			//resize(leftEyeBottomTpl,leftEyeBottomTpl,Size((int)newBottomTplWidth,(int)newBottomTplHeight));
-			Mat newLeftEyeBottomTpl;
-			resize(this->leftEyeBottomTpl,newLeftEyeBottomTpl,Size((int)newBottomTplWidth,(int)newBottomTplHeight));
-
-			
-
-			//swap templates back
-			this->leftEyeBottomTpl = newLeftEyeBottomTpl;
+			////swap templates back			
 			//newLeftEyeBottomTpl.copyTo(this->leftEyeBottomTpl);
 
 
+			//end resize
+
+
 			//update search space for NCC
-			double newTopY = this->leftEyeTopLoc.y;
-			double newBottomY = this->leftEyeBottomLoc.y;
+			double newMidYDist = (this->leftEyeTopLoc.y + this->leftEyeBottomLoc.y) / 2.0;
+			//int bufferRadius = (int)(newMidYDist / 2.0);
 
-			double newMidYDist = (newTopY + newBottomY) / 2.0;
+			int bufferRadius = 5;
 
-			int bufferRadius = (int)(newMidYDist / 2.0);
+			std::cout << "leftEyeTopLoc: " << this->leftEyeTopLoc.x << " by " << this->leftEyeTopLoc.y << std::endl;
+			std::cout << "leftEyeBottomLoc: " << this->leftEyeBottomLoc.x << " by " << this->leftEyeBottomLoc.y << std::endl;
+			std::cout << "newMidYDist: " << newMidYDist << std::endl;
+			std::cout << "bufferRadius: " << bufferRadius << std::endl;
+
 
 			//we don't have boundary condition checks yet
 			int topSearchSpaceX = leftEyeTopLoc.x - bufferRadius;
-			if(topSearchSpaceX < 0)
+			/*if(topSearchSpaceX < 0)
 			{
 				topSearchSpaceX = 0;
-			}
+			}*/
 
 			int topSearchSpaceY = leftEyeTopLoc.y - bufferRadius;
-			if(topSearchSpaceY < 0)
-			{
-				topSearchSpaceY = 0;
-			}
+			//if(topSearchSpaceY < 0)
+			//{
+			//	topSearchSpaceY = 0;
+			//}
 
 
-			//topSearchSpace = cvRect(topSearchSpaceX, topSearchSpaceY, 
-			//	leftEyeTopTpl.cols + bufferRadius, leftEyeTopTpl.rows + bufferRadius);
+			topSearchSpace = cvRect(topSearchSpaceX, topSearchSpaceY, 
+				this->leftEyeTopTpl.cols + 2*bufferRadius, this->leftEyeTopTpl.rows + 2*bufferRadius);
 
-			topSearchSpace = cvRect(leftEyeTopLoc.x, leftEyeTopLoc.y, 
-				leftEyeTopTpl.cols, leftEyeTopTpl.rows);
+			rectangle(Mat(processedImg),Point(topSearchSpace.x,topSearchSpace.y),
+				Point(topSearchSpace.x + topSearchSpace.width, topSearchSpace.y + topSearchSpace.height),CV_RGB(0, 0, 0), 1, 0, 0 );
+
+			/*topSearchSpace = cvRect(leftEyeTopLoc.x, leftEyeTopLoc.y, 
+				leftEyeTopTpl.cols, leftEyeTopTpl.rows);*/
 
 
 			int bottomSearchSpaceX = leftEyeBottomLoc.x - bufferRadius;
-			if(bottomSearchSpaceX < 0)
-			{
-				bottomSearchSpaceX = 0;
-			}
+			//if(bottomSearchSpaceX < 0)
+			//{
+			//	bottomSearchSpaceX = 0;
+			//}
 
 			int bottomSearchSpaceY = leftEyeBottomLoc.y - bufferRadius;
-			if(bottomSearchSpaceY < 0)
-			{
-				bottomSearchSpaceY = 0;
-			}
+			//if(bottomSearchSpaceY < 0)
+			//{
+			//	bottomSearchSpaceY = 0;
+			//}
 
 
-			//bottomSearchSpace = cvRect(bottomSearchSpaceX, bottomSearchSpaceY, 
-			//	leftEyeBottomTpl.cols + bufferRadius, leftEyeBottomTpl.rows + bufferRadius);
+			bottomSearchSpace = cvRect(bottomSearchSpaceX, bottomSearchSpaceY, 
+				this->leftEyeBottomTpl.cols + 2*bufferRadius, this->leftEyeBottomTpl.rows + 2*bufferRadius);
 
-			bottomSearchSpace = cvRect(leftEyeBottomLoc.x, leftEyeBottomLoc.y, 
-				leftEyeBottomTpl.cols, leftEyeBottomTpl.rows);
+			rectangle(Mat(processedImg),Point(bottomSearchSpace.x,bottomSearchSpace.y),
+				Point(bottomSearchSpace.x + bottomSearchSpace.width, bottomSearchSpace.y + bottomSearchSpace.height),CV_RGB(255, 255, 255), 1, 0, 0 );
+
+
+			//bottomSearchSpace = cvRect(leftEyeBottomLoc.x, leftEyeBottomLoc.y, 
+			//	leftEyeBottomTpl.cols, leftEyeBottomTpl.rows);
 
 		}//end else
 
@@ -420,36 +401,43 @@ public:
 		//error here about incorrect array dimensions!
 
 
-		std::cout << "img: " << img->width << " by " << img->height << std::endl;
-		std::cout << "processedImg: " << processedImg->width << " by " << processedImg->height << std::endl;
-		std::cout << "r: " << r.width << " by " << r.height << std::endl;
+		//std::cout << "img: " << img->width << " by " << img->height << std::endl;
+		//std::cout << "processedImg: " << processedImg->width << " by " << processedImg->height << std::endl;
+		//std::cout << "r: " << r.width << " by " << r.height << std::endl;
 		std::cout << "leftEyeTopTpl: " << leftEyeTopTpl.cols << " by " << leftEyeTopTpl.rows << std::endl;
 		std::cout << "topSearchSpace: " << topSearchSpace.width << " by " << topSearchSpace.height << std::endl;
-		std::cout << "topLoc: " << topLoc.width << " by " << topLoc.height << std::endl;
+		std::cout << "topLoc before: " << topLoc.width << " by " << topLoc.height << std::endl;
+
+
+		std::cout << "leftEyeBottomTpl: " << leftEyeBottomTpl.cols << " by " << leftEyeBottomTpl.rows << std::endl;
+		std::cout << "bottomSearchSpace: " << bottomSearchSpace.width << " by " << bottomSearchSpace.height << std::endl;
+		std::cout << "bottomLoc before: " << bottomLoc.width << " by " << bottomLoc.height << std::endl;
+
+
 
 		bool topFound = getSearchSpace(img,processedImg,&r,leftEyeTopTpl,topSearchSpace,topLoc);
-		//bool bottomFound = getSearchSpace(img,processedImg,&r,leftEyeBottomTpl,bottomSearchSpace,bottomLoc);
-		
-		
-		//bool topFound = getSearchSpace(img,processedImg,this->r,this->leftEyeTopTpl,topSearchSpace,topLoc);
-		//
+		std::cout << "topLoc after NCC: " << topLoc.width << " by " << topLoc.height << std::endl;
 
-		//std::cout << "after get search space topLoc: " << topLoc.x << ", " << topLoc.y << std::endl; 
-		//uncomment above:
+		bool bottomFound = getSearchSpace(img,processedImg,&r,leftEyeBottomTpl,bottomSearchSpace,bottomLoc);
+		std::cout << "bottomLoc after NCC: " << bottomLoc.width << " by " << bottomLoc.height << std::endl;
+		
 
 		//update coordinates
-		this->leftEyeTopLoc.x = topLoc.x;
-		this->leftEyeTopLoc.y = topLoc.y;
+		if(topFound && bottomFound)
+		{
+			std::cout << "^^^^^^^^^^^^^^^UPDATED" << std::endl;
+			this->leftEyeTopLoc.x = topLoc.x;
+			this->leftEyeTopLoc.y = topLoc.y;
+			this->leftEyeBottomLoc.x = bottomLoc.x;
+			this->leftEyeBottomLoc.y = bottomLoc.y;
+		}
+		else //clear out templates
+		{
+			this->leftEyeTopTpl.release();
+			this->leftEyeBottomTpl.release();
+		}
 		
-		this->leftEyeBottomLoc.x = bottomLoc.x;
-		this->leftEyeBottomLoc.y = bottomLoc.y;
-		
-		
-		//this->leftEyeTopLoc.x = 50;
-		//this->leftEyeTopLoc.y = 50;
-
-
-
+	
 		//update template image
 
 		
