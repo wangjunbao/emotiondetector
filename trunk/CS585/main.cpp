@@ -16,6 +16,7 @@ CvMemStorage            *storage;
 
 vector<Face*> oldFaces;
 vector<Face*> newFaces;
+vector<Face*> oldFacesToDelete;
 
 void detectFaces( IplImage *img );
 
@@ -34,7 +35,7 @@ int main( int argc, char** argv )
 		  //char      *imgfilename = "HowellFace50.jpg";
 		  //char      *imgfilename = "grouppic2.jpg";
 		  //char      *imgfilename = "ChrisFace.jpg"; //this does not work well now but face may be too big
-		  char      *imgfilename = "ChrisFace50.jpg";
+			char      *imgfilename = "ChrisFace50.jpg";
 		  //char      *imgfilename = "templates/face.jpg";
 
 		  cascade = ( CvHaarClassifierCascade* )cvLoad( filename, 0, 0, 0 );
@@ -144,6 +145,84 @@ void resizeFeatureTemplate(string filename, double oldFeatureWidth, double oldFe
 	delete featureImg;
 }
  
+
+/* Checks if a face found in current frame is contained inside an existing face */
+bool containedInOldFace(int faceX, int faceY, int faceWidth, int faceHeight)
+{
+	//bottom right points of face to check
+	int faceBottomX = faceX + faceWidth;
+	int faceBottomY = faceY + faceHeight;
+
+	//compare with faces found in previous frame(oldFaces) and in this frame (newFaces) 
+
+	//check matched old faces
+	for(int i=0; i<(int)(oldFaces.size()); i++)
+    {
+		Face *oldFace = oldFaces.at(i);
+		int oldFaceWidth = oldFace->getWidth();
+		int oldFaceHeight = oldFace->getHeight();
+		int oldFaceX = oldFace->getTopLeftPoint().x;
+		int oldFaceY = oldFace->getTopLeftPoint().y;
+		int oldFaceBottomX = oldFaceX + oldFaceWidth;
+		int oldFaceBottomY = oldFaceY + oldFaceHeight;
+
+		//first check if the face is smaller than the old face
+		//b/c it could be the case that small fake face was found first before a large real face
+		if( (faceWidth < oldFaceWidth) && (faceHeight < oldFaceHeight) )
+		{
+			//top left corner is contained in old face
+			if( (faceX > oldFaceX) && (faceX < oldFaceBottomX) 
+				&& (faceY > oldFaceY) && (faceY < oldFaceBottomY)
+				)
+			{
+				return true;
+			}
+			//bottom right corner is contained in old face
+			else if( (faceBottomX > oldFaceX) && (faceBottomX < oldFaceBottomX) 
+					 && (faceBottomY > oldFaceY) && (faceBottomY < oldFaceBottomY)
+				    )
+			{
+				return true;
+			}
+		}
+	}//end for
+
+	//check against new faces vector (this includes matched oldFaces)
+    for(int i=0; i<(int)(newFaces.size()); i++)
+	{
+		Face *oldFace = newFaces.at(i);
+		int oldFaceWidth = oldFace->getWidth();
+		int oldFaceHeight = oldFace->getHeight();
+		int oldFaceX = oldFace->getTopLeftPoint().x;
+		int oldFaceY = oldFace->getTopLeftPoint().y;
+		int oldFaceBottomX = oldFaceX + oldFaceWidth;
+		int oldFaceBottomY = oldFaceY + oldFaceHeight;
+
+		//first check if the face is smaller than the old face
+		//b/c it could be the case that small fake face was found first before a large real face
+		if( (faceWidth < oldFaceWidth) && (faceHeight < oldFaceHeight) )
+		{
+			//top left corner is contained in old face
+			if( (faceX > oldFaceX) && (faceX < oldFaceBottomX) 
+				&& (faceY > oldFaceY) && (faceY < oldFaceBottomY)
+				)
+			{
+				return true;
+			}
+			//bottom right corner is contained in old face
+			else if( (faceBottomX > oldFaceX) && (faceBottomX < oldFaceBottomX) 
+					 && (faceBottomY > oldFaceY) && (faceBottomY < oldFaceBottomY)
+				    )
+			{
+				return true;
+			}
+		}
+	}//end for
+
+	return false;
+}//end containedInOldFace
+
+
 /* Checks if a face found in current frame matches an existing face */
 bool matchesOldFace(Point curTopLeftPoint, int width, int height, Face* matchedFace)
 {
@@ -185,13 +264,15 @@ bool matchesOldFace(Point curTopLeftPoint, int width, int height, Face* matchedF
 		//to reduce search space for next call
 		if(matchedFaceIndex >= 0 && matchedFaceIndex < (int)oldFaces.size())
 		{
-			delete oldFaces.at(matchedFaceIndex); //delete actual object
+			//delete oldFaces.at(matchedFaceIndex); //delete actual object
+			oldFacesToDelete.push_back(oldFaces.at(matchedFaceIndex)); //put pointer into to delete vector, object not deleted yet
+			
 			oldFaces.erase(oldFaces.begin()+matchedFaceIndex); //delete pointer to object from oldFaces vector
 		}
 
         return true;
     }
-}
+}//end matchesOldFace
 
 /* Find all possible face objects in the current frame */
 void detectFaces( IplImage *img )
@@ -215,8 +296,8 @@ void detectFaces( IplImage *img )
             2,//3,
             CV_HAAR_DO_CANNY_PRUNING /*0*/ /*CV_HAAR_DO_CANNY_PRUNING*/, //pruning may speed up processing
             //cvSize( 40, 40 ) );
-			//cvSize( 50, 50 ) ); //30 by 30 good for grouppic.jpg
-			cvSize( 75, 75 ) );
+			cvSize( 50, 50 ) ); //30 by 30 good for grouppic.jpg
+			//cvSize( 75, 75 ) );
  
 	
 	double oldFaceWidth = 228;
@@ -232,10 +313,10 @@ void detectFaces( IplImage *img )
 
 
 		//white box for all faces found by Haar but not necessarily true faces
-		//cvRectangle( processedImg,
-		//	cvPoint( r->x, r->y ),
-		//	cvPoint( r->x + r->width, r->y + r->height ),
-		//	CV_RGB( 255, 255, 255 ), 1, 8, 0 );
+		cvRectangle( processedImg,
+			cvPoint( r->x, r->y ),
+			cvPoint( r->x + r->width, r->y + r->height ),
+			CV_RGB( 255, 255, 255 ), 1, 8, 0 );
 
 		//create a new face object
 		//if it is found to match an old face, it will take on the old face's values
@@ -246,7 +327,20 @@ void detectFaces( IplImage *img )
 
 		if(isOldFace == false)
 		{
-			if( face->isValidFace(img,processedImg,r) )
+			//check if the face is contained within an existing old face
+			if(containedInOldFace(r->x,r->y,r->width,r->height) == true)
+			{
+				std::cout << "face contained in old face" << std::endl;
+		
+				//purple box for all faces found by Haar but not necessarily true faces
+				cvRectangle( processedImg,
+					cvPoint( r->x, r->y ),
+					cvPoint( r->x + r->width, r->y + r->height ),
+					CV_RGB( 128, 0, 255 ), 1, 8, 0 );
+				
+				delete face;
+			}
+			else if( face->isValidFace(img,processedImg,r) )
 			{
 				std::cout << "new valid face at: (" << face->getTopLeftPoint().x <<"," << face->getTopLeftPoint().y << ")" << std::endl;
 
@@ -254,9 +348,9 @@ void detectFaces( IplImage *img )
 
 				//do Emotion Detection -> store it
                 
-                //add value to output
+				//add value to output
 
-                //add face to newFaces
+				//add face to newFaces
 				newFaces.push_back(face);
 			}
 			else //face is not valid, delete the object
@@ -272,7 +366,7 @@ void detectFaces( IplImage *img )
 			
 			//do Emotion Detection -> store it
                 
-            //add value to output
+			//add value to output
 
 			//add oldFace to newFaces
 			newFaces.push_back(face);
@@ -285,7 +379,6 @@ void detectFaces( IplImage *img )
 		}
 		//write out image for debuging
 		//imwrite("image.jpg",Mat(processedImg));
-
 		
 	}//end of for loop for performance test
     
@@ -295,15 +388,21 @@ void detectFaces( IplImage *img )
 	oldFaces.swap(newFaces);
 	
 	//delete all the unmatched old faces (now in newFaces vector):
-
-	//delete all the face objects first
-	for(int i=0; i<(int)newFaces.size(); i++)
+	for(int i=0; i<(int)newFaces.size(); i++)	//delete all the face objects first
 	{
 		delete newFaces.at(i);
 	}
 
-	//delete all the face pointers from the vector
-	newFaces.clear();
+	newFaces.clear();	//delete all the face pointers from the vector
+
+	//delete all of the matched old faces
+	for(int i=0; i<(int)oldFacesToDelete.size(); i++)	//delete all the face objects first
+	{
+		delete oldFacesToDelete.at(i);
+	}
+
+	oldFacesToDelete.clear();	//delete all the face pointers from the vector
+
  
     /* display video */
     cvShowImage( "video", img );

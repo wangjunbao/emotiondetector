@@ -70,6 +70,16 @@ public:
 		//return Point(r.x,r.y);
 		return topLeftPoint;
 	}
+
+	int getWidth()
+	{
+		return currentFaceWidth;
+	}
+
+	int getHeight()
+	{
+		return currentFaceHeight;
+	}
 	
 
 	/*
