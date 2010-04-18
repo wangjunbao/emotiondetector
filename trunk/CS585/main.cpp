@@ -232,10 +232,10 @@ void detectFaces( IplImage *img )
 
 
 		//white box for all faces found by Haar but not necessarily true faces
-		cvRectangle( processedImg,
-			cvPoint( r->x, r->y ),
-			cvPoint( r->x + r->width, r->y + r->height ),
-			CV_RGB( 255, 255, 255 ), 1, 8, 0 );
+		//cvRectangle( processedImg,
+		//	cvPoint( r->x, r->y ),
+		//	cvPoint( r->x + r->width, r->y + r->height ),
+		//	CV_RGB( 255, 255, 255 ), 1, 8, 0 );
 
 		//create a new face object
 		//if it is found to match an old face, it will take on the old face's values
