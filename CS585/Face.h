@@ -286,80 +286,80 @@ public:
 		}
 		else
 		{
-			//resize sub feature templates and search space based on new face width and height
-			//double oldFaceWidth = (double)r.width;
-			//double oldFaceHeight = (double)r.height;
+			////resize sub feature templates and search space based on new face width and height
+			////double oldFaceWidth = (double)r.width;
+			////double oldFaceHeight = (double)r.height;
 
-			//top
-			double oldTopTplWidth = (double)leftEyeTopTpl.cols;
-			//double newTopTplWidth = (oldTopTplWidth / oldFaceWidth) * newFaceWidth;
-			//double newTopTplWidth = (oldTopTplWidth / this->oldFaceWidth) * newFaceWidth;
-			double newTopTplWidth = (oldTopTplWidth / this->oldFaceWidth) * r.width;
+			////top
+			//double oldTopTplWidth = (double)leftEyeTopTpl.cols;
+			////double newTopTplWidth = (oldTopTplWidth / oldFaceWidth) * newFaceWidth;
+			////double newTopTplWidth = (oldTopTplWidth / this->oldFaceWidth) * newFaceWidth;
+			//double newTopTplWidth = (oldTopTplWidth / this->oldFaceWidth) * r.width;
 
-			//std::cout << "newTopTplWidth: " << newTopTplWidth << std::endl;
+			////std::cout << "newTopTplWidth: " << newTopTplWidth << std::endl;
 
-			//prevent against width <= 0
-			if(newTopTplWidth < 1)
-			{
-				newTopTplWidth = 1;
-			}
-
-
-			double oldTopTplHeight = (double)leftEyeTopTpl.rows;
-			//double newTopTplHeight = (oldTopTplHeight / oldFaceHeight) * newFaceHeight;
-			//double newTopTplHeight = (oldTopTplHeight / this->oldFaceHeight) * newFaceHeight;
-			double newTopTplHeight = (oldTopTplHeight / this->oldFaceHeight) * r.height;
-			//std::cout << "newTopTplHeight: " << newTopTplHeight << std::endl;
-
-			//prevent against height <= 0
-			if(newTopTplHeight < 1)
-			{
-				newTopTplHeight = 1;
-			}
-
-			Mat newLeftEyeTopTpl;
-			resize(this->leftEyeTopTpl,newLeftEyeTopTpl,Size((int)newTopTplWidth,(int)newTopTplHeight));
-
-			//swap templates back			
-			newLeftEyeTopTpl.copyTo(this->leftEyeTopTpl);
+			////prevent against width <= 0
+			//if(newTopTplWidth < 1)
+			//{
+			//	newTopTplWidth = 1;
+			//}
 
 
-			//bottom
-			double oldBottomTplWidth = (double)leftEyeBottomTpl.cols;
-			//double newBottomTplWidth = (oldBottomTplWidth / oldFaceWidth) * newFaceWidth;
-			//double newBottomTplWidth = (oldBottomTplWidth / this->oldFaceWidth) * newFaceWidth;
-			double newBottomTplWidth = (oldBottomTplWidth / this->oldFaceWidth) * r.width;
+			//double oldTopTplHeight = (double)leftEyeTopTpl.rows;
+			////double newTopTplHeight = (oldTopTplHeight / oldFaceHeight) * newFaceHeight;
+			////double newTopTplHeight = (oldTopTplHeight / this->oldFaceHeight) * newFaceHeight;
+			//double newTopTplHeight = (oldTopTplHeight / this->oldFaceHeight) * r.height;
+			////std::cout << "newTopTplHeight: " << newTopTplHeight << std::endl;
+
+			////prevent against height <= 0
+			//if(newTopTplHeight < 1)
+			//{
+			//	newTopTplHeight = 1;
+			//}
+
+			//Mat newLeftEyeTopTpl;
+			//resize(this->leftEyeTopTpl,newLeftEyeTopTpl,Size((int)newTopTplWidth,(int)newTopTplHeight));
+
+			////swap templates back			
+			//newLeftEyeTopTpl.copyTo(this->leftEyeTopTpl);
 
 
-			//std::cout << "newBottomTplWidth: " << newBottomTplWidth << std::endl;
-
-			//prevent against width <= 0
-			if(newBottomTplWidth < 1)
-			{
-				newBottomTplWidth = 1;
-			}
+			////bottom
+			//double oldBottomTplWidth = (double)leftEyeBottomTpl.cols;
+			////double newBottomTplWidth = (oldBottomTplWidth / oldFaceWidth) * newFaceWidth;
+			////double newBottomTplWidth = (oldBottomTplWidth / this->oldFaceWidth) * newFaceWidth;
+			//double newBottomTplWidth = (oldBottomTplWidth / this->oldFaceWidth) * r.width;
 
 
-			double oldBottomTplHeight = (double)leftEyeBottomTpl.rows;
-			//double newBottomTplHeight = (oldBottomTplHeight / oldFaceHeight) * newFaceHeight;
-			//double newBottomTplHeight = (oldBottomTplHeight / this->oldFaceHeight) * newFaceHeight;
-			double newBottomTplHeight = (oldBottomTplHeight / this->oldFaceHeight) * r.height;
-			//std::cout << "newBottomTplHeight: " << newBottomTplHeight << std::endl;
+			////std::cout << "newBottomTplWidth: " << newBottomTplWidth << std::endl;
 
-			//prevent against height <= 0
-			if(newBottomTplHeight < 1)
-			{
-				newBottomTplHeight = 1;
-			}
-
-			Mat newLeftEyeBottomTpl;
-			resize(this->leftEyeBottomTpl,newLeftEyeBottomTpl,Size((int)newBottomTplWidth,(int)newBottomTplHeight));
-
-			//swap templates back			
-			newLeftEyeBottomTpl.copyTo(this->leftEyeBottomTpl);
+			////prevent against width <= 0
+			//if(newBottomTplWidth < 1)
+			//{
+			//	newBottomTplWidth = 1;
+			//}
 
 
-			//end resize
+			//double oldBottomTplHeight = (double)leftEyeBottomTpl.rows;
+			////double newBottomTplHeight = (oldBottomTplHeight / oldFaceHeight) * newFaceHeight;
+			////double newBottomTplHeight = (oldBottomTplHeight / this->oldFaceHeight) * newFaceHeight;
+			//double newBottomTplHeight = (oldBottomTplHeight / this->oldFaceHeight) * r.height;
+			////std::cout << "newBottomTplHeight: " << newBottomTplHeight << std::endl;
+
+			////prevent against height <= 0
+			//if(newBottomTplHeight < 1)
+			//{
+			//	newBottomTplHeight = 1;
+			//}
+
+			//Mat newLeftEyeBottomTpl;
+			//resize(this->leftEyeBottomTpl,newLeftEyeBottomTpl,Size((int)newBottomTplWidth,(int)newBottomTplHeight));
+
+			////swap templates back			
+			//newLeftEyeBottomTpl.copyTo(this->leftEyeBottomTpl);
+
+
+			////end resize
 
 
 			//update search space for NCC
@@ -367,7 +367,16 @@ public:
 			double newMidYDist = (abs(this->leftEyeTopLoc.y - this->leftEyeBottomLoc.y)) / 2.0;
 			
 			//int bufferRadius = (int)(newMidYDist / 2.0);
-			int bufferRadius = (int)(newMidYDist);
+			//int bufferRadius = (int)(newMidYDist);
+			//int bufferRadius = 0;
+
+			//need to resize buffer too!
+			//bufferX = abs( (newWidth/oldWidth) * oldPt - oldPt)
+			int bufferX = (int)( abs( (((double)r.width/(double)this->oldFaceWidth) * this->leftEyeTopLoc.x) - this->leftEyeTopLoc.x ) );
+			int bufferY = (int)( abs( (((double)r.height/(double)this->oldFaceHeight) * this->leftEyeTopLoc.y) - this->leftEyeTopLoc.y ) );
+
+			std::cout << "bufferX: " << bufferX << std::endl;
+			std::cout << "bufferY: " << bufferY << std::endl;
 
 
 			//int bufferRadius = 5;
@@ -385,26 +394,30 @@ public:
 			//we don't have boundary condition checks yet
 
 			//use same boundaries as when searching for whole eye template in face
-			int topSearchSpaceX = leftEyeTopLoc.x - bufferRadius;
+			//int topSearchSpaceX = leftEyeTopLoc.x - bufferRadius;
+			int topSearchSpaceX = leftEyeTopLoc.x - bufferX;
 			if(topSearchSpaceX < this->topLeftPoint.x)
 			{
 				topSearchSpaceX = this->topLeftPoint.x;
 			}
 
-			int topSearchSpaceY = leftEyeTopLoc.y - bufferRadius;
+			//int topSearchSpaceY = leftEyeTopLoc.y - bufferRadius;
+			int topSearchSpaceY = leftEyeTopLoc.y - bufferY;
 			if(topSearchSpaceY < (this->topLeftPoint.y + (int)((2.5/8.0)*this->currentFaceHeight)) )
 			{
 				topSearchSpaceY = (this->topLeftPoint.y + (int)((2.5/8.0)*this->currentFaceHeight));
 			}
 
-			int topSearchSpaceWidth = this->leftEyeTopTpl.cols + 2*bufferRadius;
+			//int topSearchSpaceWidth = this->leftEyeTopTpl.cols + 2*bufferRadius;
+			int topSearchSpaceWidth = this->leftEyeTopTpl.cols + 2*bufferX;
 			if(topSearchSpaceWidth > (this->currentFaceWidth/2))
 			{
 				topSearchSpaceWidth = (this->currentFaceWidth/2);
 			}
 
 			//limit should be the min of where you look for the eye and the midpt btn the top and bottom buffers
-			int topSearchSpaceHeight = this->leftEyeTopTpl.rows + 2*bufferRadius;
+			//int topSearchSpaceHeight = this->leftEyeTopTpl.rows + 2*bufferRadius;
+			int topSearchSpaceHeight = this->leftEyeTopTpl.rows + 2*bufferY;
 			if(topSearchSpaceHeight > ((int)((2.0/8.0)*this->currentFaceHeight)) )
 			{
 				topSearchSpaceHeight = ((int)((2.0/8.0)*this->currentFaceHeight));
@@ -419,26 +432,30 @@ public:
 
 
 			//use same boundaries as when searching for whole eye template in face
-			int bottomSearchSpaceX = leftEyeBottomLoc.x - bufferRadius;
+			//int bottomSearchSpaceX = leftEyeBottomLoc.x - bufferRadius;
+			int bottomSearchSpaceX = leftEyeBottomLoc.x - bufferX;
 			if(bottomSearchSpaceX < this->topLeftPoint.x)
 			{
 				bottomSearchSpaceX = this->topLeftPoint.x;
 			}
 
-			int bottomSearchSpaceY = leftEyeBottomLoc.y - bufferRadius;
+			//int bottomSearchSpaceY = leftEyeBottomLoc.y - bufferRadius;
+			int bottomSearchSpaceY = leftEyeBottomLoc.y - bufferY;
 			if(bottomSearchSpaceY < (this->topLeftPoint.y + (int)((2.5/8.0)*this->currentFaceHeight)) )
 			{
 				bottomSearchSpaceY = (this->topLeftPoint.y + (int)((2.5/8.0)*this->currentFaceHeight));
 			}
 
-			int bottomSearchSpaceWidth = this->leftEyeBottomTpl.cols + 2*bufferRadius;
+			//int bottomSearchSpaceWidth = this->leftEyeBottomTpl.cols + 2*bufferRadius;
+			int bottomSearchSpaceWidth = this->leftEyeBottomTpl.cols + 2*bufferX;
 			if(bottomSearchSpaceWidth > (this->currentFaceWidth/2))
 			{
 				bottomSearchSpaceWidth = (this->currentFaceWidth/2);
 			}
 
 			//limit should be the min of where you look for the eye and the midpt btn the top and bottom buffers
-			int bottomSearchSpaceHeight = this->leftEyeBottomTpl.rows + 2*bufferRadius;
+			//int bottomSearchSpaceHeight = this->leftEyeBottomTpl.rows + 2*bufferRadius;
+			int bottomSearchSpaceHeight = this->leftEyeBottomTpl.rows + 2*bufferY;
 			if(bottomSearchSpaceHeight > ((int)((2.0/8.0)*this->currentFaceHeight)) )
 			{
 				bottomSearchSpaceHeight = ((int)((2.0/8.0)*this->currentFaceHeight));
