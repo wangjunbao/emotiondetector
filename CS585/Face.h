@@ -229,53 +229,35 @@ public:
 	//void updateSubFeatureLocations(IplImage *img, IplImage *processedImg, double newFaceWidth, double newFaceHeight, CvRect& parentLoc)
 	void updateSubFeatureLocations(IplImage *img, IplImage *processedImg, CvRect& r, CvRect& parentLoc)
 	{
-
-		//std::cout << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%IN updateSubFeatureLocations" << std::endl;
-
-		//store face coords
+		//update face with new coordinates
 		this->oldFaceWidth = this->currentFaceWidth;
 		this->oldFaceHeight = this->currentFaceWidth;
 
-		this->currentFaceWidth = r.width;//newFaceWidth;
-		this->currentFaceHeight = r.height;//newFaceHeight;
+		this->currentFaceWidth = r.width;	//newFaceWidth
+		this->currentFaceHeight = r.height;	//newFaceHeight
 		
 		this->topLeftPoint.x = r.x;
 		this->topLeftPoint.y = r.y;
 
 
-		
-		//typically doResize and doCrop are true at same time
 		CvRect topLoc = cvRect(0,0,0,0);			
 		CvRect bottomLoc = cvRect(0,0,0,0);
 
 		CvRect topSearchSpace;		// if condition is true, parent feature subsection, else subfeature location with Buffer
 		CvRect bottomSearchSpace;
-		
-		Mat testMat;
-		/*
-		std::cout << "left top rows: " << leftEyeTopTpl.rows << std::endl;
-		std::cout << "left top cols: " << leftEyeTopTpl.cols << std::endl;
-		std::cout << "left bottom rows: " << leftEyeBottomTpl.rows << std::endl;
-		std::cout << "left bottom cols: " << leftEyeBottomTpl.cols << std::endl;
-		*/
 
-		//std::cout << "parent: " << parentLoc.x << ", " << parentLoc.y << std::endl;
-
-		//if(subfeature has no previous coordinates, i.e. == -1)
+		//subfeature has no previous coordinates, i.e. the template images are empty
 		if(leftEyeTopTpl.empty() || leftEyeBottomTpl.empty())
-		//if(true)
 		{
 			//look at parent feature coords for search space
 			
 			//top subtemplate
 			Mat oldTopTpl = imread("templates/leftEyeTop.jpg",1);			
-			//resizeFeatureTemplate(oldTopTpl,newFaceWidth,newFaceHeight,this->leftEyeTopTpl);
 			resizeFeatureTemplate(oldTopTpl,r.width,r.height,this->leftEyeTopTpl);
-			
 			
 			topSearchSpace = cvRect(parentLoc.x, parentLoc.y,parentLoc.width, parentLoc.height/2);
 			
-			//draw search space
+			//yellow box
 			rectangle(Mat(processedImg),Point(topSearchSpace.x,topSearchSpace.y),
 				Point(topSearchSpace.x+topSearchSpace.width,topSearchSpace.y+topSearchSpace.height),
 				CV_RGB(255,255,0),1,0,0);
@@ -283,134 +265,20 @@ public:
 
 			//bottom subtemplate
 			Mat oldBottomTpl = imread("templates/leftEyeBottom.jpg",1);
-			//resizeFeatureTemplate(oldBottomTpl,newFaceWidth,newFaceHeight,this->leftEyeBottomTpl);
 			resizeFeatureTemplate(oldBottomTpl,r.width,r.height,this->leftEyeBottomTpl);
 
 			bottomSearchSpace = cvRect(parentLoc.x, parentLoc.y + parentLoc.height/2, parentLoc.width, parentLoc.height/2);
 
-			//draw search space
+			//pink box
 			rectangle(Mat(processedImg),Point(bottomSearchSpace.x,bottomSearchSpace.y),
 				Point(bottomSearchSpace.x+bottomSearchSpace.width,bottomSearchSpace.y+bottomSearchSpace.height),
 				CV_RGB(255,0,255),1,0,0);
 
 		}
-		else
+		else //update search space for NCC
 		{
-			std::cout << "=================================" << std::endl;
-			////resize sub feature templates and search space based on new face width and height
-			////double oldFaceWidth = (double)r.width;
-			////double oldFaceHeight = (double)r.height;
+			//resize buffers for search space depending on how much face size changed
 
-			////top
-			//double oldTopTplWidth = (double)leftEyeTopTpl.cols;
-			////double newTopTplWidth = (oldTopTplWidth / oldFaceWidth) * newFaceWidth;
-			////double newTopTplWidth = (oldTopTplWidth / this->oldFaceWidth) * newFaceWidth;
-			//
-			////double newTopTplWidth = (oldTopTplWidth / this->oldFaceWidth) * r.width;
-			//double newTopTplWidth = ceil( (oldTopTplWidth / this->oldFaceWidth) * r.width );
-
-			////prevent against width <= 0
-			//if(newTopTplWidth < 1)
-			//{
-			//	newTopTplWidth = 1;
-			//}
-
-			//std::cout << "old face width: " << this->oldFaceWidth << std::endl;
-			//std::cout << "new face width: " << r.width << std::endl;
-			//
-			//std::cout << "oldTopTplWidth: " << oldTopTplWidth << std::endl;
-			//std::cout << "newTopTplWidth: " << newTopTplWidth << std::endl;
-
-
-			//double oldTopTplHeight = (double)leftEyeTopTpl.rows;
-			////double newTopTplHeight = (oldTopTplHeight / oldFaceHeight) * newFaceHeight;
-			////double newTopTplHeight = (oldTopTplHeight / this->oldFaceHeight) * newFaceHeight;
-			//
-			////double newTopTplHeight = (oldTopTplHeight / this->oldFaceHeight) * r.height;
-			//double newTopTplHeight = ceil( (oldTopTplHeight / this->oldFaceHeight) * r.height );
-			//
-			////std::cout << "newTopTplHeight: " << newTopTplHeight << std::endl;
-
-			////prevent against height <= 0
-			//if(newTopTplHeight < 1)
-			//{
-			//	newTopTplHeight = 1;
-			//}
-
-			//std::cout << "old face height: " << this->oldFaceHeight << std::endl;
-			//std::cout << "new face height: " << r.height << std::endl;
-			//
-			//std::cout << "oldTopTplHeight: " << oldTopTplHeight << std::endl;
-			//std::cout << "newTopTplHeight: " << newTopTplHeight << std::endl;
-
-			//Mat newLeftEyeTopTpl;
-			//resize(this->leftEyeTopTpl,newLeftEyeTopTpl,Size((int)newTopTplWidth,(int)newTopTplHeight));
-
-			////swap templates back			
-			////newLeftEyeTopTpl.copyTo(this->leftEyeTopTpl);
-			//this->leftEyeTopTpl = newLeftEyeTopTpl;
-
-
-			////bottom
-			//double oldBottomTplWidth = (double)leftEyeBottomTpl.cols;
-			////double newBottomTplWidth = (oldBottomTplWidth / oldFaceWidth) * newFaceWidth;
-			////double newBottomTplWidth = (oldBottomTplWidth / this->oldFaceWidth) * newFaceWidth;
-			//double newBottomTplWidth = (oldBottomTplWidth / this->oldFaceWidth) * r.width;
-
-
-
-
-
-			////std::cout << "newBottomTplWidth: " << newBottomTplWidth << std::endl;
-
-			////prevent against width <= 0
-			//if(newBottomTplWidth < 1)
-			//{
-			//	newBottomTplWidth = 1;
-			//}
-
-			//std::cout << "oldBottomTplWidth: " << oldBottomTplWidth << std::endl;
-			//std::cout << "newBottomTplWidth: " << newBottomTplWidth << std::endl;
-
-
-			//double oldBottomTplHeight = (double)leftEyeBottomTpl.rows;
-			////double newBottomTplHeight = (oldBottomTplHeight / oldFaceHeight) * newFaceHeight;
-			////double newBottomTplHeight = (oldBottomTplHeight / this->oldFaceHeight) * newFaceHeight;
-			//double newBottomTplHeight = (oldBottomTplHeight / this->oldFaceHeight) * r.height;
-			////std::cout << "newBottomTplHeight: " << newBottomTplHeight << std::endl;
-
-			////prevent against height <= 0
-			//if(newBottomTplHeight < 1)
-			//{
-			//	newBottomTplHeight = 1;
-			//}
-
-			//std::cout << "oldBottomTplHeight: " << oldBottomTplHeight << std::endl;
-			//std::cout << "newBottomTplHeight: " << newBottomTplHeight << std::endl;
-
-			//Mat newLeftEyeBottomTpl;
-			//resize(this->leftEyeBottomTpl,newLeftEyeBottomTpl,Size((int)newBottomTplWidth,(int)newBottomTplHeight));
-
-			////swap templates back			
-			////newLeftEyeBottomTpl.copyTo(this->leftEyeBottomTpl);
-			//this->leftEyeBottomTpl = newLeftEyeBottomTpl;
-
-
-
-			////end resize
-
-
-			//update search space for NCC
-			//double newMidYDist = (this->leftEyeTopLoc.y + this->leftEyeBottomLoc.y) / 2.0;
-			//double newMidYDist = (abs(this->leftEyeTopLoc.y - this->leftEyeBottomLoc.y)) / 2.0;
-			
-			//int bufferRadius = (int)(newMidYDist / 2.0);
-			//int bufferRadius = (int)(newMidYDist);
-			//int bufferRadius = 0;
-
-			//need to resize buffer too!
-			//bufferX = abs( (newWidth/oldWidth) * oldPt - oldPt)
-			//int bufferX = (int)( abs( (((double)r.width/(double)this->oldFaceWidth) * this->leftEyeTopLoc.x) - this->leftEyeTopLoc.x ) );
 			int bufferX = (int)( (((double)r.width/(double)this->oldFaceWidth) * this->leftEyeTopLoc.x) - this->leftEyeTopLoc.x );
 			//when the face grows smaller, just use no buffer (same search space as previous) to search instead of shrinking the search space
 			//b/c the current template may actually be larger than a resized smaller search space
@@ -419,60 +287,32 @@ public:
 				bufferX = 0;
 			}
 			
-			
-			//int bufferY = (int)( abs( (((double)r.height/(double)this->oldFaceHeight) * this->leftEyeTopLoc.y) - this->leftEyeTopLoc.y ) );
 			int bufferY = (int)( (((double)r.height/(double)this->oldFaceHeight) * this->leftEyeTopLoc.y) - this->leftEyeTopLoc.y );
 			if(bufferY < 0)
 			{
 				bufferY = 0;
 			}
 
-
-			//int bufferX = 1;
-			//int bufferY = 1;
-
-			std::cout << "bufferX: " << bufferX << std::endl;
-			std::cout << "bufferY: " << bufferY << std::endl;
-
-
-			//int bufferRadius = 5;
-
-			/*
-			std::cout << "leftEyeTopLoc: " << this->leftEyeTopLoc.x << " by " << this->leftEyeTopLoc.y << std::endl;
-			std::cout << "leftEyeBottomLoc: " << this->leftEyeBottomLoc.x << " by " << this->leftEyeBottomLoc.y << std::endl;
-			std::cout << "newMidYDist: " << newMidYDist << std::endl;
-			std::cout << "bufferRadius: " << bufferRadius << std::endl;
-			*/
-
-
-			//CvRect leftEyeSearchSpace = cvRect((r->x), (r->y + (int)((2.5/8.0)*r->height)), r->width/2, (int)((2.0/8.0)*r->height));
-
-			//we don't have boundary condition checks yet
-
-			//use same boundaries as when searching for whole eye template in face
-			//int topSearchSpaceX = leftEyeTopLoc.x - bufferRadius;
+			//edge cases for top search space
+			//use same maximum boundaries as when searching for whole eye template in face
 			int topSearchSpaceX = leftEyeTopLoc.x - bufferX;
 			if(topSearchSpaceX < this->topLeftPoint.x)
 			{
 				topSearchSpaceX = this->topLeftPoint.x;
 			}
 
-			//int topSearchSpaceY = leftEyeTopLoc.y - bufferRadius;
 			int topSearchSpaceY = leftEyeTopLoc.y - bufferY;
 			if(topSearchSpaceY < (this->topLeftPoint.y + (int)((2.5/8.0)*this->currentFaceHeight)) )
 			{
 				topSearchSpaceY = (this->topLeftPoint.y + (int)((2.5/8.0)*this->currentFaceHeight));
 			}
 
-			//int topSearchSpaceWidth = this->leftEyeTopTpl.cols + 2*bufferRadius;
 			int topSearchSpaceWidth = this->leftEyeTopTpl.cols + 2*bufferX;
 			if(topSearchSpaceWidth > (this->currentFaceWidth/2))
 			{
 				topSearchSpaceWidth = (this->currentFaceWidth/2);
 			}
 
-			//limit should be the min of where you look for the eye and the midpt btn the top and bottom buffers
-			//int topSearchSpaceHeight = this->leftEyeTopTpl.rows + 2*bufferRadius;
 			int topSearchSpaceHeight = this->leftEyeTopTpl.rows + 2*bufferY;
 			if(topSearchSpaceHeight > ((int)((2.0/8.0)*this->currentFaceHeight)) )
 			{
@@ -481,36 +321,33 @@ public:
 
 			topSearchSpace = cvRect(topSearchSpaceX, topSearchSpaceY, topSearchSpaceWidth, topSearchSpaceHeight);
 
+			//black rectangle for top search space
 			rectangle(Mat(processedImg),Point(topSearchSpace.x,topSearchSpace.y),
 				Point(topSearchSpace.x + topSearchSpace.width, topSearchSpace.y + topSearchSpace.height),CV_RGB(0, 0, 0), 1, 0, 0 );
 
 
 			std::cout << "top search space: " << topSearchSpace.x << "," << topSearchSpace.y << ": " << topSearchSpace.width << "by" << topSearchSpace.height << std::endl;
 
-			//use same boundaries as when searching for whole eye template in face
-			//int bottomSearchSpaceX = leftEyeBottomLoc.x - bufferRadius;
+			//edge cases for bottom search space
+			//use same maximum boundaries as when searching for whole eye template in face
 			int bottomSearchSpaceX = leftEyeBottomLoc.x - bufferX;
 			if(bottomSearchSpaceX < this->topLeftPoint.x)
 			{
 				bottomSearchSpaceX = this->topLeftPoint.x;
 			}
 
-			//int bottomSearchSpaceY = leftEyeBottomLoc.y - bufferRadius;
 			int bottomSearchSpaceY = leftEyeBottomLoc.y - bufferY;
 			if(bottomSearchSpaceY < (this->topLeftPoint.y + (int)((2.5/8.0)*this->currentFaceHeight)) )
 			{
 				bottomSearchSpaceY = (this->topLeftPoint.y + (int)((2.5/8.0)*this->currentFaceHeight));
 			}
 
-			//int bottomSearchSpaceWidth = this->leftEyeBottomTpl.cols + 2*bufferRadius;
 			int bottomSearchSpaceWidth = this->leftEyeBottomTpl.cols + 2*bufferX;
 			if(bottomSearchSpaceWidth > (this->currentFaceWidth/2))
 			{
 				bottomSearchSpaceWidth = (this->currentFaceWidth/2);
 			}
 
-			//limit should be the min of where you look for the eye and the midpt btn the top and bottom buffers
-			//int bottomSearchSpaceHeight = this->leftEyeBottomTpl.rows + 2*bufferRadius;
 			int bottomSearchSpaceHeight = this->leftEyeBottomTpl.rows + 2*bufferY;
 			if(bottomSearchSpaceHeight > ((int)((2.0/8.0)*this->currentFaceHeight)) )
 			{
@@ -519,59 +356,20 @@ public:
 
 			bottomSearchSpace = cvRect(bottomSearchSpaceX, bottomSearchSpaceY, bottomSearchSpaceWidth, bottomSearchSpaceHeight);
 
-
-			
-			std::cout << "bottom search space: " << bottomSearchSpace.x << "," << bottomSearchSpace.y << ": " << bottomSearchSpace.width << "by" << bottomSearchSpace.height << std::endl;
-
-
+			//white box
 			rectangle(Mat(processedImg),Point(bottomSearchSpace.x,bottomSearchSpace.y),
 				Point(bottomSearchSpace.x + bottomSearchSpace.width, bottomSearchSpace.y + bottomSearchSpace.height),CV_RGB(255, 255, 255), 1, 0, 0 );
 
-			std::cout << "=================================" << std::endl;
 		}//end else
 
 
 		//update template image by running NCC
-		//runNCC(search space) and store new maxloc
-		//bool getSearchSpace(IplImage *img, IplImage *processedImg, CvRect *r, Mat& tpl, CvRect& inputSearchSpace, CvRect& outputSearchSpace)
-		
-		//uncomment below:
-
-		//std::cout << "before get search space topLoc: " << topLoc.x << ", " << topLoc.y << std::endl;
-
-		//CvRect topLoc;
-		
-		
-		//error here about incorrect array dimensions!
-
-
-		//std::cout << "img: " << img->width << " by " << img->height << std::endl;
-		//std::cout << "processedImg: " << processedImg->width << " by " << processedImg->height << std::endl;
-		//std::cout << "r: " << r.width << " by " << r.height << std::endl;
-		
-		/*std::cout << "leftEyeTopTpl: " << leftEyeTopTpl.cols << " by " << leftEyeTopTpl.rows << std::endl;
-		std::cout << "topSearchSpace: " << topSearchSpace.width << " by " << topSearchSpace.height << std::endl;
-		std::cout << "topLoc before: " << topLoc.width << " by " << topLoc.height << std::endl;
-
-
-		std::cout << "leftEyeBottomTpl: " << leftEyeBottomTpl.cols << " by " << leftEyeBottomTpl.rows << std::endl;
-		std::cout << "bottomSearchSpace: " << bottomSearchSpace.width << " by " << bottomSearchSpace.height << std::endl;
-		std::cout << "bottomLoc before: " << bottomLoc.width << " by " << bottomLoc.height << std::endl;*/
-
-
-
 		bool topFound = getSearchSpace(img,processedImg,&r,leftEyeTopTpl,topSearchSpace,topLoc);
-		//std::cout << "topLoc after NCC: " << topLoc.width << " by " << topLoc.height << std::endl;
-
 		bool bottomFound = getSearchSpace(img,processedImg,&r,leftEyeBottomTpl,bottomSearchSpace,bottomLoc);
-		//std::cout << "bottomLoc after NCC: " << bottomLoc.width << " by " << bottomLoc.height << std::endl;
-		
 
-		
 		//update coordinates because maybe it was only taking the greatest but not surpassing threshold
 		if(topFound && bottomFound)
 		{
-			//std::cout << "^^^^^^^^^^^^^^^UPDATED" << std::endl;
 			this->leftEyeTopLoc.x = topLoc.x;
 			this->leftEyeTopLoc.y = topLoc.y;
 			this->leftEyeBottomLoc.x = bottomLoc.x;
@@ -580,39 +378,13 @@ public:
 		else //clear out templates
 		{
 			this->leftEyeTopTpl.release();
-			std::cout << "after release top is empty: " << this->leftEyeTopTpl.empty() << std::endl;
 			this->leftEyeBottomTpl.release();
-			std::cout << "after release bottom is empty: " << this->leftEyeBottomTpl.empty() << std::endl;
-			
 			//we didnt' find the feature in this frame :(
 		}
 		
-
-		/*
-			this->leftEyeTopLoc.x = topLoc.x;
-			this->leftEyeTopLoc.y = topLoc.y;
-			this->leftEyeBottomLoc.x = bottomLoc.x;
-			this->leftEyeBottomLoc.y = bottomLoc.y;
-			*/
-		
-	
-		//update template image
-
-		
-		////CvRect topLoc;
-		//bool topFound = getSearchSpace(img,processedImg,r,topTpl,topSearchSpace,topLoc);
-		//
-		////CvRect bottomLoc;
-		//bool bottomFound = getSearchSpace(img,processedImg,r,bottomTpl,bottomSearchSpace,bottomLoc);
-
-		//if(doCrop == true or frame # is mod something)
-		//{
-		//	crop out new template images based on stored locations
-		//}
+		//update (crop out) template image
 
 	}//end updateSubFeatureLocations
-
-
 
 
 	/* Check if a face found by Haar is valid (has a left eye) */
