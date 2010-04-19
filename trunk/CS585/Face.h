@@ -248,23 +248,34 @@ public:
 
 		//subfeature has no previous coordinates, i.e. the template images are empty
 		if(leftEyeTopTpl.empty() || leftEyeBottomTpl.empty())
+		//if(true)
 		{
 			//look at parent feature coords for search space
 			
-			////crop out eye template
-			//Rect parentROI(parentLoc);	//Make a rectangle
-			//Mat imgParentROI = Mat(img)(parentROI);	//Point a cv::Mat header at it (no allocation is done)
-			////imgParentROI.copyTo(this->leftEyeParentTpl);
+			//crop out eye template
+			Rect parentROI(parentLoc);	//Make a rectangle
+			Mat imgParentROI = Mat(img)(parentROI);	//Point a cv::Mat header at it (no allocation is done)
+			//imgParentROI.copyTo(this->leftEyeParentTpl);
 
-			//cvNamedWindow( "eyeTop", 1 );
-			//imshow( "eyeTop", imgParentROI);
+			cvNamedWindow( "eyeTop", 1 );
+			imshow( "eyeTop", imgParentROI);
 
 
 			//top subtemplate
-			Mat oldTopTpl = imread("templates/leftEyeTop.jpg",1);			
-			resizeFeatureTemplate(oldTopTpl,r.width,r.height,this->leftEyeTopTpl);
+			//Mat oldTopTpl = imread("templates/leftEyeTop.jpg",1);			
+			//resizeFeatureTemplate(oldTopTpl,r.width,r.height,this->leftEyeTopTpl);
 			
-			topSearchSpace = cvRect(parentLoc.x, parentLoc.y,parentLoc.width, parentLoc.height/2);
+			//topSearchSpace = cvRect(parentLoc.x, parentLoc.y,parentLoc.width, parentLoc.height/2);
+			topSearchSpace = cvRect(parentLoc.x, parentLoc.y,parentLoc.width, (3.0/8.0)*parentLoc.height);
+
+
+			Rect topROI(topSearchSpace);
+			Mat imgTopROI = Mat(img)(topROI);
+			imgTopROI.copyTo(this->leftEyeTopTpl);
+
+			cvNamedWindow( "leftEyeTop", 1 );
+			imshow( "leftEyeTop", this->leftEyeTopTpl);
+
 			
 			//yellow box
 			//rectangle(Mat(processedImg),Point(topSearchSpace.x,topSearchSpace.y),
@@ -273,10 +284,19 @@ public:
 
 
 			//bottom subtemplate
-			Mat oldBottomTpl = imread("templates/leftEyeBottom.jpg",1);
-			resizeFeatureTemplate(oldBottomTpl,r.width,r.height,this->leftEyeBottomTpl);
+			//Mat oldBottomTpl = imread("templates/leftEyeBottom.jpg",1);
+			//resizeFeatureTemplate(oldBottomTpl,r.width,r.height,this->leftEyeBottomTpl);
 
-			bottomSearchSpace = cvRect(parentLoc.x, parentLoc.y + parentLoc.height/2, parentLoc.width, parentLoc.height/2);
+			//bottomSearchSpace = cvRect(parentLoc.x, parentLoc.y + (1.0/2.0)*parentLoc.height, parentLoc.width, (1.0/2.0)*parentLoc.height);
+			bottomSearchSpace = cvRect(parentLoc.x, parentLoc.y + (5.0/8.0)*parentLoc.height, parentLoc.width, (3.0/8.0)*parentLoc.height);
+
+			Rect bottomROI(bottomSearchSpace);	//Make a rectangle
+			Mat imgBottomROI = Mat(img)(bottomROI);	//Point a cv::Mat header at it (no allocation is done)
+			imgBottomROI.copyTo(this->leftEyeBottomTpl);
+
+			cvNamedWindow( "leftEyeBottom", 1 );
+			imshow( "leftEyeBottom", this->leftEyeBottomTpl);
+
 
 			//pink box
 			//rectangle(Mat(processedImg),Point(bottomSearchSpace.x,bottomSearchSpace.y),
@@ -474,7 +494,8 @@ public:
 		bool bottomFound = getSearchSpace(img,processedImg,&r,leftEyeBottomTpl,bottomSearchSpace,bottomLoc);
 
 		//update coordinates because maybe it was only taking the greatest but not surpassing threshold
-		if(topFound && bottomFound)
+		//if(topFound && bottomFound)
+		if(true)
 		{
 			this->leftEyeTopLoc.x = topLoc.x;
 			this->leftEyeTopLoc.y = topLoc.y;
@@ -501,7 +522,7 @@ public:
 			cvNamedWindow( "leftEyeBottom", 1 );
 			imshow( "leftEyeBottom", this->leftEyeBottomTpl);
 
-			std::cout << "top bot diff: " << abs(topLoc.y - bottomLoc.y) << std::endl;
+			//std::cout << "top bot diff: " << abs(topLoc.y - bottomLoc.y) << std::endl;
 
 		}
 		else //clear out templates
@@ -510,6 +531,8 @@ public:
 			this->leftEyeBottomTpl.release();
 			//we didnt' find the feature in this frame :(
 		}
+
+		std::cout << "top bot diff: " << abs(topLoc.y - bottomLoc.y) << std::endl;
 
 
 	}//end updateSubFeatureLocations
