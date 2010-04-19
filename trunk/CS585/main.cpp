@@ -226,7 +226,7 @@ bool containedInOldFace(int faceX, int faceY, int faceWidth, int faceHeight)
 bool matchesOldFace(Point curTopLeftPoint, int width, int height, Face* matchedFace)
 {
     double NOT_FOUND_VAL = 999.0;
-	double SUM_THRESH = 0.2; //calc: 2/50 + 2/50 = 0.08 
+	double SUM_THRESH = 0.08; //calc: 2/50 + 2/50 = 0.08 
     
     double minSumDiff = NOT_FOUND_VAL;
 	int matchedFaceIndex = -1;
