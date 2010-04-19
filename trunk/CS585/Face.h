@@ -251,6 +251,15 @@ public:
 		{
 			//look at parent feature coords for search space
 			
+			////crop out eye template
+			//Rect parentROI(parentLoc);	//Make a rectangle
+			//Mat imgParentROI = Mat(img)(parentROI);	//Point a cv::Mat header at it (no allocation is done)
+			////imgParentROI.copyTo(this->leftEyeParentTpl);
+
+			//cvNamedWindow( "eyeTop", 1 );
+			//imshow( "eyeTop", imgParentROI);
+
+
 			//top subtemplate
 			Mat oldTopTpl = imread("templates/leftEyeTop.jpg",1);			
 			resizeFeatureTemplate(oldTopTpl,r.width,r.height,this->leftEyeTopTpl);
@@ -258,9 +267,9 @@ public:
 			topSearchSpace = cvRect(parentLoc.x, parentLoc.y,parentLoc.width, parentLoc.height/2);
 			
 			//yellow box
-			rectangle(Mat(processedImg),Point(topSearchSpace.x,topSearchSpace.y),
-				Point(topSearchSpace.x+topSearchSpace.width,topSearchSpace.y+topSearchSpace.height),
-				CV_RGB(255,255,0),1,0,0);
+			//rectangle(Mat(processedImg),Point(topSearchSpace.x,topSearchSpace.y),
+			//	Point(topSearchSpace.x+topSearchSpace.width,topSearchSpace.y+topSearchSpace.height),
+			//	CV_RGB(255,255,0),1,0,0);
 
 
 			//bottom subtemplate
@@ -270,13 +279,110 @@ public:
 			bottomSearchSpace = cvRect(parentLoc.x, parentLoc.y + parentLoc.height/2, parentLoc.width, parentLoc.height/2);
 
 			//pink box
-			rectangle(Mat(processedImg),Point(bottomSearchSpace.x,bottomSearchSpace.y),
-				Point(bottomSearchSpace.x+bottomSearchSpace.width,bottomSearchSpace.y+bottomSearchSpace.height),
-				CV_RGB(255,0,255),1,0,0);
+			//rectangle(Mat(processedImg),Point(bottomSearchSpace.x,bottomSearchSpace.y),
+			//	Point(bottomSearchSpace.x+bottomSearchSpace.width,bottomSearchSpace.y+bottomSearchSpace.height),
+			//	CV_RGB(255,0,255),1,0,0);
 
 		}
 		else //update search space for NCC
 		{
+ ////resize sub feature templates and search space based on new face width and height
+ //                       //double oldFaceWidth = (double)r.width;
+ //                       //double oldFaceHeight = (double)r.height;
+
+ //                       //top
+ //                       double oldTopTplWidth = (double)leftEyeTopTpl.cols;
+ //                       //double newTopTplWidth = (oldTopTplWidth / oldFaceWidth) * newFaceWidth;
+ //                       //double newTopTplWidth = (oldTopTplWidth / this->oldFaceWidth) * newFaceWidth;
+ //                       
+ //                       //double newTopTplWidth = (oldTopTplWidth / this->oldFaceWidth) * r.width;
+ //                       double newTopTplWidth = ceil( (oldTopTplWidth / this->oldFaceWidth) * r.width );
+
+ //                       //prevent against width <= 0
+ //                       if(newTopTplWidth < 1)
+ //                       {
+ //                             newTopTplWidth = 1;
+ //                       }
+
+ //                       std::cout << "old face width: " << this->oldFaceWidth << std::endl;
+ //                       std::cout << "new face width: " << r.width << std::endl;
+ //                       
+ //                       std::cout << "oldTopTplWidth: " << oldTopTplWidth << std::endl;
+ //                       std::cout << "newTopTplWidth: " << newTopTplWidth << std::endl;
+
+
+ //                       double oldTopTplHeight = (double)leftEyeTopTpl.rows;
+ //                       //double newTopTplHeight = (oldTopTplHeight / oldFaceHeight) * newFaceHeight;
+ //                       //double newTopTplHeight = (oldTopTplHeight / this->oldFaceHeight) * newFaceHeight;
+ //                       
+ //                       //double newTopTplHeight = (oldTopTplHeight / this->oldFaceHeight) * r.height;
+ //                       double newTopTplHeight = ceil( (oldTopTplHeight / this->oldFaceHeight) * r.height );
+ //                       
+ //                       //std::cout << "newTopTplHeight: " << newTopTplHeight << std::endl;
+
+ //                       //prevent against height <= 0
+ //                       if(newTopTplHeight < 1)
+ //                       {
+ //                             newTopTplHeight = 1;
+ //                       }
+
+ //                       std::cout << "old face height: " << this->oldFaceHeight << std::endl;
+ //                       std::cout << "new face height: " << r.height << std::endl;
+ //                       
+ //                       std::cout << "oldTopTplHeight: " << oldTopTplHeight << std::endl;
+ //                       std::cout << "newTopTplHeight: " << newTopTplHeight << std::endl;
+
+ //                       Mat newLeftEyeTopTpl;
+ //                       resize(this->leftEyeTopTpl,newLeftEyeTopTpl,Size((int)newTopTplWidth,(int)newTopTplHeight));
+
+ //                       //swap templates back                 
+ //                       //newLeftEyeTopTpl.copyTo(this->leftEyeTopTpl);
+ //                       this->leftEyeTopTpl = newLeftEyeTopTpl;
+
+
+ //                       //bottom
+ //                       double oldBottomTplWidth = (double)leftEyeBottomTpl.cols;
+ //                       //double newBottomTplWidth = (oldBottomTplWidth / oldFaceWidth) * newFaceWidth;
+ //                       //double newBottomTplWidth = (oldBottomTplWidth / this->oldFaceWidth) * newFaceWidth;
+ //                       double newBottomTplWidth = (oldBottomTplWidth / this->oldFaceWidth) * r.width;
+
+	//					//std::cout << "newBottomTplWidth: " << newBottomTplWidth << std::endl;
+
+ //                       //prevent against width <= 0
+ //                       if(newBottomTplWidth < 1)
+ //                       {
+ //                             newBottomTplWidth = 1;
+ //                       }
+
+ //                       std::cout << "oldBottomTplWidth: " << oldBottomTplWidth << std::endl;
+ //                       std::cout << "newBottomTplWidth: " << newBottomTplWidth << std::endl;
+
+
+ //                       double oldBottomTplHeight = (double)leftEyeBottomTpl.rows;
+ //                       //double newBottomTplHeight = (oldBottomTplHeight / oldFaceHeight) * newFaceHeight;
+ //                       //double newBottomTplHeight = (oldBottomTplHeight / this->oldFaceHeight) * newFaceHeight;
+ //                       double newBottomTplHeight = (oldBottomTplHeight / this->oldFaceHeight) * r.height;
+ //                       //std::cout << "newBottomTplHeight: " << newBottomTplHeight << std::endl;
+
+ //                       //prevent against height <= 0
+ //                       if(newBottomTplHeight < 1)
+ //                       {
+ //                             newBottomTplHeight = 1;
+ //                       }
+
+ //                       std::cout << "oldBottomTplHeight: " << oldBottomTplHeight << std::endl;
+ //                       std::cout << "newBottomTplHeight: " << newBottomTplHeight << std::endl;
+
+ //                       Mat newLeftEyeBottomTpl;
+ //                       resize(this->leftEyeBottomTpl,newLeftEyeBottomTpl,Size((int)newBottomTplWidth,(int)newBottomTplHeight));
+
+ //                       //swap templates back                 
+ //                       //newLeftEyeBottomTpl.copyTo(this->leftEyeBottomTpl);
+ //                       this->leftEyeBottomTpl = newLeftEyeBottomTpl;
+ //                       //end resize
+
+
+
 			//resize buffers for search space depending on how much face size changed
 
 			int bufferX = (int)( (((double)r.width/(double)this->oldFaceWidth) * this->leftEyeTopLoc.x) - this->leftEyeTopLoc.x );
@@ -322,11 +428,11 @@ public:
 			topSearchSpace = cvRect(topSearchSpaceX, topSearchSpaceY, topSearchSpaceWidth, topSearchSpaceHeight);
 
 			//black rectangle for top search space
-			rectangle(Mat(processedImg),Point(topSearchSpace.x,topSearchSpace.y),
-				Point(topSearchSpace.x + topSearchSpace.width, topSearchSpace.y + topSearchSpace.height),CV_RGB(0, 0, 0), 1, 0, 0 );
+			//rectangle(Mat(processedImg),Point(topSearchSpace.x,topSearchSpace.y),
+			//	Point(topSearchSpace.x + topSearchSpace.width, topSearchSpace.y + topSearchSpace.height),CV_RGB(0, 0, 0), 1, 0, 0 );
 
 
-			std::cout << "top search space: " << topSearchSpace.x << "," << topSearchSpace.y << ": " << topSearchSpace.width << "by" << topSearchSpace.height << std::endl;
+			//std::cout << "top search space: " << topSearchSpace.x << "," << topSearchSpace.y << ": " << topSearchSpace.width << "by" << topSearchSpace.height << std::endl;
 
 			//edge cases for bottom search space
 			//use same maximum boundaries as when searching for whole eye template in face
@@ -357,8 +463,8 @@ public:
 			bottomSearchSpace = cvRect(bottomSearchSpaceX, bottomSearchSpaceY, bottomSearchSpaceWidth, bottomSearchSpaceHeight);
 
 			//white box
-			rectangle(Mat(processedImg),Point(bottomSearchSpace.x,bottomSearchSpace.y),
-				Point(bottomSearchSpace.x + bottomSearchSpace.width, bottomSearchSpace.y + bottomSearchSpace.height),CV_RGB(255, 255, 255), 1, 0, 0 );
+		/*	rectangle(Mat(processedImg),Point(bottomSearchSpace.x,bottomSearchSpace.y),
+				Point(bottomSearchSpace.x + bottomSearchSpace.width, bottomSearchSpace.y + bottomSearchSpace.height),CV_RGB(255, 255, 255), 1, 0, 0 );*/
 
 		}//end else
 
@@ -374,6 +480,29 @@ public:
 			this->leftEyeTopLoc.y = topLoc.y;
 			this->leftEyeBottomLoc.x = bottomLoc.x;
 			this->leftEyeBottomLoc.y = bottomLoc.y;
+
+			//update (crop out) template images
+			//referenced from: http://opencv.willowgarage.com/documentation/cpp/c++_cheatsheet.html
+			
+			//top
+			//Rect topROI(topLoc);	//Make a rectangle
+			//Mat imgTopROI = Mat(img)(topROI);	//Point a cv::Mat header at it (no allocation is done)
+			//imgTopROI.copyTo(this->leftEyeTopTpl);
+
+			cvNamedWindow( "leftEyeTop", 1 );
+			imshow( "leftEyeTop", this->leftEyeTopTpl);
+
+
+			//bottom
+			//Rect bottomROI(bottomLoc);	//Make a rectangle
+			//Mat imgBottomROI = Mat(img)(bottomROI);	//Point a cv::Mat header at it (no allocation is done)
+			//imgBottomROI.copyTo(this->leftEyeBottomTpl);
+
+			cvNamedWindow( "leftEyeBottom", 1 );
+			imshow( "leftEyeBottom", this->leftEyeBottomTpl);
+
+			std::cout << "top bot diff: " << abs(topLoc.y - bottomLoc.y) << std::endl;
+
 		}
 		else //clear out templates
 		{
@@ -381,8 +510,7 @@ public:
 			this->leftEyeBottomTpl.release();
 			//we didnt' find the feature in this frame :(
 		}
-		
-		//update (crop out) template image
+
 
 	}//end updateSubFeatureLocations
 
