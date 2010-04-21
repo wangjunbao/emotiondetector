@@ -31,7 +31,7 @@ private:
 	Mat leftEyeTopTpl;
 	Mat leftEyeBottomTpl;
 
-	Mat mouth;
+	Mat mouthTpl;
 	Point mouthTopLoc;
 	Point mouthBottomLoc;
 	Mat mouthTopTpl;
@@ -180,7 +180,7 @@ public:
 		
 		
 		//blue box
-		rectangle(Mat(processedImg),Point(inputSearchSpace.x,inputSearchSpace.y),Point(inputSearchSpace.x+inputSearchSpace.width, inputSearchSpace.y+inputSearchSpace.height),CV_RGB(0, 0, 255), 1, 0, 0 );
+		//rectangle(Mat(processedImg),Point(inputSearchSpace.x,inputSearchSpace.y),Point(inputSearchSpace.x+inputSearchSpace.width, inputSearchSpace.y+inputSearchSpace.height),CV_RGB(0, 0, 255), 1, 0, 0 );
 
 		cvSetImageROI(img, inputSearchSpace);
 		cvSetImageROI(processedImg, inputSearchSpace);
@@ -258,33 +258,31 @@ public:
 			//look at parent feature coords for search space
 			
 			//crop out mouth template
-			/*
+			
 			Rect parentROI(parentLoc);	//Make a rectangle
 			Mat imgParentROI = Mat(img)(parentROI);	//Point a cv::Mat header at it (no allocation is done)
-			//imgParentROI.copyTo(this->mouthParentTpl);
+			imgParentROI.copyTo(this->mouthTpl);
 
-			cvNamedWindow( "mouthTop", 1 );
-			imshow( "mouthTop", imgParentROI);
-			*/
+			cvNamedWindow( "mouth", 1 );
+			//imshow( "mouthTop", imgParentROI);
+			imshow("mouth",this->mouthTpl);
 
 
 			//top subtemplate
-			Mat oldTopTpl = imread("templates/mouthTop.jpg",1);			
-			resizeFeatureTemplate(oldTopTpl,r.width,r.height,this->mouthTopTpl);
+			//Mat oldTopTpl = imread("templates/mouthTop.jpg",1);			
+			//resizeFeatureTemplate(oldTopTpl,r.width,r.height,this->mouthTopTpl);
+			//topSearchSpace = cvRect(parentLoc.x, parentLoc.y,parentLoc.width, parentLoc.height/2);
 			
-			topSearchSpace = cvRect(parentLoc.x, parentLoc.y,parentLoc.width, parentLoc.height/2);
-			//topSearchSpace = cvRect(parentLoc.x + (2.0/8.0)*parentLoc.width, parentLoc.y,
-			//	(4.0/8.0)*parentLoc.width, (3.0/8.0)*parentLoc.height);
-
-
-			/*
+			topSearchSpace = cvRect(parentLoc.x + (2.0/8.0)*parentLoc.width, parentLoc.y,
+				(4.0/8.0)*parentLoc.width, (3.0/8.0)*parentLoc.height);			
 			Rect topROI(topSearchSpace);
 			Mat imgTopROI = Mat(img)(topROI);
 			imgTopROI.copyTo(this->mouthTopTpl);
+			
 
 			cvNamedWindow( "mouthTop", 1 );
 			imshow( "mouthTop", this->mouthTopTpl);
-			*/
+			
 
 			
 			//yellow box
@@ -294,21 +292,21 @@ public:
 
 
 			//bottom subtemplate
-			Mat oldBottomTpl = imread("templates/mouthBottom.jpg",1);
+	/*		Mat oldBottomTpl = imread("templates/mouthBottom.jpg",1);
 			resizeFeatureTemplate(oldBottomTpl,r.width,r.height,this->mouthBottomTpl);
-
 			bottomSearchSpace = cvRect(parentLoc.x, parentLoc.y + (1.0/2.0)*parentLoc.height, parentLoc.width, (1.0/2.0)*parentLoc.height);
-			/*bottomSearchSpace = cvRect(parentLoc.x + (2.0/8.0)*parentLoc.width, parentLoc.y + (5.0/8.0)*parentLoc.height, 
-				(4.0/8.0)*parentLoc.width, (3.0/8.0)*parentLoc.height);*/
-
-			/*
+			*/
+			
+			bottomSearchSpace = cvRect(parentLoc.x + (2.0/8.0)*parentLoc.width, parentLoc.y + (5.0/8.0)*parentLoc.height, 
+				(4.0/8.0)*parentLoc.width, (3.0/8.0)*parentLoc.height);
 			Rect bottomROI(bottomSearchSpace);	//Make a rectangle
 			Mat imgBottomROI = Mat(img)(bottomROI);	//Point a cv::Mat header at it (no allocation is done)
 			imgBottomROI.copyTo(this->mouthBottomTpl);
+			
 
 			cvNamedWindow( "mouthBottom", 1 );
 			imshow( "mouthBottom", this->mouthBottomTpl);
-			*/
+			
 
 
 			//pink box
@@ -538,8 +536,8 @@ public:
 		bool bottomFound = getSearchSpace(img,processedImg,&r,mouthBottomTpl,bottomSearchSpace,bottomLoc);
 
 		//update coordinates because maybe it was only taking the greatest but not surpassing threshold
-		//if(topFound && bottomFound)
-		if(true)
+		if(topFound && bottomFound)
+		//if(true)
 		{
 			this->mouthTopLoc.x = topLoc.x;
 			this->mouthTopLoc.y = topLoc.y;
