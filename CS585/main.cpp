@@ -94,7 +94,7 @@ int main( int argc, char** argv )
 		while( key != 'q' ) {
 			
 			frameCount++;
-			std::cout << frameCount << ": ";
+			//std::cout << frameCount << ": ";
 
 			// get a frame */
 			//frame = cvQueryFrame( capture );
@@ -327,7 +327,7 @@ void detectFaces( IplImage *img )
 			//check if the face is contained within an existing old face
 			if(containedInOldFace(r->x,r->y,r->width,r->height) == true)
 			{
-				std::cout << "face contained in old face" << std::endl;
+				//std::cout << "face contained in old face" << std::endl;
 		
 				//purple box for all faces found by Haar but not necessarily true faces
 				cvRectangle( processedImg,
@@ -339,7 +339,7 @@ void detectFaces( IplImage *img )
 			}
 			else if( face->isValidFace(img,processedImg,r) )
 			{
-				std::cout << "new valid face at: (" << face->getTopLeftPoint().x <<"," << face->getTopLeftPoint().y << ")" << std::endl;
+				//std::cout << "new valid face at: (" << face->getTopLeftPoint().x <<"," << face->getTopLeftPoint().y << ")" << std::endl;
 
 				//update sub features
 
@@ -357,7 +357,7 @@ void detectFaces( IplImage *img )
 		}
 		else if(isOldFace == true)
 		{
-			std::cout << "old face matched at: (" << face->getTopLeftPoint().x << "," << face->getTopLeftPoint().y << ")" << std::endl;
+			//std::cout << "old face matched at: (" << face->getTopLeftPoint().x << "," << face->getTopLeftPoint().y << ")" << std::endl;
 
 			//update sub features
 			
@@ -366,14 +366,25 @@ void detectFaces( IplImage *img )
 			//add value to output
 
 			//add oldFace to newFaces
-			newFaces.push_back(face);
+			//newFaces.push_back(face);
 
 			//draw a box on faces matched with old faces
-			face->updateMouthSubFeatureLocs(img,processedImg,*r);
+			bool updateMouthSuccess = face->updateMouthSubFeatureLocs(img,processedImg,*r);
+			if(updateMouthSuccess == false)
+			{
+				delete face;
+			}
+			else
+			{
+				face->drawBox(img,processedImg,r);
+				newFaces.push_back(face);
+			}
+			
+			
 			//face->isValidFace(img,processedImg,r); //DELETE
 			//CvRect dummy;
 			//face->updateEyeSubFeatureLocations(img, processedImg, r->width, r->height, dummy);
-			face->drawBox(img,processedImg,r);
+			//face->drawBox(img,processedImg,r);
 		}
 		//write out image for debuging
 		//imwrite("image.jpg",Mat(processedImg));
