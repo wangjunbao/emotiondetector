@@ -32,10 +32,11 @@ private:
 	Mat leftEyeBottomTpl;
 
 	Mat mouthTpl;
-	Point mouthTopLoc;
-	Point mouthBottomLoc;
+	CvRect mouthLoc;
 	Mat mouthTopTpl;
+	Point mouthTopLoc;
 	Mat mouthBottomTpl;
+	Point mouthBottomLoc;
 
 
 
@@ -231,8 +232,11 @@ public:
 
 	}
 
-	void updateMouthSubFeatureLocs(IplImage *img, IplImage *processedImg, CvRect& r, CvRect& parentLoc)
+	void updateMouthSubFeatureLocs(IplImage *img, IplImage *processedImg, CvRect& r)
+	//void updateMouthSubFeatureLocs(IplImage *img, IplImage *processedImg, CvRect& r, CvRect& parentLoc)
 	{
+
+
 		//update face with new coordinates
 		this->oldFaceWidth = this->currentFaceWidth;
 		this->oldFaceHeight = this->currentFaceWidth;
@@ -243,6 +247,7 @@ public:
 		this->topLeftPoint.x = r.x;
 		this->topLeftPoint.y = r.y;
 
+		CvRect parentLoc = this->mouthLoc;
 
 		CvRect topLoc = cvRect(0,0,0,0);			
 		CvRect bottomLoc = cvRect(0,0,0,0);
@@ -416,15 +421,22 @@ public:
 
 			//resize buffers for search space depending on how much face size changed
 
-			int bufferX = (int)( (((double)r.width/(double)this->oldFaceWidth) * this->mouthTopLoc.x) - this->mouthTopLoc.x );
-			//when the face grows smaller, just use no buffer (same search space as previous) to search instead of shrinking the search space
+			//int bufferX = (int)( (((double)r.width/(double)this->oldFaceWidth) * this->mouthTopLoc.x) - this->mouthTopLoc.x );
+int bufferX = 5;
+			
+
+
+//when the face grows smaller, just use no buffer (same search space as previous) to search instead of shrinking the search space
 			//b/c the current template may actually be larger than a resized smaller search space
 			if(bufferX < 0)
 			{
 				bufferX = 0;
 			}
 			
-			int bufferY = (int)( (((double)r.height/(double)this->oldFaceHeight) * this->mouthTopLoc.y) - this->mouthTopLoc.y );
+			//int bufferY = (int)( (((double)r.height/(double)this->oldFaceHeight) * this->mouthTopLoc.y) - this->mouthTopLoc.y );
+			
+			int bufferY = 5;
+			
 			if(bufferY < 0)
 			{
 				bufferY = 0;
@@ -516,17 +528,17 @@ public:
 			//if(bottomSearchSpaceHeight > ((int)((2.0/8.0)*this->currentFaceHeight)) )
 
 			//possible for lower lip to extend outside of the "face"
-			//if(bottomSearchSpaceHeight > mouthSearchSpace.height)
-			//{
-			//	//bottomSearchSpaceHeight = ((int)((2.0/8.0)*this->currentFaceHeight));
-			//	bottomSearchSpaceHeight = mouthSearchSpace.height;
-			//}
+			if(bottomSearchSpaceHeight > mouthSearchSpace.height)
+			{
+				//bottomSearchSpaceHeight = ((int)((2.0/8.0)*this->currentFaceHeight));
+				bottomSearchSpaceHeight = mouthSearchSpace.height;
+			}
 
 			bottomSearchSpace = cvRect(bottomSearchSpaceX, bottomSearchSpaceY, bottomSearchSpaceWidth, bottomSearchSpaceHeight);
 
 			//white box
-		/*	rectangle(Mat(processedImg),Point(bottomSearchSpace.x,bottomSearchSpace.y),
-				Point(bottomSearchSpace.x + bottomSearchSpace.width, bottomSearchSpace.y + bottomSearchSpace.height),CV_RGB(255, 255, 255), 1, 0, 0 );*/
+			rectangle(Mat(processedImg),Point(bottomSearchSpace.x,bottomSearchSpace.y),
+				Point(bottomSearchSpace.x + bottomSearchSpace.width, bottomSearchSpace.y + bottomSearchSpace.height),CV_RGB(255, 255, 255), 1, 0, 0 );
 
 		}//end else
 
@@ -1006,7 +1018,11 @@ public:
 			CvRect mouthLoc;
 			bool mouthFound = getSearchSpace(img,processedImg,r,mouthTpl,mouthSearchSpace,mouthLoc);
 			
-			updateMouthSubFeatureLocs(img, processedImg, *r, mouthLoc);
+			this->mouthLoc = mouthLoc;
+
+			//updateMouthSubFeatureLocs(img, processedImg, *r, mouthLoc);
+			updateMouthSubFeatureLocs(img, processedImg, *r);
+
 
 
 			result = true;
