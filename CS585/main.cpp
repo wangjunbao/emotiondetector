@@ -371,7 +371,7 @@ void detectFaces( IplImage *img )
 			//draw a box on faces matched with old faces
 			face->isValidFace(img,processedImg,r); //DELETE
 			//CvRect dummy;
-			//face->updateSubFeatureLocations(img, processedImg, r->width, r->height, dummy);
+			//face->updateEyeSubFeatureLocations(img, processedImg, r->width, r->height, dummy);
 			face->drawBox(img,processedImg,r);
 		}
 		//write out image for debuging
