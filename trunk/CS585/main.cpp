@@ -34,8 +34,10 @@ int main( int argc, char** argv )
 		  //char      *imgfilename = "HowellFace50.jpg";
 		  //char      *imgfilename = "grouppic2.jpg";
 		  //char      *imgfilename = "ChrisFace.jpg"; //this does not work well now but face may be too big
-			char      *imgfilename = "ChrisFace50.jpg";
+		  //char      *imgfilename = "ChrisFace50.jpg";
+		  //char      *imgfilename = "averageFace.jpg";
 		  //char      *imgfilename = "templates/face.jpg";
+		  char      *imgfilename = "templates - Howell/face.jpg";
 
 		  cascade = ( CvHaarClassifierCascade* )cvLoad( filename, 0, 0, 0 );
 		  storage = cvCreateMemStorage( 0 );
@@ -308,6 +310,7 @@ void detectFaces( IplImage *img )
 	{
         CvRect *r = ( CvRect* )cvGetSeqElem( faces, i );
 
+		std::cout << "r: " << r->width << " by " << r->height << std::endl;
 
 		//white box for all faces found by Haar but not necessarily true faces
 		cvRectangle( processedImg,
@@ -370,6 +373,7 @@ void detectFaces( IplImage *img )
 
 			//draw a box on faces matched with old faces
 			bool updateMouthSuccess = face->updateMouthSubFeatureLocs(img,processedImg,*r);
+			
 			if(updateMouthSuccess == false)
 			{
 				delete face;
