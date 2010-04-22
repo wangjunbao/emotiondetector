@@ -321,6 +321,9 @@ public:
 			Rect topROI(topSearchSpace);
 			Mat imgTopROI = Mat(img)(topROI);
 			imgTopROI.copyTo(this->mouthTopTpl);
+
+			//maybe we should run the ncc here instead of just doing location search
+
 			
 
 			cvNamedWindow( "mouthTop", 1 );
@@ -346,6 +349,7 @@ public:
 			Mat imgBottomROI = Mat(img)(bottomROI);	//Point a cv::Mat header at it (no allocation is done)
 			imgBottomROI.copyTo(this->mouthBottomTpl);
 			
+			//maybe we should run the ncc here instead of just doing location search
 
 			cvNamedWindow( "mouthBottom", 1 );
 			imshow( "mouthBottom", this->mouthBottomTpl);
@@ -460,7 +464,12 @@ public:
 			//resize buffers for search space depending on how much face size changed
 
 			//int bufferX = (int)( (((double)r.width/(double)this->oldFaceWidth) * this->mouthTopLoc.x) - this->mouthTopLoc.x );
-			int bufferX = 10;//5;
+			int bufferX = this->mouthTopTpl.cols + 
+				(int)( (((double)r.width/(double)this->oldFaceWidth) * this->mouthTopLoc.x) - this->mouthTopLoc.x );
+			
+//int bufferX = 15;//10;//5;
+			//std::cout << "top width: " << this->mouthTopTpl.cols << std::endl;
+			//std::cout << "buffer x: " << bufferX << std::endl;
 			
 
 
@@ -471,9 +480,11 @@ public:
 				bufferX = 0;
 			}
 			
-			//int bufferY = (int)( (((double)r.height/(double)this->oldFaceHeight) * this->mouthTopLoc.y) - this->mouthTopLoc.y );
+			int bufferY = this->mouthTopTpl.rows + 
+				(int)( (((double)r.height/(double)this->oldFaceHeight) * this->mouthTopLoc.y) - this->mouthTopLoc.y );
 			
-			int bufferY = 10;//5;
+			//int bufferY = 15;//10;//5;
+			//std::cout << "buffer y: " << bufferY << std::endl;
 			
 			if(bufferY < 0)
 			{
