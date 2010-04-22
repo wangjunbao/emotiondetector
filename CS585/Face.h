@@ -142,8 +142,8 @@ public:
 		double oldFeatureWidth = (double)oldFeatureTemplateImg.cols;
 		double oldFeatureHeight = (double)oldFeatureTemplateImg.rows;
 		
-		double oldFaceWidth = 228;
-		double oldFaceHeight = 228;
+		double oldFaceWidth = 196;//228;
+		double oldFaceHeight = 196;//228;
 			
 		double newFeatureWidth = newFaceWidth * (oldFeatureWidth/oldFaceWidth);
 		double newFeatureHeight = newFaceHeight * (oldFeatureHeight/oldFaceHeight);
@@ -175,13 +175,13 @@ public:
 			std::cout << "TPL IS NOT EMPTY" << std::endl;
 		*/
 		bool result = false;
-		double THRESH = 0.50;
+		double THRESH = 0.50;//0.40;//0.50;
 
 		//http://nashruddin.com/OpenCV_Region_of_Interest_(ROI)
 		
 		
 		//blue box
-		//rectangle(Mat(processedImg),Point(inputSearchSpace.x,inputSearchSpace.y),Point(inputSearchSpace.x+inputSearchSpace.width, inputSearchSpace.y+inputSearchSpace.height),CV_RGB(0, 0, 255), 1, 0, 0 );
+		rectangle(Mat(processedImg),Point(inputSearchSpace.x,inputSearchSpace.y),Point(inputSearchSpace.x+inputSearchSpace.width, inputSearchSpace.y+inputSearchSpace.height),CV_RGB(0, 0, 255), 1, 0, 0 );
 
 		cvSetImageROI(img, inputSearchSpace);
 		cvSetImageROI(processedImg, inputSearchSpace);
@@ -199,7 +199,7 @@ public:
 
 		//green box
 		rectangle(Mat(processedImg),maxloc,Point(maxloc.x + tpl.cols, maxloc.y + tpl.rows),CV_RGB(0, 255, 0), 1, 0, 0 );
-		//std::cout << "max: " << "(" << maxloc.x << "," << maxloc.y << "): " << maxval << std::endl;
+		std::cout << "max: " << "(" << maxloc.x << "," << maxloc.y << "): " << maxval << std::endl;
 
 		outputSearchSpace = cvRect(inputSearchSpace.x + maxloc.x, inputSearchSpace.y + maxloc.y, tpl.cols, tpl.rows);
 		//std::cout << "**************outputSearchSpace: " << outputSearchSpace.width << " by " << outputSearchSpace.height << std::endl;
@@ -364,110 +364,18 @@ public:
 		}
 		else //update search space for NCC
 		{
- ////resize sub feature templates and search space based on new face width and height
- //                       //double oldFaceWidth = (double)r.width;
- //                       //double oldFaceHeight = (double)r.height;
 
- //                       //top
- //                       double oldTopTplWidth = (double)mouthTopTpl.cols;
- //                       //double newTopTplWidth = (oldTopTplWidth / oldFaceWidth) * newFaceWidth;
- //                       //double newTopTplWidth = (oldTopTplWidth / this->oldFaceWidth) * newFaceWidth;
- //                       
- //                       //double newTopTplWidth = (oldTopTplWidth / this->oldFaceWidth) * r.width;
- //                       double newTopTplWidth = ceil( (oldTopTplWidth / this->oldFaceWidth) * r.width );
-
- //                       //prevent against width <= 0
- //                       if(newTopTplWidth < 1)
- //                       {
- //                             newTopTplWidth = 1;
- //                       }
-
- //                       std::cout << "old face width: " << this->oldFaceWidth << std::endl;
- //                       std::cout << "new face width: " << r.width << std::endl;
- //                       
- //                       std::cout << "oldTopTplWidth: " << oldTopTplWidth << std::endl;
- //                       std::cout << "newTopTplWidth: " << newTopTplWidth << std::endl;
-
-
- //                       double oldTopTplHeight = (double)mouthTopTpl.rows;
- //                       //double newTopTplHeight = (oldTopTplHeight / oldFaceHeight) * newFaceHeight;
- //                       //double newTopTplHeight = (oldTopTplHeight / this->oldFaceHeight) * newFaceHeight;
- //                       
- //                       //double newTopTplHeight = (oldTopTplHeight / this->oldFaceHeight) * r.height;
- //                       double newTopTplHeight = ceil( (oldTopTplHeight / this->oldFaceHeight) * r.height );
- //                       
- //                       //std::cout << "newTopTplHeight: " << newTopTplHeight << std::endl;
-
- //                       //prevent against height <= 0
- //                       if(newTopTplHeight < 1)
- //                       {
- //                             newTopTplHeight = 1;
- //                       }
-
- //                       std::cout << "old face height: " << this->oldFaceHeight << std::endl;
- //                       std::cout << "new face height: " << r.height << std::endl;
- //                       
- //                       std::cout << "oldTopTplHeight: " << oldTopTplHeight << std::endl;
- //                       std::cout << "newTopTplHeight: " << newTopTplHeight << std::endl;
-
- //                       Mat newMouthTopTpl;
- //                       resize(this->mouthTopTpl,newMouthTopTpl,Size((int)newTopTplWidth,(int)newTopTplHeight));
-
- //                       //swap templates back                 
- //                       //newMouthTopTpl.copyTo(this->mouthTopTpl);
- //                       this->mouthTopTpl = newMouthTopTpl;
-
-
- //                       //bottom
- //                       double oldBottomTplWidth = (double)mouthBottomTpl.cols;
- //                       //double newBottomTplWidth = (oldBottomTplWidth / oldFaceWidth) * newFaceWidth;
- //                       //double newBottomTplWidth = (oldBottomTplWidth / this->oldFaceWidth) * newFaceWidth;
- //                       double newBottomTplWidth = (oldBottomTplWidth / this->oldFaceWidth) * r.width;
-
-	//					//std::cout << "newBottomTplWidth: " << newBottomTplWidth << std::endl;
-
- //                       //prevent against width <= 0
- //                       if(newBottomTplWidth < 1)
- //                       {
- //                             newBottomTplWidth = 1;
- //                       }
-
- //                       std::cout << "oldBottomTplWidth: " << oldBottomTplWidth << std::endl;
- //                       std::cout << "newBottomTplWidth: " << newBottomTplWidth << std::endl;
-
-
- //                       double oldBottomTplHeight = (double)mouthBottomTpl.rows;
- //                       //double newBottomTplHeight = (oldBottomTplHeight / oldFaceHeight) * newFaceHeight;
- //                       //double newBottomTplHeight = (oldBottomTplHeight / this->oldFaceHeight) * newFaceHeight;
- //                       double newBottomTplHeight = (oldBottomTplHeight / this->oldFaceHeight) * r.height;
- //                       //std::cout << "newBottomTplHeight: " << newBottomTplHeight << std::endl;
-
- //                       //prevent against height <= 0
- //                       if(newBottomTplHeight < 1)
- //                       {
- //                             newBottomTplHeight = 1;
- //                       }
-
- //                       std::cout << "oldBottomTplHeight: " << oldBottomTplHeight << std::endl;
- //                       std::cout << "newBottomTplHeight: " << newBottomTplHeight << std::endl;
-
- //                       Mat newMouthBottomTpl;
- //                       resize(this->mouthBottomTpl,newMouthBottomTpl,Size((int)newBottomTplWidth,(int)newBottomTplHeight));
-
- //                       //swap templates back                 
- //                       //newMouthBottomTpl.copyTo(this->mouthBottomTpl);
- //                       this->mouthBottomTpl = newMouthBottomTpl;
- //                       //end resize
 
 
 
 			//resize buffers for search space depending on how much face size changed
 
 			//int bufferX = (int)( (((double)r.width/(double)this->oldFaceWidth) * this->mouthTopLoc.x) - this->mouthTopLoc.x );
-			int bufferX = this->mouthTopTpl.cols + 
-				(int)( (((double)r.width/(double)this->oldFaceWidth) * this->mouthTopLoc.x) - this->mouthTopLoc.x );
 			
-//int bufferX = 15;//10;//5;
+			/*int bufferX = this->mouthTopTpl.cols + 
+				(int)( (((double)r.width/(double)this->oldFaceWidth) * this->mouthTopLoc.x) - this->mouthTopLoc.x );
+			*/
+int bufferX = 15;//10;//5;
 			//std::cout << "top width: " << this->mouthTopTpl.cols << std::endl;
 			//std::cout << "buffer x: " << bufferX << std::endl;
 			
@@ -480,10 +388,10 @@ public:
 				bufferX = 0;
 			}
 			
-			int bufferY = this->mouthTopTpl.rows + 
+			/*int bufferY = this->mouthTopTpl.rows + 
 				(int)( (((double)r.height/(double)this->oldFaceHeight) * this->mouthTopLoc.y) - this->mouthTopLoc.y );
-			
-			//int bufferY = 15;//10;//5;
+			*/
+			int bufferY = 15;//10;//5;
 			//std::cout << "buffer y: " << bufferY << std::endl;
 			
 			if(bufferY < 0)
@@ -1035,32 +943,32 @@ public:
 
 			//uncomment starting here:
 
-			////right eye
-			//Mat oldRightEyeTpl = imread("templates/rightEye.jpg",1);
-			//Mat rightEyeTpl;
-			//resizeFeatureTemplate(oldRightEyeTpl,newFaceWidth,newFaceHeight,rightEyeTpl);
-			////CvRect rightEyeSearchSpace = cvRect((r->x + r->width/2), (r->y + r->height/4), r->width/2, (int)((3.0/8.0)*r->height));
-			////CvRect rightEyeSearchSpace = cvRect((r->x + r->width/2), (r->y + (int)((2.5/8.0)*r->height)), r->width/2, (int)((2.5/8.0)*r->height));
-			//CvRect rightEyeSearchSpace = cvRect((r->x + r->width/2), (r->y + (int)((2.5/8.0)*r->height)), r->width/2, (int)((2.0/8.0)*r->height));
-			//CvRect rightEyeSubSearchSpace;
-			//bool rightEyeFound = getSearchSpace(img,processedImg,r,rightEyeTpl,rightEyeSearchSpace,rightEyeSubSearchSpace);
+			//right eye
+			Mat oldRightEyeTpl = imread("templates/rightEye.jpg",1);
+			Mat rightEyeTpl;
+			resizeFeatureTemplate(oldRightEyeTpl,newFaceWidth,newFaceHeight,rightEyeTpl);
+			//CvRect rightEyeSearchSpace = cvRect((r->x + r->width/2), (r->y + r->height/4), r->width/2, (int)((3.0/8.0)*r->height));
+			//CvRect rightEyeSearchSpace = cvRect((r->x + r->width/2), (r->y + (int)((2.5/8.0)*r->height)), r->width/2, (int)((2.5/8.0)*r->height));
+			CvRect rightEyeSearchSpace = cvRect((r->x + r->width/2), (r->y + (int)((2.5/8.0)*r->height)), r->width/2, (int)((2.0/8.0)*r->height));
+			CvRect rightEyeSubSearchSpace;
+			bool rightEyeFound = getSearchSpace(img,processedImg,r,rightEyeTpl,rightEyeSearchSpace,rightEyeSubSearchSpace);
 
-			////left eyebrow
-			//Mat oldLeftEyebrowTpl = imread("templates/leftEyebrow.jpg",1);
-			//Mat leftEyebrowTpl;
-			//resizeFeatureTemplate(oldLeftEyebrowTpl,newFaceWidth,newFaceHeight,leftEyebrowTpl);
-			//CvRect leftEyebrowSearchSpace = cvRect(r->x, r->y, r->width/2, (int)((3.0/8.0)*r->height));
-			////CvRect leftEyebrowSearchSpace = cvRect(r->x, r->y, r->width/2, (int)((4.0/8.0)*r->height));
-			//CvRect leftEyebrowSubSearchSpace;
-			//bool leftEyebrowFound = getSearchSpace(img,processedImg,r,leftEyebrowTpl,leftEyebrowSearchSpace,leftEyebrowSubSearchSpace);
+			//left eyebrow
+			Mat oldLeftEyebrowTpl = imread("templates/leftEyebrow.jpg",1);
+			Mat leftEyebrowTpl;
+			resizeFeatureTemplate(oldLeftEyebrowTpl,newFaceWidth,newFaceHeight,leftEyebrowTpl);
+			CvRect leftEyebrowSearchSpace = cvRect(r->x, r->y, r->width/2, (int)((3.0/8.0)*r->height));
+			//CvRect leftEyebrowSearchSpace = cvRect(r->x, r->y, r->width/2, (int)((4.0/8.0)*r->height));
+			CvRect leftEyebrowSubSearchSpace;
+			bool leftEyebrowFound = getSearchSpace(img,processedImg,r,leftEyebrowTpl,leftEyebrowSearchSpace,leftEyebrowSubSearchSpace);
 
-			////right eyebrow
-			//Mat oldRightEyebrowTpl = imread("templates/rightEyebrow.jpg",1);
-			//Mat rightEyebrowTpl;
-			//resizeFeatureTemplate(oldRightEyebrowTpl,newFaceWidth,newFaceHeight,rightEyebrowTpl);
-			//CvRect rightEyebrowSearchSpace = cvRect((r->x + r->width/2),r->y, r->width/2, (int)((3.0/8.0)*r->height));
-			//CvRect rightEyebrowSubSearchSpace;
-			//bool rightEyebrowFound = getSearchSpace(img,processedImg,r,rightEyebrowTpl,rightEyebrowSearchSpace,rightEyebrowSubSearchSpace);
+			//right eyebrow
+			Mat oldRightEyebrowTpl = imread("templates/rightEyebrow.jpg",1);
+			Mat rightEyebrowTpl;
+			resizeFeatureTemplate(oldRightEyebrowTpl,newFaceWidth,newFaceHeight,rightEyebrowTpl);
+			CvRect rightEyebrowSearchSpace = cvRect((r->x + r->width/2),r->y, r->width/2, (int)((3.0/8.0)*r->height));
+			CvRect rightEyebrowSubSearchSpace;
+			bool rightEyebrowFound = getSearchSpace(img,processedImg,r,rightEyebrowTpl,rightEyebrowSearchSpace,rightEyebrowSubSearchSpace);
 
 			//mouth
 			Mat oldMouthTpl = imread("templates/mouth.jpg",1);
@@ -1083,6 +991,104 @@ public:
 		}
 
 		return result;
+	}
+
+	void resizeCode()
+	{
+		 ////resize sub feature templates and search space based on new face width and height
+   //                     //double oldFaceWidth = (double)r.width;
+   //                     //double oldFaceHeight = (double)r.height;
+
+   //                     //top
+   //                     double oldTopTplWidth = (double)mouthTopTpl.cols;
+   //                     //double newTopTplWidth = (oldTopTplWidth / oldFaceWidth) * newFaceWidth;
+   //                     //double newTopTplWidth = (oldTopTplWidth / this->oldFaceWidth) * newFaceWidth;
+   //                     
+   //                     //double newTopTplWidth = (oldTopTplWidth / this->oldFaceWidth) * r.width;
+   //                     double newTopTplWidth = ceil( (oldTopTplWidth / this->oldFaceWidth) * r.width );
+
+   //                     //prevent against width <= 0
+   //                     if(newTopTplWidth < 1)
+   //                     {
+   //                           newTopTplWidth = 1;
+   //                     }
+
+   //                     std::cout << "old face width: " << this->oldFaceWidth << std::endl;
+   //                     std::cout << "new face width: " << r.width << std::endl;
+   //                     
+   //                     std::cout << "oldTopTplWidth: " << oldTopTplWidth << std::endl;
+   //                     std::cout << "newTopTplWidth: " << newTopTplWidth << std::endl;
+
+
+   //                     double oldTopTplHeight = (double)mouthTopTpl.rows;
+   //                     //double newTopTplHeight = (oldTopTplHeight / oldFaceHeight) * newFaceHeight;
+   //                     //double newTopTplHeight = (oldTopTplHeight / this->oldFaceHeight) * newFaceHeight;
+   //                     
+   //                     //double newTopTplHeight = (oldTopTplHeight / this->oldFaceHeight) * r.height;
+   //                     double newTopTplHeight = ceil( (oldTopTplHeight / this->oldFaceHeight) * r.height );
+   //                     
+   //                     //std::cout << "newTopTplHeight: " << newTopTplHeight << std::endl;
+
+   //                     //prevent against height <= 0
+   //                     if(newTopTplHeight < 1)
+   //                     {
+   //                           newTopTplHeight = 1;
+   //                     }
+
+   //                     std::cout << "old face height: " << this->oldFaceHeight << std::endl;
+   //                     std::cout << "new face height: " << r.height << std::endl;
+   //                     
+   //                     std::cout << "oldTopTplHeight: " << oldTopTplHeight << std::endl;
+   //                     std::cout << "newTopTplHeight: " << newTopTplHeight << std::endl;
+
+   //                     Mat newMouthTopTpl;
+   //                     resize(this->mouthTopTpl,newMouthTopTpl,Size((int)newTopTplWidth,(int)newTopTplHeight));
+
+   //                     //swap templates back                 
+   //                     //newMouthTopTpl.copyTo(this->mouthTopTpl);
+   //                     this->mouthTopTpl = newMouthTopTpl;
+
+
+   //                     //bottom
+   //                     double oldBottomTplWidth = (double)mouthBottomTpl.cols;
+   //                     //double newBottomTplWidth = (oldBottomTplWidth / oldFaceWidth) * newFaceWidth;
+   //                     //double newBottomTplWidth = (oldBottomTplWidth / this->oldFaceWidth) * newFaceWidth;
+   //                     double newBottomTplWidth = (oldBottomTplWidth / this->oldFaceWidth) * r.width;
+
+			//			//std::cout << "newBottomTplWidth: " << newBottomTplWidth << std::endl;
+
+   //                     //prevent against width <= 0
+   //                     if(newBottomTplWidth < 1)
+   //                     {
+   //                           newBottomTplWidth = 1;
+   //                     }
+
+   //                     std::cout << "oldBottomTplWidth: " << oldBottomTplWidth << std::endl;
+   //                     std::cout << "newBottomTplWidth: " << newBottomTplWidth << std::endl;
+
+
+   //                     double oldBottomTplHeight = (double)mouthBottomTpl.rows;
+   //                     //double newBottomTplHeight = (oldBottomTplHeight / oldFaceHeight) * newFaceHeight;
+   //                     //double newBottomTplHeight = (oldBottomTplHeight / this->oldFaceHeight) * newFaceHeight;
+   //                     double newBottomTplHeight = (oldBottomTplHeight / this->oldFaceHeight) * r.height;
+   //                     //std::cout << "newBottomTplHeight: " << newBottomTplHeight << std::endl;
+
+   //                     //prevent against height <= 0
+   //                     if(newBottomTplHeight < 1)
+   //                     {
+   //                           newBottomTplHeight = 1;
+   //                     }
+
+   //                     std::cout << "oldBottomTplHeight: " << oldBottomTplHeight << std::endl;
+   //                     std::cout << "newBottomTplHeight: " << newBottomTplHeight << std::endl;
+
+   //                     Mat newMouthBottomTpl;
+   //                     resize(this->mouthBottomTpl,newMouthBottomTpl,Size((int)newBottomTplWidth,(int)newBottomTplHeight));
+
+   //                     //swap templates back                 
+   //                     //newMouthBottomTpl.copyTo(this->mouthBottomTpl);
+   //                     this->mouthBottomTpl = newMouthBottomTpl;
+   //                     //end resize
 	}
 	
 };
