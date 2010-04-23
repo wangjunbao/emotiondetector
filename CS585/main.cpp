@@ -21,8 +21,8 @@ void detectFaces( IplImage *img );
 
 int main( int argc, char** argv )
 {
-	bool isVideo = true; //video
-	//bool isVideo = false; //image
+	//bool isVideo = true; //video
+	bool isVideo = false; //image
 
 	//is image
 	if(isVideo == false)
@@ -235,6 +235,7 @@ bool matchesOldFace(Point curTopLeftPoint, int width, int height, Face* matchedF
         return true;
     }
 }//end matchesOldFace
+
 
 /* Find all possible face objects in the current frame */
 void detectFaces( IplImage *img )
