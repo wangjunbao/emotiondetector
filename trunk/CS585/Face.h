@@ -30,6 +30,12 @@ private:
 	Mat mouthBottomTpl;
 	Point mouthBottomLoc;
 
+	//left eyebrow
+	CvRect leftEyebrowLoc;
+
+	//right eyebrow
+	CvRect rightEyebrowLoc;
+
 
 public:
 	Face(CvRect r) 
@@ -475,10 +481,59 @@ int bufferX = 15;//10;//5;
 		return (updateMouthSuccess);
 	}
 
+
+	/* Look in the lower half of the face for the mouth */
+	CvRect getMouthSearchSpace(CvRect *r)
+	{
+		return cvRect(r->x,
+						(r->y +  (int)((1.0/2.0)*r->height)),
+						r->width, 
+						(int)((1.0/2.0)*r->height));
+	}
+
+	/* look in top left quarter for left eyebrow */
+	CvRect getLeftEyebrowSearchSpace(CvRect *r)
+	{
+		return cvRect(r->x,
+						r->y, 
+						(int)((3.0/4.0)*r->width), 
+						(int)((1.0/2.0)*r->height) );
+	}
+
+	/* look in top right quarter for right eyebrow */
+	CvRect getRightEyebrowSearchSpace(CvRect *r)
+	{
+		return cvRect(r->x + (int)((1.0/4.0)*r->width),
+						r->y,
+						(int)((3.0/4.0)*r->width),
+						(int)((1.0/2.0)*r->height) );
+	}
+
+	/* look under left eyebrow midpoint and face midpoint for left eye */
+	CvRect getLeftEyeSearchSpace(CvRect *r)
+	{
+		int y = this->leftEyebrowLoc.y + (int)((1.0/2.0)*this->leftEyebrowLoc.height);
+		return cvRect(r->x,
+						y, 
+						(int)((1.0/2.0)*r->width), 
+						this->mouthLoc.y - y );
+	}
+
+	/* look under right eyebrow midpoint and face midpoint for right eye */
+	CvRect getRightEyeSearchSpace(CvRect *r)
+	{
+		int y = this->rightEyebrowLoc.y + (int)((1.0/2.0)*this->rightEyebrowLoc.height);
+		return cvRect(r->x + (int)((1.0/2.0)*r->width),
+						y,
+						(int)((1.0/2.0)*r->width),
+						this->mouthLoc.y - y );
+	}
+
+
 	/* Check if a face found by Haar is valid (has a left eye) */
 	boolean isValidFace(IplImage *img, IplImage *processedImg, CvRect *r)
 	{
-		bool result = false;
+		//bool result = false;
 		
 		double newFaceWidth = r->width;
 		double newFaceHeight = r->height;
@@ -490,20 +545,8 @@ int bufferX = 15;//10;//5;
 		Mat mouthTpl;
 		resizeFeatureTemplate(oldMouthTpl,newFaceWidth,newFaceHeight,mouthTpl);
 		
-		//CvRect mouthSearchSpace = cvRect(r->x + (int)((2.0/8.0)*r->width), 
-		//	(r->y +  (int)((5.0/8.0)*r->height)), (int)((4.0/8.0)*r->width), (int)((3.0/8.0)*r->height));
+		CvRect mouthSearchSpace = this->getMouthSearchSpace(r);
 		
-		//look in the lower half of the face for the mouth
-		CvRect mouthSearchSpace = cvRect(r->x,
-										(r->y +  (int)((1.0/2.0)*r->height)),
-										r->width, 
-										(int)((1.0/2.0)*r->height));
-
-		/*CvRect mouthSearchSpace = cvRect(r->x, 
-			(r->y +  (int)((5.0/8.0)*r->height)), r->width, (int)((3.0/8.0)*r->height));
-			*/
-		
-
 		CvRect mouthLoc;
 		std::cout << "mouth=============================" << std::endl;
 		bool mouthFound = getSearchSpace(img,processedImg,r,mouthTpl,mouthSearchSpace,mouthLoc);
@@ -511,8 +554,7 @@ int bufferX = 15;//10;//5;
 		
 		if(mouthFound == false)
 		{
-			result = false;
-			return result;
+			return false;
 		}
 
 		//mouth found
@@ -527,17 +569,8 @@ int bufferX = 15;//10;//5;
 		Mat leftEyebrowTpl;
 		resizeFeatureTemplate(oldLeftEyebrowTpl,newFaceWidth,newFaceHeight,leftEyebrowTpl);
 		
-		//CvRect leftEyebrowSearchSpace = cvRect(r->x, r->y, r->width/2, (int)((3.0/8.0)*r->height));
+		CvRect leftEyebrowSearchSpace = this->getLeftEyebrowSearchSpace(r);
 		
-		//look in top left quarter for left eyebrow
-		CvRect leftEyebrowSearchSpace = cvRect(r->x,
-												r->y, 
-												(int)((1.0/2.0)*r->width), 
-												(int)((1.0/2.0)*r->height) );
-		
-		
-		
-		//CvRect leftEyebrowSearchSpace = cvRect(r->x, r->y, r->width/2, (int)((4.0/8.0)*r->height));
 		CvRect leftEyebrowSubSearchSpace;
 		bool leftEyebrowFound = getSearchSpace(img,processedImg,r,leftEyebrowTpl,leftEyebrowSearchSpace,leftEyebrowSubSearchSpace);
 
@@ -547,7 +580,7 @@ int bufferX = 15;//10;//5;
 		}
 
 		//update left eyebrow template
-
+		this->leftEyebrowLoc = leftEyebrowSubSearchSpace;
 
 
 		//right eyebrow
@@ -555,15 +588,7 @@ int bufferX = 15;//10;//5;
 		Mat rightEyebrowTpl;
 		resizeFeatureTemplate(oldRightEyebrowTpl,newFaceWidth,newFaceHeight,rightEyebrowTpl);
 		
-		
-		//CvRect rightEyebrowSearchSpace = cvRect((r->x + r->width/2),r->y, r->width/2, (int)((3.0/8.0)*r->height));
-		
-		//look in top right quarter for right eyebrow
-		CvRect rightEyebrowSearchSpace = cvRect(r->x + (int)((1.0/2.0)*r->width),
-												r->y,
-												(int)((1.0/2.0)*r->width),
-												(int)((1.0/2.0)*r->height) );
-		
+		CvRect rightEyebrowSearchSpace = this->getRightEyebrowSearchSpace(r);
 		
 		CvRect rightEyebrowSubSearchSpace;
 		bool rightEyebrowFound = getSearchSpace(img,processedImg,r,rightEyebrowTpl,rightEyebrowSearchSpace,rightEyebrowSubSearchSpace);
@@ -573,6 +598,8 @@ int bufferX = 15;//10;//5;
 			return false;
 		}
 
+		//update right eyebrow template
+		this->rightEyebrowLoc = rightEyebrowSubSearchSpace;
 
 
 
@@ -592,10 +619,13 @@ int bufferX = 15;//10;//5;
 		//									(int)((1.0/2.0)*r->width),
 		//									(int)((1.0/2.0)*r->height) );
 
-		CvRect leftEyeSearchSpace = cvRect(r->x + (int)((1.0/4.0)*r->width), 
-											r->y, 
-											(int)((2.0/4.0)*r->width),
-											(int)((1.0/2.0)*r->height) );
+		//CvRect leftEyeSearchSpace = cvRect(r->x + (int)((1.0/4.0)*r->width), 
+		//									r->y, 
+		//									(int)((2.0/4.0)*r->width),
+		//									(int)((1.0/2.0)*r->height) );
+
+
+		CvRect leftEyeSearchSpace = this->getLeftEyeSearchSpace(r);
 		
 		CvRect leftEyeLoc;
 		std::cout << "left eye =============================" << std::endl;
@@ -603,102 +633,109 @@ int bufferX = 15;//10;//5;
 		std::cout << "=============================left eye" << std::endl;
 		
 
-		if(!leftEyeFound)
+		//if(!leftEyeFound)
+		if(leftEyeFound == false)
 		{
-			result = false;
-		}
-		else
-		{
-			//resize each parent feature (except left eye)      
-			//each parent feature has specific search space (area of face)
-			//run NCC on parent feature (except left eye) to get search space for sub features
-			
-			//void updateEyeSubFeatureLocations(IplImage *img, IplImage *processedImg, double newFaceWidth, double newFaceHeight, CvRect& parentLoc)
-			//updateEyeSubFeatureLocations(img, processedImg, r->width, r->height, leftEyeLoc);
-			
-			//uncomment below:
-			//updateEyeSubFeatureLocations(img, processedImg, *r, leftEyeLoc);
-
-			////left eye left
-			//Mat oldLeftEyeLeftTpl = imread("templates/leftEyeLeft.jpg",1);
-			//Mat leftEyeLeftTpl;
-			//resizeFeatureTemplate(oldLeftEyeLeftTpl,newFaceWidth,newFaceHeight,leftEyeLeftTpl);
-			//CvRect leftEyeLeftSearchSpace = cvRect(leftEyeLoc.x,leftEyeLoc.y,
-			//	leftEyeLoc.width/2,leftEyeLoc.height);
-			//CvRect leftEyeLeftSubSearchSpace;
-			//bool leftEyeLeftFound = getSearchSpace(img,processedImg,r,leftEyeLeftTpl,leftEyeLeftSearchSpace,leftEyeLeftSubSearchSpace);
-
-			////left eye right
-			//Mat oldLeftEyeRightTpl = imread("templates/leftEyeRight.jpg",1);
-			//Mat leftEyeRightTpl;
-			//resizeFeatureTemplate(oldLeftEyeRightTpl,newFaceWidth,newFaceHeight,leftEyeRightTpl);	
-			//CvRect leftEyeRightSearchSpace = cvRect((leftEyeLoc.x + leftEyeLoc.width/2),leftEyeLoc.y,
-			//	leftEyeLoc.width/2,leftEyeLoc.height);
-			//CvRect leftEyeRightSubSearchSpace;
-			//bool leftEyeRightFound = getSearchSpace(img,processedImg,r,leftEyeRightTpl,leftEyeRightSearchSpace,leftEyeRightSubSearchSpace);
-
-			
-
-			////left eye top
-			//Mat oldLeftEyeTopTpl = imread("templates/leftEyeTop.jpg",1);
-			//Mat leftEyeTopTpl;
-			//resizeFeatureTemplate(oldLeftEyeTopTpl,newFaceWidth,newFaceHeight,leftEyeTopTpl);
-			//CvRect leftEyeTopSearchSpace = cvRect((leftEyeLoc.x),(leftEyeLoc.y),
-			//	leftEyeLoc.width,leftEyeLoc.height/2);
-			//CvRect leftEyeTopSubSearchSpace;
-			//bool leftEyeTopFound = getSearchSpace(img,processedImg,r,leftEyeTopTpl,leftEyeTopSearchSpace,leftEyeTopSubSearchSpace);
-
-			////left eye bottom
-			//Mat oldLeftEyeBottomTpl = imread("templates/leftEyeBottom.jpg",1);
-			//Mat leftEyeBottomTpl;
-			//resizeFeatureTemplate(oldLeftEyeBottomTpl,newFaceWidth,newFaceHeight,leftEyeBottomTpl);
-			//CvRect leftEyeBottomSearchSpace = cvRect((leftEyeLoc.x),(leftEyeLoc.y + leftEyeLoc.height/2),
-			//	leftEyeLoc.width,leftEyeLoc.height/2);
-			//CvRect leftEyeBottomSubSearchSpace;
-			//bool leftEyeBottomFound = getSearchSpace(img,processedImg,r,leftEyeBottomTpl,leftEyeBottomSearchSpace,leftEyeBottomSubSearchSpace);
-
-
-			//uncomment starting here:
-
-			//right eye
-			Mat oldRightEyeTpl = imread("templates/rightEye.jpg",1);
-			Mat rightEyeTpl;
-			resizeFeatureTemplate(oldRightEyeTpl,newFaceWidth,newFaceHeight,rightEyeTpl);
-			//CvRect rightEyeSearchSpace = cvRect((r->x + r->width/2), (r->y + r->height/4), r->width/2, (int)((3.0/8.0)*r->height));
-			//CvRect rightEyeSearchSpace = cvRect((r->x + r->width/2), (r->y + (int)((2.5/8.0)*r->height)), r->width/2, (int)((2.5/8.0)*r->height));
-			
-			//CvRect rightEyeSearchSpace = cvRect((r->x + r->width/2), (r->y + (int)((2.5/8.0)*r->height)), r->width/2, (int)((2.0/8.0)*r->height));
-			
-			//look in top right quarter for right eye
-			/*
-			CvRect rightEyeSearchSpace = cvRect((r->x + (int)((1.0/2.0)*r->width)),
-												r->y,
-												(int)((1.0/2.0)*r->width),
-												(int)((1.0/2.0)*r->height) );
-												*/
-			CvRect rightEyeSearchSpace = cvRect(r->x + (int)((1.0/4.0)*r->width),
-												r->y,
-												(int)((3.0/4.0)*r->width),
-												(int)((1.0/2.0)*r->height) );
-			
-			
-			CvRect rightEyeSubSearchSpace;
-			std::cout << "right eye=============================" << std::endl;
-			bool rightEyeFound = getSearchSpace(img,processedImg,r,rightEyeTpl,rightEyeSearchSpace,rightEyeSubSearchSpace);
-			std::cout << "=============================right eye" << std::endl;
-
-
-			
-
-			
-			//updateMouthSubFeatureLocs(img, processedImg, *r, mouthLoc);
-			//updateMouthSubFeatureLocs(img, processedImg, *r);
-			updateSubFeatureLocs(img, processedImg, *r);
-
-			result = true;
+			return false;
+			//result = false;
 		}
 
-		return result;
+		//resize each parent feature (except left eye)      
+		//each parent feature has specific search space (area of face)
+		//run NCC on parent feature (except left eye) to get search space for sub features
+		
+		//void updateEyeSubFeatureLocations(IplImage *img, IplImage *processedImg, double newFaceWidth, double newFaceHeight, CvRect& parentLoc)
+		//updateEyeSubFeatureLocations(img, processedImg, r->width, r->height, leftEyeLoc);
+		
+		//uncomment below:
+		//updateEyeSubFeatureLocations(img, processedImg, *r, leftEyeLoc);
+
+		////left eye left
+		//Mat oldLeftEyeLeftTpl = imread("templates/leftEyeLeft.jpg",1);
+		//Mat leftEyeLeftTpl;
+		//resizeFeatureTemplate(oldLeftEyeLeftTpl,newFaceWidth,newFaceHeight,leftEyeLeftTpl);
+		//CvRect leftEyeLeftSearchSpace = cvRect(leftEyeLoc.x,leftEyeLoc.y,
+		//	leftEyeLoc.width/2,leftEyeLoc.height);
+		//CvRect leftEyeLeftSubSearchSpace;
+		//bool leftEyeLeftFound = getSearchSpace(img,processedImg,r,leftEyeLeftTpl,leftEyeLeftSearchSpace,leftEyeLeftSubSearchSpace);
+
+		////left eye right
+		//Mat oldLeftEyeRightTpl = imread("templates/leftEyeRight.jpg",1);
+		//Mat leftEyeRightTpl;
+		//resizeFeatureTemplate(oldLeftEyeRightTpl,newFaceWidth,newFaceHeight,leftEyeRightTpl);	
+		//CvRect leftEyeRightSearchSpace = cvRect((leftEyeLoc.x + leftEyeLoc.width/2),leftEyeLoc.y,
+		//	leftEyeLoc.width/2,leftEyeLoc.height);
+		//CvRect leftEyeRightSubSearchSpace;
+		//bool leftEyeRightFound = getSearchSpace(img,processedImg,r,leftEyeRightTpl,leftEyeRightSearchSpace,leftEyeRightSubSearchSpace);
+
+		
+
+		////left eye top
+		//Mat oldLeftEyeTopTpl = imread("templates/leftEyeTop.jpg",1);
+		//Mat leftEyeTopTpl;
+		//resizeFeatureTemplate(oldLeftEyeTopTpl,newFaceWidth,newFaceHeight,leftEyeTopTpl);
+		//CvRect leftEyeTopSearchSpace = cvRect((leftEyeLoc.x),(leftEyeLoc.y),
+		//	leftEyeLoc.width,leftEyeLoc.height/2);
+		//CvRect leftEyeTopSubSearchSpace;
+		//bool leftEyeTopFound = getSearchSpace(img,processedImg,r,leftEyeTopTpl,leftEyeTopSearchSpace,leftEyeTopSubSearchSpace);
+
+		////left eye bottom
+		//Mat oldLeftEyeBottomTpl = imread("templates/leftEyeBottom.jpg",1);
+		//Mat leftEyeBottomTpl;
+		//resizeFeatureTemplate(oldLeftEyeBottomTpl,newFaceWidth,newFaceHeight,leftEyeBottomTpl);
+		//CvRect leftEyeBottomSearchSpace = cvRect((leftEyeLoc.x),(leftEyeLoc.y + leftEyeLoc.height/2),
+		//	leftEyeLoc.width,leftEyeLoc.height/2);
+		//CvRect leftEyeBottomSubSearchSpace;
+		//bool leftEyeBottomFound = getSearchSpace(img,processedImg,r,leftEyeBottomTpl,leftEyeBottomSearchSpace,leftEyeBottomSubSearchSpace);
+
+
+		//uncomment starting here:
+
+		//right eye
+		Mat oldRightEyeTpl = imread("templates/rightEye.jpg",1);
+		Mat rightEyeTpl;
+		resizeFeatureTemplate(oldRightEyeTpl,newFaceWidth,newFaceHeight,rightEyeTpl);
+		//CvRect rightEyeSearchSpace = cvRect((r->x + r->width/2), (r->y + r->height/4), r->width/2, (int)((3.0/8.0)*r->height));
+		//CvRect rightEyeSearchSpace = cvRect((r->x + r->width/2), (r->y + (int)((2.5/8.0)*r->height)), r->width/2, (int)((2.5/8.0)*r->height));
+		
+		//CvRect rightEyeSearchSpace = cvRect((r->x + r->width/2), (r->y + (int)((2.5/8.0)*r->height)), r->width/2, (int)((2.0/8.0)*r->height));
+		
+		//look in top right quarter for right eye
+		/*
+		CvRect rightEyeSearchSpace = cvRect((r->x + (int)((1.0/2.0)*r->width)),
+											r->y,
+											(int)((1.0/2.0)*r->width),
+											(int)((1.0/2.0)*r->height) );
+											*/
+		//CvRect rightEyeSearchSpace = cvRect(r->x + (int)((1.0/4.0)*r->width),
+		//									r->y,
+		//									(int)((3.0/4.0)*r->width),
+		//									(int)((1.0/2.0)*r->height) );
+		
+
+		CvRect rightEyeSearchSpace = this->getRightEyeSearchSpace(r);
+
+		CvRect rightEyeSubSearchSpace;
+		std::cout << "right eye=============================" << std::endl;
+		bool rightEyeFound = getSearchSpace(img,processedImg,r,rightEyeTpl,rightEyeSearchSpace,rightEyeSubSearchSpace);
+		std::cout << "=============================right eye" << std::endl;
+
+
+		if(rightEyeFound == false)
+		{
+			return false;
+		}
+
+		//update right eye stuff
+		
+
+
+		//update sub templates			
+		//updateMouthSubFeatureLocs(img, processedImg, *r, mouthLoc);
+		//updateMouthSubFeatureLocs(img, processedImg, *r);
+		updateSubFeatureLocs(img, processedImg, *r);
+
+		return true;
 	}
 
 	void eyeSubCode()
