@@ -19,3 +19,18 @@
  * Detecting emotion in a single image - compare to some average normal face if a normal face is not available for that person. (Black and Yacoob used video sequences)
  * Detecting emotions of multiple faces simultaneously - aggregate emotions to change output even more
  * Real-time / fast detection
+
+==What we are currently tracking==
+  * 2 points of eyebrows
+    
+  * 4 points of mouth
+    * (top-bottom) 
+      * greater = arousal + 
+      * less = arousal -
+      * none = arousal 0
+    * left
+  * degree of white pixels in eye?
+    * greater = arousal +
+    * less = arousal -
+    * none = arousal 0
+  
