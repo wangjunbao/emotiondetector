@@ -21,8 +21,8 @@ void detectFaces( IplImage *img );
 
 int main( int argc, char** argv )
 {
-	//bool isVideo = true; //video
-	bool isVideo = false; //image
+	bool isVideo = true; //video
+	//bool isVideo = false; //image
 
 	//is image
 	if(isVideo == false)
@@ -62,17 +62,14 @@ int main( int argc, char** argv )
 	}
 	else //video
 	{
-		//CvCapture *capture;
 		VideoCapture cap(0); // open the default camera
 		if(!cap.isOpened())  // check if we succeeded
 			return -1;
 		
-		//IplImage  *frame;
 		Mat frame;
 
 		int       key = ' ';
 		char      *filename = "haarcascade_frontalface_default.xml";
-		//char      *filename = "haarcascade_frontalface_alt.xml";
 
 		///* load the classifier
 		//   note that I put the file in the same directory with
@@ -81,12 +78,6 @@ int main( int argc, char** argv )
 	 
 		///* setup memory buffer; needed by the face detector */
 		storage = cvCreateMemStorage( 0 );
-	 
-		///* initialize camera */
-		//capture = cvCaptureFromCAM( 0 );
-
-		///* always check */
-		//assert( cascade && storage && capture );
 	 
 		/* create a window */
 		cvNamedWindow( "video", 1 );
@@ -98,15 +89,8 @@ int main( int argc, char** argv )
 			frameCount++;
 			//std::cout << frameCount << ": ";
 
-			// get a frame */
-			//frame = cvQueryFrame( capture );
-	 
-			cap >> frame; // get a new frame from camera
-
-			// always check */
-			//if( !frame ) break;
-	
-			//frame->origin = 0;
+			// get a new frame from camera
+			cap >> frame; 
 	 
 			// detect faces and display video */
 			detectFaces( &IplImage(frame) );
@@ -116,13 +100,8 @@ int main( int argc, char** argv )
 		}
 	 
 		//// free memory */
-
 		cvDestroyWindow( "video" );
 		cvDestroyWindow( "processed" );
-
-		//cvReleaseImage( &frame );
-		//cvReleaseCapture( &capture );
-		
 		cvReleaseHaarClassifierCascade( &cascade );
 		cvReleaseMemStorage( &storage );
 
@@ -130,22 +109,6 @@ int main( int argc, char** argv )
 	}//end else
 }
 
-void resizeFeatureTemplate(string filename, double oldFeatureWidth, double oldFeatureHeight, double newFaceWidth, double newFaceHeight, Mat &resizedFeatureImg ) {
-	double oldFaceWidth = 228;
-	double oldFaceHeight = 228;
-	double newFeatureWidth = newFaceWidth * (oldFeatureWidth/oldFaceWidth);
-	double newFeatureHeight = newFaceHeight * (oldFeatureHeight/oldFaceHeight);
-	
-	Mat *featureImg = new Mat;
-	*featureImg = imread( "templates/"+filename, 1 );
-	
-	resize(*featureImg, resizedFeatureImg, Size((int)newFeatureWidth,(int)newFeatureHeight));
-
-	//imwrite("resizedTemplates/"+filename,resizedFeatureImg);
-	
-	delete featureImg;
-}
- 
 
 /* Checks if a face found in current frame is contained inside an existing face */
 bool containedInOldFace(int faceX, int faceY, int faceWidth, int faceHeight)
@@ -293,24 +256,16 @@ void detectFaces( IplImage *img )
             storage,
             1.2,//1.1,
             2,//3,
-            CV_HAAR_DO_CANNY_PRUNING /*0*/ /*CV_HAAR_DO_CANNY_PRUNING*/, //pruning may speed up processing
+            CV_HAAR_DO_CANNY_PRUNING /*0*/, //pruning may speed up processing
             //cvSize( 40, 40 ) );
 			cvSize( 50, 50 ) ); //30 by 30 good for grouppic.jpg
 			//cvSize( 75, 75 ) );
- 
-	
-	double oldFaceWidth = 228;
-	double oldFaceHeight = 228;
 
     for( i = 0 ; i < ( faces ? faces->total : 0 ) ; i++ ) 
 	{
-	
-	//performance estimation:
-	for( int j=0; j<1; j++)
-	{
         CvRect *r = ( CvRect* )cvGetSeqElem( faces, i );
 
-		std::cout << "r: " << r->width << " by " << r->height << std::endl;
+		//std::cout << "r: " << r->width << " by " << r->height << std::endl;
 
 		//white box for all faces found by Haar but not necessarily true faces
 		cvRectangle( processedImg,
@@ -363,15 +318,6 @@ void detectFaces( IplImage *img )
 			//std::cout << "old face matched at: (" << face->getTopLeftPoint().x << "," << face->getTopLeftPoint().y << ")" << std::endl;
 
 			//update sub features
-			
-			//do Emotion Detection -> store it
-                
-			//add value to output
-
-			//add oldFace to newFaces
-			//newFaces.push_back(face);
-
-			//draw a box on faces matched with old faces
 			bool updateMouthSuccess = face->updateMouthSubFeatureLocs(img,processedImg,*r);
 			
 			if(updateMouthSuccess == false)
@@ -380,21 +326,16 @@ void detectFaces( IplImage *img )
 			}
 			else
 			{
-				face->drawBox(img,processedImg,r);
-				newFaces.push_back(face);
+				face->drawBox(img,processedImg,r);	//draw a yellow box on faces matched with old faces
+				newFaces.push_back(face);			//add oldFace to newFaces
+				//do Emotion Detection -> store it
+                //add value to output
 			}
 			
-			
+			//for debugging:
 			//face->isValidFace(img,processedImg,r); //DELETE
-			//CvRect dummy;
-			//face->updateEyeSubFeatureLocations(img, processedImg, r->width, r->height, dummy);
-			//face->drawBox(img,processedImg,r);
 		}
-		//write out image for debuging
-		//imwrite("image.jpg",Mat(processedImg));
 		
-	}//end of for loop for performance test
-    
 	}//end for faces
 
 	//newFaces vector becomes oldFaces vector for next frame
@@ -412,6 +353,7 @@ void detectFaces( IplImage *img )
     cvShowImage( "video", img );
 	cvShowImage( "processed", processedImg );
 
+	//free memory
 	cvReleaseImage( &processedImg );
 }
  
