@@ -24,7 +24,7 @@
   * 2 points of eyebrows
     
   * 4 points of mouth
-    * (top-bottom) 
+   *(top-bottom) 
       * greater = arousal + 
       * less = arousal -
       * none = arousal 0
