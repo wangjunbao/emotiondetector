@@ -34,4 +34,12 @@
     * greater = arousal +
     * less = arousal -
     * none = arousal 0
+
+== Flowchart ==
+
+Mouth
+  Open
+  Neutral 
+  Closed 
+  
   
