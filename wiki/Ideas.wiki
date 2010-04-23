@@ -22,13 +22,14 @@
 
 ==What we are currently tracking==
   * 2 points of eyebrows
-    
+    * |leftY-rightY|
+      * 
   * 4 points of mouth
-   *(top-bottom) 
+    * (topY-bottomY) 
       * greater = arousal + 
       * less = arousal -
       * none = arousal 0
-    * left
+    * |leftY-rightY|
   * degree of white pixels in eye?
     * greater = arousal +
     * less = arousal -
