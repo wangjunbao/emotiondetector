@@ -199,7 +199,7 @@ public:
 
 		//green box
 		rectangle(Mat(processedImg),maxloc,Point(maxloc.x + tpl.cols, maxloc.y + tpl.rows),CV_RGB(0, 255, 0), 1, 0, 0 );
-		std::cout << "max: " << "(" << maxloc.x << "," << maxloc.y << "): " << maxval << std::endl;
+		//std::cout << "max: " << "(" << maxloc.x << "," << maxloc.y << "): " << maxval << std::endl;
 
 		outputSearchSpace = cvRect(inputSearchSpace.x + maxloc.x, inputSearchSpace.y + maxloc.y, tpl.cols, tpl.rows);
 		//std::cout << "**************outputSearchSpace: " << outputSearchSpace.width << " by " << outputSearchSpace.height << std::endl;
@@ -226,7 +226,7 @@ public:
 		}
 
 
-		//std::cout << "max: " << "(" << inputSearchSpace.x + maxloc.x << "," << inputSearchSpace.y + maxloc.y << "): " << maxval << std::endl;
+		std::cout << "max: " << "(" << inputSearchSpace.x + maxloc.x << "," << inputSearchSpace.y + maxloc.y << "): " << maxval << std::endl;
 
 		return result;
 
@@ -974,8 +974,16 @@ int bufferX = 15;//10;//5;
 			Mat oldMouthTpl = imread("templates/mouth.jpg",1);
 			Mat mouthTpl;
 			resizeFeatureTemplate(oldMouthTpl,newFaceWidth,newFaceHeight,mouthTpl);
-			CvRect mouthSearchSpace = cvRect(r->x + (int)((2.0/8.0)*r->width), 
+			
+			/*CvRect mouthSearchSpace = cvRect(r->x + (int)((2.0/8.0)*r->width), 
 				(r->y +  (int)((5.0/8.0)*r->height)), (int)((4.0/8.0)*r->width), (int)((3.0/8.0)*r->height));
+			*/
+			
+
+			CvRect mouthSearchSpace = cvRect(r->x, 
+				(r->y +  (int)((5.0/8.0)*r->height)), r->width, (int)((3.0/8.0)*r->height));
+			
+
 			CvRect mouthLoc;
 			bool mouthFound = getSearchSpace(img,processedImg,r,mouthTpl,mouthSearchSpace,mouthLoc);
 			
