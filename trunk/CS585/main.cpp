@@ -21,8 +21,8 @@ void detectFaces( IplImage *img );
 
 int main( int argc, char** argv )
 {
-	bool isVideo = true; //video
-	//bool isVideo = false; //image
+	//bool isVideo = true; //video
+	bool isVideo = false; //image
 
 	//is image
 	if(isVideo == false)
@@ -318,9 +318,10 @@ void detectFaces( IplImage *img )
 			//std::cout << "old face matched at: (" << face->getTopLeftPoint().x << "," << face->getTopLeftPoint().y << ")" << std::endl;
 
 			//update sub features
-			bool updateMouthSuccess = face->updateMouthSubFeatureLocs(img,processedImg,*r);
+			bool updateSuccess = true;
+			//bool updateSuccess = face->updateSubFeatureLocs(img,processedImg,*r);
 			
-			if(updateMouthSuccess == false)
+			if(updateSuccess == false)
 			{
 				delete face;
 			}
@@ -333,7 +334,7 @@ void detectFaces( IplImage *img )
 			}
 			
 			//for debugging:
-			//face->isValidFace(img,processedImg,r); //DELETE
+			face->isValidFace(img,processedImg,r); //DELETE
 		}
 		
 	}//end for faces
