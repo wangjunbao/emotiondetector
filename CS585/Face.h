@@ -483,6 +483,100 @@ int bufferX = 15;//10;//5;
 		double newFaceWidth = r->width;
 		double newFaceHeight = r->height;
 		
+
+		//look for the mouth
+		//mouth
+		Mat oldMouthTpl = imread("templates/mouth.jpg",1);
+		Mat mouthTpl;
+		resizeFeatureTemplate(oldMouthTpl,newFaceWidth,newFaceHeight,mouthTpl);
+		
+		//CvRect mouthSearchSpace = cvRect(r->x + (int)((2.0/8.0)*r->width), 
+		//	(r->y +  (int)((5.0/8.0)*r->height)), (int)((4.0/8.0)*r->width), (int)((3.0/8.0)*r->height));
+		
+		//look in the lower half of the face for the mouth
+		CvRect mouthSearchSpace = cvRect(r->x,
+										(r->y +  (int)((1.0/2.0)*r->height)),
+										r->width, 
+										(int)((1.0/2.0)*r->height));
+
+		/*CvRect mouthSearchSpace = cvRect(r->x, 
+			(r->y +  (int)((5.0/8.0)*r->height)), r->width, (int)((3.0/8.0)*r->height));
+			*/
+		
+
+		CvRect mouthLoc;
+		std::cout << "mouth=============================" << std::endl;
+		bool mouthFound = getSearchSpace(img,processedImg,r,mouthTpl,mouthSearchSpace,mouthLoc);
+		std::cout << "==============================mouth" << std::endl;
+		
+		if(mouthFound == false)
+		{
+			result = false;
+			return result;
+		}
+
+		//mouth found
+		//update coordinates
+		this->mouthTpl = mouthTpl;
+		this->mouthLoc = mouthLoc;
+		
+		//look for eyebrows
+
+		//left eyebrow
+		Mat oldLeftEyebrowTpl = imread("templates/leftEyebrow.jpg",1);
+		Mat leftEyebrowTpl;
+		resizeFeatureTemplate(oldLeftEyebrowTpl,newFaceWidth,newFaceHeight,leftEyebrowTpl);
+		
+		//CvRect leftEyebrowSearchSpace = cvRect(r->x, r->y, r->width/2, (int)((3.0/8.0)*r->height));
+		
+		//look in top left quarter for left eyebrow
+		CvRect leftEyebrowSearchSpace = cvRect(r->x,
+												r->y, 
+												(int)((1.0/2.0)*r->width), 
+												(int)((1.0/2.0)*r->height) );
+		
+		
+		
+		//CvRect leftEyebrowSearchSpace = cvRect(r->x, r->y, r->width/2, (int)((4.0/8.0)*r->height));
+		CvRect leftEyebrowSubSearchSpace;
+		bool leftEyebrowFound = getSearchSpace(img,processedImg,r,leftEyebrowTpl,leftEyebrowSearchSpace,leftEyebrowSubSearchSpace);
+
+		if(leftEyebrowFound == false)
+		{
+			return false;
+		}
+
+		//update left eyebrow template
+
+
+
+		//right eyebrow
+		Mat oldRightEyebrowTpl = imread("templates/rightEyebrow.jpg",1);
+		Mat rightEyebrowTpl;
+		resizeFeatureTemplate(oldRightEyebrowTpl,newFaceWidth,newFaceHeight,rightEyebrowTpl);
+		
+		
+		//CvRect rightEyebrowSearchSpace = cvRect((r->x + r->width/2),r->y, r->width/2, (int)((3.0/8.0)*r->height));
+		
+		//look in top right quarter for right eyebrow
+		CvRect rightEyebrowSearchSpace = cvRect(r->x + (int)((1.0/2.0)*r->width),
+												r->y,
+												(int)((1.0/2.0)*r->width),
+												(int)((1.0/2.0)*r->height) );
+		
+		
+		CvRect rightEyebrowSubSearchSpace;
+		bool rightEyebrowFound = getSearchSpace(img,processedImg,r,rightEyebrowTpl,rightEyebrowSearchSpace,rightEyebrowSubSearchSpace);
+
+		if(rightEyebrowFound == false)
+		{
+			return false;
+		}
+
+
+
+
+
 		//look for left eye in face
 		Mat oldTopEyeTpl = imread("templates/leftEye.jpg",1);
 		Mat leftEyeTpl;
@@ -493,11 +587,15 @@ int bufferX = 15;//10;//5;
 		//CvRect leftEyeSearchSpace = cvRect((r->x), (r->y + (int)((2.5/8.0)*r->height)), r->width/2, (int)((2.0/8.0)*r->height));
 		
 		//look in the top left quarter for the left eye
-		CvRect leftEyeSearchSpace = cvRect(r->x, 
+		//CvRect leftEyeSearchSpace = cvRect(r->x, 
+		//									r->y, 
+		//									(int)((1.0/2.0)*r->width),
+		//									(int)((1.0/2.0)*r->height) );
+
+		CvRect leftEyeSearchSpace = cvRect(r->x + (int)((1.0/4.0)*r->width), 
 											r->y, 
-											(int)((1.0/2.0)*r->width),
+											(int)((2.0/4.0)*r->width),
 											(int)((1.0/2.0)*r->height) );
-		
 		
 		CvRect leftEyeLoc;
 		std::cout << "left eye =============================" << std::endl;
@@ -572,9 +670,15 @@ int bufferX = 15;//10;//5;
 			//CvRect rightEyeSearchSpace = cvRect((r->x + r->width/2), (r->y + (int)((2.5/8.0)*r->height)), r->width/2, (int)((2.0/8.0)*r->height));
 			
 			//look in top right quarter for right eye
+			/*
 			CvRect rightEyeSearchSpace = cvRect((r->x + (int)((1.0/2.0)*r->width)),
 												r->y,
 												(int)((1.0/2.0)*r->width),
+												(int)((1.0/2.0)*r->height) );
+												*/
+			CvRect rightEyeSearchSpace = cvRect(r->x + (int)((1.0/4.0)*r->width),
+												r->y,
+												(int)((3.0/4.0)*r->width),
 												(int)((1.0/2.0)*r->height) );
 			
 			
@@ -584,72 +688,9 @@ int bufferX = 15;//10;//5;
 			std::cout << "=============================right eye" << std::endl;
 
 
-			//left eyebrow
-			Mat oldLeftEyebrowTpl = imread("templates/leftEyebrow.jpg",1);
-			Mat leftEyebrowTpl;
-			resizeFeatureTemplate(oldLeftEyebrowTpl,newFaceWidth,newFaceHeight,leftEyebrowTpl);
-			
-			//CvRect leftEyebrowSearchSpace = cvRect(r->x, r->y, r->width/2, (int)((3.0/8.0)*r->height));
-			
-			//look in top left quarter for left eyebrow
-			CvRect leftEyebrowSearchSpace = cvRect(r->x,
-													r->y, 
-													(int)((1.0/2.0)*r->width), 
-													(int)((1.0/2.0)*r->height) );
-			
-			
-			
-			//CvRect leftEyebrowSearchSpace = cvRect(r->x, r->y, r->width/2, (int)((4.0/8.0)*r->height));
-			CvRect leftEyebrowSubSearchSpace;
-			bool leftEyebrowFound = getSearchSpace(img,processedImg,r,leftEyebrowTpl,leftEyebrowSearchSpace,leftEyebrowSubSearchSpace);
-
-			//right eyebrow
-			Mat oldRightEyebrowTpl = imread("templates/rightEyebrow.jpg",1);
-			Mat rightEyebrowTpl;
-			resizeFeatureTemplate(oldRightEyebrowTpl,newFaceWidth,newFaceHeight,rightEyebrowTpl);
-			
-			
-			//CvRect rightEyebrowSearchSpace = cvRect((r->x + r->width/2),r->y, r->width/2, (int)((3.0/8.0)*r->height));
-			
-			//look in top right quarter for right eyebrow
-			CvRect rightEyebrowSearchSpace = cvRect(r->x + (int)((1.0/2.0)*r->width),
-													r->y,
-													(int)((1.0/2.0)*r->width),
-													(int)((1.0/2.0)*r->height) );
-			
-			
-			CvRect rightEyebrowSubSearchSpace;
-			bool rightEyebrowFound = getSearchSpace(img,processedImg,r,rightEyebrowTpl,rightEyebrowSearchSpace,rightEyebrowSubSearchSpace);
-
-			//mouth
-			Mat oldMouthTpl = imread("templates/mouth.jpg",1);
-			Mat mouthTpl;
-			resizeFeatureTemplate(oldMouthTpl,newFaceWidth,newFaceHeight,mouthTpl);
-			
-			/*CvRect mouthSearchSpace = cvRect(r->x + (int)((2.0/8.0)*r->width), 
-				(r->y +  (int)((5.0/8.0)*r->height)), (int)((4.0/8.0)*r->width), (int)((3.0/8.0)*r->height));
-			*/
 			
 
-			//look in the lower half of the face for the mouth
-			CvRect mouthSearchSpace = cvRect(r->x,
-											(r->y +  (int)((1.0/2.0)*r->height)),
-											r->width, 
-											(int)((1.0/2.0)*r->height));
-
-			/*CvRect mouthSearchSpace = cvRect(r->x, 
-				(r->y +  (int)((5.0/8.0)*r->height)), r->width, (int)((3.0/8.0)*r->height));
-				*/
 			
-
-			CvRect mouthLoc;
-			std::cout << "mouth=============================" << std::endl;
-			bool mouthFound = getSearchSpace(img,processedImg,r,mouthTpl,mouthSearchSpace,mouthLoc);
-			std::cout << "==============================mouth" << std::endl;
-			
-			this->mouthTpl = mouthTpl;
-			this->mouthLoc = mouthLoc;
-
 			//updateMouthSubFeatureLocs(img, processedImg, *r, mouthLoc);
 			//updateMouthSubFeatureLocs(img, processedImg, *r);
 			updateSubFeatureLocs(img, processedImg, *r);
