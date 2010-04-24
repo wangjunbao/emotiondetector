@@ -308,6 +308,8 @@ void detectFaces( IplImage *img )
 
 				//add face to newFaces
 				newFaces.push_back(face);
+
+				face->drawBox(img,processedImg,r);//DELETE
 			}
 			else //face is not valid, delete the object
 			{
