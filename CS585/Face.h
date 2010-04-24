@@ -506,20 +506,6 @@ int bufferX = 15;//10;//5;
 	}//end updateMouthSubFeatureLocs
 
 
-	
-	/* Update locations of all subfeatures */
-	bool updateSubFeatureLocs(IplImage *img, IplImage *processedImg, CvRect& r)
-	{
-		//update face coordinates
-		this->updateFaceCoords(r);
-
-		//mouth
-		//bool updateMouthSuccess = this->updateMouthSubFeatureLocs(img,processedImg,r);
-		bool updateMouthSuccess = true;
-		return (updateMouthSuccess);
-	}
-
-
 	/* Look in the lower half of the face for the mouth */
 	CvRect getMouthSearchSpace(CvRect *r)
 	{
@@ -576,7 +562,41 @@ int bufferX = 15;//10;//5;
 		imgROI.copyTo(dst);
 	}
 
-	/* Check if a face found by Haar is valid (has a left eye) */
+
+	/* Update locations of all subfeatures */
+	bool updateSubFeatureLocs(IplImage *img, IplImage *processedImg, CvRect& r)
+	{
+		//update face coordinates
+		this->updateFaceCoords(r);
+
+		//mouth
+		//bool updateMouthSuccess = this->updateMouthSubFeatureLocs(img,processedImg,r);
+		bool updateMouthSuccess = true;
+		return (updateMouthSuccess);
+	}
+
+	/* Update locations of all features by running NCC's */
+	bool updateFeatureLocs(IplImage *img, IplImage *processedImg, CvRect *r)
+	{
+		//update face coordinates
+		this->updateFaceCoords(*r);
+
+		//we can possibly save some time by searching a reduced space
+		//but first we will just try using the same space as original
+
+		//MOUTH
+		CvRect mouthSearchSpace = this->getMouthSearchSpace(r);
+		CvRect mouthLoc;
+		std::cout << "mouth=============================" << std::endl;
+		bool mouthFound = getSearchSpace(img,processedImg,r,mouthTpl,mouthSearchSpace,mouthLoc,true);
+		std::cout << "==============================mouth" << std::endl;
+
+		
+
+	}
+
+
+	/* Return true if a face found by Haar is valid (has mouth,eyebrows,eyes) */
 	boolean isValidFace(IplImage *img, IplImage *processedImg, CvRect *r)
 	{
 		//store face dimensions in order to resize templates
@@ -610,15 +630,13 @@ int bufferX = 15;//10;//5;
 		{
 			return false;
 		}
-
 		//store mouth coordinates and template image 
 		//(at first this will just be the resized version of the average face template)
-		this->mouthTpl = mouthTpl;
-		this->mouthLoc = mouthLoc;
-
-		//crop out template from this face (we should NOT call this every time)
-		this->cropTemplate(img,this->mouthLoc,this->mouthTpl);
-		
+		else
+		{
+			this->mouthTpl = mouthTpl;
+			this->mouthLoc = mouthLoc;	
+		}
 		/* END MOUTH */
 
 		/* LEFT EYEBROW */
@@ -643,14 +661,11 @@ int bufferX = 15;//10;//5;
 		{
 			return false;
 		}
-
-		//update left eyebrow template
-		this->leftEyebrowTpl = leftEyebrowTpl;
-		this->leftEyebrowLoc = leftEyebrowLoc;
-
-		//crop template
-		this->cropTemplate(img,this->leftEyebrowLoc,this->leftEyebrowTpl);
-
+		else //update left eyebrow template
+		{
+			this->leftEyebrowTpl = leftEyebrowTpl;
+			this->leftEyebrowLoc = leftEyebrowLoc;
+		}
 		/* END LEFT EYEBROW */
 
 		/* RIGHT EYEBROW */
@@ -676,19 +691,14 @@ int bufferX = 15;//10;//5;
 		{
 			return false;
 		}
-
-		//update right eyebrow template
-		this->rightEyebrowTpl = rightEyebrowTpl;
-		this->rightEyebrowLoc = rightEyebrowLoc;
-
-		//crop
-		this->cropTemplate(img,this->rightEyebrowLoc,this->rightEyebrowTpl);
-
+		else //update right eyebrow template
+		{
+			this->rightEyebrowTpl = rightEyebrowTpl;
+			this->rightEyebrowLoc = rightEyebrowLoc;
+		}
 		/* END RIGHT EYEBROW */
 
-
 		/* LEFT EYE */
-
 		Mat leftEyeTpl;
 		if(this->leftEyeTpl.empty())
 		{
@@ -710,15 +720,11 @@ int bufferX = 15;//10;//5;
 		{
 			return false;
 		}
-
-		//update left eye stuff
-		this->leftEyeTpl = leftEyeTpl;
-		this->leftEyeLoc = leftEyeLoc;
-
-		//crop template
-		this->cropTemplate(img,this->leftEyeLoc,this->leftEyeTpl);
-
-
+		else //update left eye stuff
+		{
+			this->leftEyeTpl = leftEyeTpl;
+			this->leftEyeLoc = leftEyeLoc;
+		}
 		/* END LEFT EYE */
 
 		/* RIGHT EYE */
@@ -743,16 +749,20 @@ int bufferX = 15;//10;//5;
 		{
 			return false;
 		}
-
-		//update right eye stuff
-		this->rightEyeTpl = rightEyeTpl;
-		this->rightEyeLoc = rightEyeLoc;
-
-		//crop
-		this->cropTemplate(img,this->rightEyeLoc,this->rightEyeTpl);
-		
-
+		else //update right eye stuff
+		{
+			this->rightEyeTpl = rightEyeTpl;
+			this->rightEyeLoc = rightEyeLoc;
+		}
 		/* END RIGHT EYE */
+
+		//crop out all feature templates from the valid face
+		//we do all of these at the end so we don't waste time cropping out features from invalid faces
+		this->cropTemplate(img,this->mouthLoc,this->mouthTpl);
+		this->cropTemplate(img,this->leftEyebrowLoc,this->leftEyebrowTpl);
+		this->cropTemplate(img,this->rightEyebrowLoc,this->rightEyebrowTpl);
+		this->cropTemplate(img,this->leftEyeLoc,this->leftEyeTpl);
+		this->cropTemplate(img,this->rightEyeLoc,this->rightEyeTpl);
 
 		//update sub templates			
 		//updateMouthSubFeatureLocs(img, processedImg, *r, mouthLoc);
