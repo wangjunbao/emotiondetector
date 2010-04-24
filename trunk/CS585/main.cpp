@@ -296,7 +296,7 @@ void detectFaces( IplImage *img )
 				
 				delete face;
 			}
-			else if( face->isValidFace(img,processedImg,r,true) )
+			else if( face->isValidFace(img,processedImg,r) )
 			{
 				//std::cout << "new valid face at: (" << face->getTopLeftPoint().x <<"," << face->getTopLeftPoint().y << ")" << std::endl;
 
@@ -324,7 +324,8 @@ void detectFaces( IplImage *img )
 			//bool updateSuccess = true;
 			//bool updateSuccess = face->updateSubFeatureLocs(img,processedImg,*r);
 			
-			bool updateSuccess = face->isValidFace(img,processedImg,r,false);
+			//bool updateSuccess = face->isValidFace(img,processedImg,r,false);
+			bool updateSuccess = face->updateFeatureLocs(img,processedImg,r);
 
 			if(updateSuccess == false)
 			{
