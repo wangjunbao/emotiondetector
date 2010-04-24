@@ -203,7 +203,87 @@ public:
 	}
 
 
-	/* 
+
+
+
+	/* Look in the lower half of the face for the mouth */
+	CvRect getMouthSearchSpace(CvRect *r)
+	{
+		return cvRect(r->x,
+						(r->y +  (int)((1.0/2.0)*r->height)),
+						r->width, 
+						(int)((1.0/2.0)*r->height));
+	}
+
+	/* Look in the top halfish area of the mouth for the mouthTop */
+	CvRect getMouthTopSearchSpace()
+	{
+		CvRect parentLoc = this->mouthLoc;
+		return cvRect(parentLoc.x + (int)((1.0/4.0)*parentLoc.width),
+						parentLoc.y,
+						(int)((1.0/2.0)*parentLoc.width),
+						(int)((3.0/8.0)*parentLoc.height));	
+	}
+
+	/* Look in the bottom halfish area of the mouth for the mouthBottom */
+	CvRect getMouthBottomSearchSpace()
+	{
+		CvRect parentLoc = this->mouthLoc;
+		return cvRect(parentLoc.x + (int)((1.0/4.0)*parentLoc.width),
+						parentLoc.y + (int)((5.0/8.0)*parentLoc.height), 
+						(int)((1.0/2.0)*parentLoc.width),
+						(int)((3.0/8.0)*parentLoc.height));	
+	}
+
+	/* look in top left 5/8's for left eyebrow */
+	CvRect getLeftEyebrowSearchSpace(CvRect *r)
+	{
+		return cvRect(r->x,
+						r->y, 
+						(int)((5.0/8.0)*r->width), 
+						(int)((1.0/2.0)*r->height) );
+	}
+
+	/* look in top right 5/8's for right eyebrow */
+	CvRect getRightEyebrowSearchSpace(CvRect *r)
+	{
+		return cvRect(r->x + (int)((3.0/8.0)*r->width),
+						r->y,
+						(int)((5.0/8.0)*r->width),
+						(int)((1.0/2.0)*r->height) );
+	}
+
+	/* look under left eyebrow midpoint and face midpoint for left eye */
+	CvRect getLeftEyeSearchSpace(CvRect *r)
+	{
+		int y = this->leftEyebrowLoc.y + (int)((1.0/2.0)*this->leftEyebrowLoc.height);
+		return cvRect(r->x,
+						y, 
+						(int)((1.0/2.0)*r->width), 
+						this->mouthLoc.y - y );
+	}
+
+	/* look under right eyebrow midpoint and face midpoint for right eye */
+	CvRect getRightEyeSearchSpace(CvRect *r)
+	{
+		int y = this->rightEyebrowLoc.y + (int)((1.0/2.0)*this->rightEyebrowLoc.height);
+		return cvRect(r->x + (int)((1.0/2.0)*r->width),
+						y,
+						(int)((1.0/2.0)*r->width),
+						this->mouthLoc.y - y );
+	}
+
+
+	/* Crop out a template from a face */
+	void cropTemplate(IplImage *img, CvRect& loc, Mat& dst)
+	{
+		Rect ROI(loc);	//Make a rectangle
+		Mat imgROI = Mat(img)(ROI);	//Point a cv::Mat header at it (no allocation is done)
+		imgROI.copyTo(dst);
+	}
+
+
+		/* 
 		Update locations of mouth subfeatures
 		Return true if update successful, false if unsuccessful (ie: features were lost)
 	*/
@@ -273,12 +353,7 @@ public:
 			//imshow( "mouthTop", imgParentROI);
 			imshow("mouth",this->mouthTpl);
 
-
-			//top subtemplate
-			topSearchSpace = cvRect(parentLoc.x + (int)((1.0/4.0)*parentLoc.width),
-									parentLoc.y,
-									(int)((1.0/2.0)*parentLoc.width),
-									(int)((3.0/8.0)*parentLoc.height));					
+			topSearchSpace = this->getMouthTopSearchSpace();
 
 			//maybe we should run the ncc here instead of just doing location search
 			this->cropTemplate(img,topSearchSpace,this->mouthTopTpl);
@@ -293,12 +368,7 @@ public:
 				Point(topSearchSpace.x+topSearchSpace.width,topSearchSpace.y+topSearchSpace.height),
 				CV_RGB(255,255,0),1,0,0);
 
-
-			//bottom subtemplate
-			bottomSearchSpace = cvRect(parentLoc.x + (1.0/4.0)*parentLoc.width,
-										parentLoc.y + (5.0/8.0)*parentLoc.height, 
-										(1.0/2.0)*parentLoc.width,
-										(3.0/8.0)*parentLoc.height);
+			bottomSearchSpace = this->getMouthBottomSearchSpace();
 
 			//bottomSearchSpace = this->mouthBottomLoc;
 			
@@ -487,6 +557,11 @@ int bufferX = 15;//10;//5;
 			imshow( "mouthBottom", this->mouthBottomTpl);
 
 			//std::cout << "top bot diff: " << abs(topLoc.y - bottomLoc.y) << std::endl;
+			std::cout << "--------------------" << std::endl;
+			std::cout << "Top: (" << this->mouthTopLoc.x << ", " << this->mouthTopLoc.y << ")" << std::endl;
+			std::cout << "Bottom: (" << this->mouthBottomLoc.x << ", " << this->mouthBottomLoc.y << ")" << std::endl;
+			std::cout << "Y Diff: " << bottomLoc.y - topLoc.y << std::endl;
+			std::cout << "--------------------" << std::endl;
 
 			return true;
 
@@ -505,63 +580,6 @@ int bufferX = 15;//10;//5;
 
 
 	}//end updateMouthSubFeatureLocs
-
-
-	/* Look in the lower half of the face for the mouth */
-	CvRect getMouthSearchSpace(CvRect *r)
-	{
-		return cvRect(r->x,
-						(r->y +  (int)((1.0/2.0)*r->height)),
-						r->width, 
-						(int)((1.0/2.0)*r->height));
-	}
-
-	/* look in top left 5/8's for left eyebrow */
-	CvRect getLeftEyebrowSearchSpace(CvRect *r)
-	{
-		return cvRect(r->x,
-						r->y, 
-						(int)((5.0/8.0)*r->width), 
-						(int)((1.0/2.0)*r->height) );
-	}
-
-	/* look in top right 5/8's for right eyebrow */
-	CvRect getRightEyebrowSearchSpace(CvRect *r)
-	{
-		return cvRect(r->x + (int)((3.0/8.0)*r->width),
-						r->y,
-						(int)((5.0/8.0)*r->width),
-						(int)((1.0/2.0)*r->height) );
-	}
-
-	/* look under left eyebrow midpoint and face midpoint for left eye */
-	CvRect getLeftEyeSearchSpace(CvRect *r)
-	{
-		int y = this->leftEyebrowLoc.y + (int)((1.0/2.0)*this->leftEyebrowLoc.height);
-		return cvRect(r->x,
-						y, 
-						(int)((1.0/2.0)*r->width), 
-						this->mouthLoc.y - y );
-	}
-
-	/* look under right eyebrow midpoint and face midpoint for right eye */
-	CvRect getRightEyeSearchSpace(CvRect *r)
-	{
-		int y = this->rightEyebrowLoc.y + (int)((1.0/2.0)*this->rightEyebrowLoc.height);
-		return cvRect(r->x + (int)((1.0/2.0)*r->width),
-						y,
-						(int)((1.0/2.0)*r->width),
-						this->mouthLoc.y - y );
-	}
-
-
-	/* Crop out a template from a face */
-	void cropTemplate(IplImage *img, CvRect& loc, Mat& dst)
-	{
-		Rect ROI(loc);	//Make a rectangle
-		Mat imgROI = Mat(img)(ROI);	//Point a cv::Mat header at it (no allocation is done)
-		imgROI.copyTo(dst);
-	}
 
 
 	/* Update locations of all subfeatures */
