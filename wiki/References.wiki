@@ -5,6 +5,7 @@
 ==FACS==
  * http://face-and-emotion.com/dataface/facs/manual/TOC.html
  * http://www-2.cs.cmu.edu/afs/cs/project/face/www/facs.htm
+ * http://www.psych.nyu.edu/pelli/docs/NilaLeighIntel.pdf
 
 ==Face Images==
  * With Expressions https://pal.utdallas.edu/facedb/request/index
