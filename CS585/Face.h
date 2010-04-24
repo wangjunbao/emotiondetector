@@ -22,9 +22,10 @@ private:
 	CvRect mouthLoc;
 
 	Mat mouthTopTpl;
-	Point mouthTopLoc;
+	CvRect mouthTopLoc;
+
 	Mat mouthBottomTpl;
-	Point mouthBottomLoc;
+	CvRect mouthBottomLoc;
 
 	//left eyebrow
 	Mat leftEyebrowTpl;
@@ -227,24 +228,58 @@ public:
 			int newFaceWidth = r->width;
 			int newFaceHeight = r->height;
 
-			//mouth
-			Mat oldMouthTpl = imread("templates/mouth.jpg",1); //just to get the dimensions
-			//Mat oldMouthTpl = this->mouthTpl;
+			/* MOUTH */
 			Mat mouthTpl;
-			resizeFeatureTemplate(oldMouthTpl,newFaceWidth,newFaceHeight,mouthTpl);
+			if(this->mouthTpl.empty())	//use default template from average face
+			{
+				Mat oldMouthTpl	= imread("templates/mouth.jpg",1);
+				resizeFeatureTemplate(oldMouthTpl,newFaceWidth,newFaceHeight,mouthTpl);
+			}
+			else //use an existing template from this face 
+				//(this only happens in debugging when we run isValidFace even on old faces)
+			{
+				mouthTpl = this->mouthTpl;
+			}
 			
-			CvRect mouthSearchSpace = cvRect(r->x + (int)((2.0/8.0)*r->width), 
-				(r->y +  (int)((5.0/8.0)*r->height)), (int)((4.0/8.0)*r->width), (int)((3.0/8.0)*r->height));
-			
+			//run NCC to get coordinates of the mouth
+			CvRect mouthSearchSpace = this->getMouthSearchSpace(r);
 			CvRect mouthLoc;
+			//std::cout << "mouth=============================" << std::endl;
 			bool mouthFound = getSearchSpace(img,processedImg,r,mouthTpl,mouthSearchSpace,mouthLoc,true);
-
-			std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~MOUTH FOUND: " << mouthFound << std::endl;
-
+			//std::cout << "==============================mouth" << std::endl;
+			
+			//break out if no mouth found
 			if(mouthFound == false)
 			{
 				return false;
 			}
+			//store mouth coordinates and template image 
+			//(at first this will just be the resized version of the average face template)
+			else
+			{
+				this->mouthTpl = mouthTpl;
+				this->mouthLoc = mouthLoc;	
+			}
+			/* END MOUTH */
+
+			//mouth
+			//Mat oldMouthTpl = imread("templates/mouth.jpg",1); //just to get the dimensions
+			////Mat oldMouthTpl = this->mouthTpl;
+			//Mat mouthTpl;
+			//resizeFeatureTemplate(oldMouthTpl,newFaceWidth,newFaceHeight,mouthTpl);
+			//
+			//CvRect mouthSearchSpace = cvRect(r->x + (int)((2.0/8.0)*r->width), 
+			//	(r->y +  (int)((5.0/8.0)*r->height)), (int)((4.0/8.0)*r->width), (int)((3.0/8.0)*r->height));
+			//
+			//CvRect mouthLoc;
+			//bool mouthFound = getSearchSpace(img,processedImg,r,mouthTpl,mouthSearchSpace,mouthLoc,true);
+
+			//std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~MOUTH FOUND: " << mouthFound << std::endl;
+
+			//if(mouthFound == false)
+			//{
+			//	return false;
+			//}
 
 
 			//CvRect parentLoc = this->mouthLoc;
@@ -285,7 +320,7 @@ public:
 
 			
 
-			cvNamedWindow( "mouthTop", 1 );
+			namedWindow( "mouthTop", 1 );
 			imshow( "mouthTop", this->mouthTopTpl);
 			
 
@@ -576,8 +611,8 @@ int bufferX = 15;//10;//5;
 		this->updateFaceCoords(r);
 
 		//mouth
-		//bool updateMouthSuccess = this->updateMouthSubFeatureLocs(img,processedImg,r);
-		bool updateMouthSuccess = true;
+		bool updateMouthSuccess = this->updateMouthSubFeatureLocs(img,processedImg,r);
+		//bool updateMouthSuccess = true;
 		return (updateMouthSuccess);
 	}
 
@@ -765,7 +800,7 @@ int bufferX = 15;//10;//5;
 
 		//update sub templates			
 		//updateMouthSubFeatureLocs(img, processedImg, *r, mouthLoc);
-		//updateMouthSubFeatureLocs(img, processedImg, *r);
+		updateMouthSubFeatureLocs(img, processedImg, r);
 		
 		//updateSubFeatureLocs(img, processedImg, *r);
 
