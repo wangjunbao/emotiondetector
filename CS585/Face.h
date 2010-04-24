@@ -126,7 +126,7 @@ public:
 		Return true if NCC was above a threshold, otherwise false
 	*/
 	bool getSearchSpace(IplImage *img, IplImage *processedImg, 
-		CvRect *r, Mat& tpl, CvRect& inputSearchSpace, CvRect& outputSearchSpace, bool detailedOutput)
+		CvRect *r, Mat& tpl, CvRect& inputSearchSpace, CvRect& outputSearchSpace, bool detailedOutput=false)
 	{
 		bool result = false;
 		double THRESH = 0.50;
@@ -460,8 +460,8 @@ int bufferX = 15;//10;//5;
 
 
 		//update template image by running NCC
-		bool topFound = getSearchSpace(img,processedImg,&r,mouthTopTpl,topSearchSpace,topLoc,false);
-		bool bottomFound = getSearchSpace(img,processedImg,&r,mouthBottomTpl,bottomSearchSpace,bottomLoc,false);
+		bool topFound = getSearchSpace(img,processedImg,&r,mouthTopTpl,topSearchSpace,topLoc,true);
+		bool bottomFound = getSearchSpace(img,processedImg,&r,mouthBottomTpl,bottomSearchSpace,bottomLoc,true);
 
 		//update coordinates because maybe it was only taking the greatest but not surpassing threshold
 		if(topFound && bottomFound)
