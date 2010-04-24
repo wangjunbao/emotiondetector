@@ -191,14 +191,14 @@ public:
 	}
 
 	/* update face with new coordinates */
-	void updateFaceCoords(CvRect& r)
+	void updateFaceCoords(CvRect *r)
 	{
 		this->oldFaceWidth = this->currentFaceWidth;
 		this->oldFaceHeight = this->currentFaceWidth;
-		this->currentFaceWidth = r.width;
-		this->currentFaceHeight = r.height;
-		this->topLeftPoint.x = r.x;
-		this->topLeftPoint.y = r.y;
+		this->currentFaceWidth = r->width;
+		this->currentFaceHeight = r->height;
+		this->topLeftPoint.x = r->x;
+		this->topLeftPoint.y = r->y;
 	}
 
 
@@ -570,7 +570,7 @@ int bufferX = 15;//10;//5;
 
 
 	/* Update locations of all subfeatures */
-	bool updateSubFeatureLocs(IplImage *img, IplImage *processedImg, CvRect& r)
+	bool updateSubFeatureLocs(IplImage *img, IplImage *processedImg, CvRect *r)
 	{
 		//update face coordinates
 		this->updateFaceCoords(r);
@@ -593,7 +593,7 @@ int bufferX = 15;//10;//5;
 	bool isValidFace(IplImage *img, IplImage *processedImg, CvRect *r, bool doCrop = true)
 	{
 		//update face coordinates
-		this->updateFaceCoords(*r);
+		this->updateFaceCoords(r);
 
 		//store face dimensions in order to resize templates
 		double newFaceWidth = r->width;
