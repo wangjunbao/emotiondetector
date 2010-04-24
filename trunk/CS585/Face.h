@@ -206,7 +206,7 @@ public:
 		Update locations of mouth subfeatures
 		Return true if update successful, false if unsuccessful (ie: features were lost)
 	*/
-	bool updateMouthSubFeatureLocs(IplImage *img, IplImage *processedImg, CvRect& r)
+	bool updateMouthSubFeatureLocs(IplImage *img, IplImage *processedImg, CvRect *r)
 	{
 		//initialize search spaces to 0's
 		CvRect topLoc = cvRect(0,0,0,0);			
@@ -224,8 +224,8 @@ public:
 
 			//should run ncc on parent here because we never do!
 
-			int newFaceWidth = r.width;
-			int newFaceHeight = r.height;
+			int newFaceWidth = r->width;
+			int newFaceHeight = r->height;
 
 			//mouth
 			Mat oldMouthTpl = imread("templates/mouth.jpg",1); //just to get the dimensions
@@ -233,11 +233,11 @@ public:
 			Mat mouthTpl;
 			resizeFeatureTemplate(oldMouthTpl,newFaceWidth,newFaceHeight,mouthTpl);
 			
-			CvRect mouthSearchSpace = cvRect(r.x + (int)((2.0/8.0)*r.width), 
-				(r.y +  (int)((5.0/8.0)*r.height)), (int)((4.0/8.0)*r.width), (int)((3.0/8.0)*r.height));
+			CvRect mouthSearchSpace = cvRect(r->x + (int)((2.0/8.0)*r->width), 
+				(r->y +  (int)((5.0/8.0)*r->height)), (int)((4.0/8.0)*r->width), (int)((3.0/8.0)*r->height));
 			
 			CvRect mouthLoc;
-			bool mouthFound = getSearchSpace(img,processedImg,&r,mouthTpl,mouthSearchSpace,mouthLoc,true);
+			bool mouthFound = getSearchSpace(img,processedImg,r,mouthTpl,mouthSearchSpace,mouthLoc,true);
 
 			std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~MOUTH FOUND: " << mouthFound << std::endl;
 
@@ -460,8 +460,8 @@ int bufferX = 15;//10;//5;
 
 
 		//update template image by running NCC
-		bool topFound = getSearchSpace(img,processedImg,&r,mouthTopTpl,topSearchSpace,topLoc,true);
-		bool bottomFound = getSearchSpace(img,processedImg,&r,mouthBottomTpl,bottomSearchSpace,bottomLoc,true);
+		bool topFound = getSearchSpace(img,processedImg,r,mouthTopTpl,topSearchSpace,topLoc,true);
+		bool bottomFound = getSearchSpace(img,processedImg,r,mouthBottomTpl,bottomSearchSpace,bottomLoc,true);
 
 		//update coordinates because maybe it was only taking the greatest but not surpassing threshold
 		if(topFound && bottomFound)
