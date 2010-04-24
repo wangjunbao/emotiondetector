@@ -136,7 +136,9 @@ public:
 		//draw a box around the search space
 		//blue box
 		if(detailedOutput == true)
+		{
 			rectangle(Mat(processedImg),Point(inputSearchSpace.x,inputSearchSpace.y),Point(inputSearchSpace.x+inputSearchSpace.width, inputSearchSpace.y+inputSearchSpace.height),CV_RGB(0, 0, 255), 1, 0, 0 );
+		}
 
 		cvSetImageROI(img, inputSearchSpace);
 		cvSetImageROI(processedImg, inputSearchSpace);
@@ -155,7 +157,9 @@ public:
 		//draw a box around the found feature
 		//green box
 		if(detailedOutput == true)
+		{
 			rectangle(Mat(processedImg),maxloc,Point(maxloc.x + tpl.cols, maxloc.y + tpl.rows),CV_RGB(0, 255, 0), 1, 0, 0 );
+		}
 
 		outputSearchSpace = cvRect(inputSearchSpace.x + maxloc.x, inputSearchSpace.y + maxloc.y, tpl.cols, tpl.rows);
 		//std::cout << "**************outputSearchSpace: " << outputSearchSpace.width << " by " << outputSearchSpace.height << std::endl;
@@ -178,7 +182,9 @@ public:
 
 		//print out search space relative to entire image, not just ROI
 		if(detailedOutput == true)
+		{
 			//std::cout << "max: " << "(" << inputSearchSpace.x + maxloc.x << "," << inputSearchSpace.y + maxloc.y << "): " << maxval << std::endl;
+		}
 
 		return result;
 
@@ -578,29 +584,17 @@ int bufferX = 15;//10;//5;
 	/* Update locations of all features by running NCC's */
 	bool updateFeatureLocs(IplImage *img, IplImage *processedImg, CvRect *r)
 	{
-		//update face coordinates
-		this->updateFaceCoords(*r);
-
-		//we can possibly save some time by searching a reduced space
-		//but first we will just try using the same space as original
-
-		//MOUTH
-		CvRect mouthSearchSpace = this->getMouthSearchSpace(r);
-		CvRect mouthLoc;
-		std::cout << "mouth=============================" << std::endl;
-		bool mouthFound = getSearchSpace(img,processedImg,r,mouthTpl,mouthSearchSpace,mouthLoc,true);
-		std::cout << "==============================mouth" << std::endl;
-
-
-
-		
-
+		//call isValidFace without cropping out templates
+		return this->isValidFace(img,processedImg,r,false);
 	}
 
 
 	/* Return true if a face found by Haar is valid (has mouth,eyebrows,eyes) */
-	bool isValidFace(IplImage *img, IplImage *processedImg, CvRect *r, bool doCrop)
+	bool isValidFace(IplImage *img, IplImage *processedImg, CvRect *r, bool doCrop = true)
 	{
+		//update face coordinates
+		this->updateFaceCoords(*r);
+
 		//store face dimensions in order to resize templates
 		double newFaceWidth = r->width;
 		double newFaceHeight = r->height;
