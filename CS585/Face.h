@@ -246,7 +246,7 @@ public:
 			CvRect mouthSearchSpace = this->getMouthSearchSpace(r);
 			CvRect mouthLoc;
 			std::cout << "mouth=============================" << std::endl;
-			bool mouthFound = getSearchSpace(img,processedImg,r,mouthTpl,mouthSearchSpace,mouthLoc);
+			bool mouthFound = getSearchSpace(img,processedImg,r,mouthTpl,mouthSearchSpace,mouthLoc,true);
 			std::cout << "==============================mouth" << std::endl;
 			
 			//break out if no mouth found
@@ -357,12 +357,14 @@ public:
 			
 			//run NCC to get coordinates of the mouthBottom
 			//CvRect mouthSpace = this->mouthLoc;		//search where the mouth was found
-			CvRect mouthBottomSearchSpace = cvRect(this->mouthLoc.x, this->mouthLoc.y + (int)((1.0/2.0)*this->mouthLoc.height),
-											//this->mouthLoc.width, (int)((1.0/2.0)*this->mouthLoc.height));
-											this->mouthLoc.width, (int)((1.0/1.0)*this->mouthLoc.height));
+			//CvRect mouthBottomSearchSpace = cvRect(this->mouthLoc.x, this->mouthLoc.y + (int)((1.0/2.0)*this->mouthLoc.height),
+			//								//this->mouthLoc.width, (int)((1.0/2.0)*this->mouthLoc.height));
+			//								this->mouthLoc.width, (int)((1.0/1.0)*this->mouthLoc.height));
+			CvRect mouthBottomSearchSpace = cvRect(this->mouthLoc.x, this->mouthLoc.y,
+											this->mouthLoc.width, (this->mouthLoc.height));
 			CvRect mouthBottomLoc;
 			std::cout << "mouthBottom=============================" << std::endl;
-			bool mouthBottomFound = getSearchSpace(img,processedImg,r,mouthBottomTpl,mouthBottomSearchSpace,mouthBottomLoc);
+			bool mouthBottomFound = getSearchSpace(img,processedImg,r,mouthBottomTpl,mouthBottomSearchSpace,mouthBottomLoc,true);
 			std::cout << "==============================mouthBottom" << std::endl;
 			
 			//break out if no mouthBottom found
