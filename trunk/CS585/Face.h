@@ -178,7 +178,7 @@ public:
 
 		//print out search space relative to entire image, not just ROI
 		if(detailedOutput == true)
-			std::cout << "max: " << "(" << inputSearchSpace.x + maxloc.x << "," << inputSearchSpace.y + maxloc.y << "): " << maxval << std::endl;
+			//std::cout << "max: " << "(" << inputSearchSpace.x + maxloc.x << "," << inputSearchSpace.y + maxloc.y << "): " << maxval << std::endl;
 
 		return result;
 
@@ -591,13 +591,15 @@ int bufferX = 15;//10;//5;
 		bool mouthFound = getSearchSpace(img,processedImg,r,mouthTpl,mouthSearchSpace,mouthLoc,true);
 		std::cout << "==============================mouth" << std::endl;
 
+
+
 		
 
 	}
 
 
 	/* Return true if a face found by Haar is valid (has mouth,eyebrows,eyes) */
-	boolean isValidFace(IplImage *img, IplImage *processedImg, CvRect *r)
+	bool isValidFace(IplImage *img, IplImage *processedImg, CvRect *r, bool doCrop)
 	{
 		//store face dimensions in order to resize templates
 		double newFaceWidth = r->width;
@@ -621,9 +623,9 @@ int bufferX = 15;//10;//5;
 		//run NCC to get coordinates of the mouth
 		CvRect mouthSearchSpace = this->getMouthSearchSpace(r);
 		CvRect mouthLoc;
-		std::cout << "mouth=============================" << std::endl;
+		//std::cout << "mouth=============================" << std::endl;
 		bool mouthFound = getSearchSpace(img,processedImg,r,mouthTpl,mouthSearchSpace,mouthLoc,true);
-		std::cout << "==============================mouth" << std::endl;
+		//std::cout << "==============================mouth" << std::endl;
 		
 		//break out if no mouth found
 		if(mouthFound == false)
@@ -653,9 +655,9 @@ int bufferX = 15;//10;//5;
 		
 		CvRect leftEyebrowSearchSpace = this->getLeftEyebrowSearchSpace(r);
 		CvRect leftEyebrowLoc;
-		std::cout << "left eyebrow =============================" << std::endl;
+		//std::cout << "left eyebrow =============================" << std::endl;
 		bool leftEyebrowFound = getSearchSpace(img,processedImg,r,leftEyebrowTpl,leftEyebrowSearchSpace,leftEyebrowLoc,true);
-		std::cout << " ============================= left eyebrow" << std::endl;
+		//std::cout << " ============================= left eyebrow" << std::endl;
 
 		if(leftEyebrowFound == false)
 		{
@@ -683,9 +685,9 @@ int bufferX = 15;//10;//5;
 		
 		CvRect rightEyebrowSearchSpace = this->getRightEyebrowSearchSpace(r);
 		CvRect rightEyebrowLoc;
-		std::cout << "right eyebrow =============================" << std::endl;
+		//std::cout << "right eyebrow =============================" << std::endl;
 		bool rightEyebrowFound = getSearchSpace(img,processedImg,r,rightEyebrowTpl,rightEyebrowSearchSpace,rightEyebrowLoc,true);
-		std::cout << " ============================= right eyebrow" << std::endl;
+		//std::cout << " ============================= right eyebrow" << std::endl;
 
 		if(rightEyebrowFound == false)
 		{
@@ -712,9 +714,9 @@ int bufferX = 15;//10;//5;
 		
 		CvRect leftEyeSearchSpace = this->getLeftEyeSearchSpace(r);
 		CvRect leftEyeLoc;
-		std::cout << "left eye =============================" << std::endl;
+		//std::cout << "left eye =============================" << std::endl;
 		bool leftEyeFound = getSearchSpace(img,processedImg,r,leftEyeTpl,leftEyeSearchSpace,leftEyeLoc,true);
-		std::cout << "=============================left eye" << std::endl;
+		//std::cout << "=============================left eye" << std::endl;
 		
 		if(leftEyeFound == false)
 		{
@@ -741,9 +743,9 @@ int bufferX = 15;//10;//5;
 
 		CvRect rightEyeSearchSpace = this->getRightEyeSearchSpace(r);
 		CvRect rightEyeLoc;
-		std::cout << "right eye=============================" << std::endl;
+		//std::cout << "right eye=============================" << std::endl;
 		bool rightEyeFound = getSearchSpace(img,processedImg,r,rightEyeTpl,rightEyeSearchSpace,rightEyeLoc,true);
-		std::cout << "=============================right eye" << std::endl;
+		//std::cout << "=============================right eye" << std::endl;
 
 		if(rightEyeFound == false)
 		{
@@ -758,16 +760,20 @@ int bufferX = 15;//10;//5;
 
 		//crop out all feature templates from the valid face
 		//we do all of these at the end so we don't waste time cropping out features from invalid faces
-		this->cropTemplate(img,this->mouthLoc,this->mouthTpl);
-		this->cropTemplate(img,this->leftEyebrowLoc,this->leftEyebrowTpl);
-		this->cropTemplate(img,this->rightEyebrowLoc,this->rightEyebrowTpl);
-		this->cropTemplate(img,this->leftEyeLoc,this->leftEyeTpl);
-		this->cropTemplate(img,this->rightEyeLoc,this->rightEyeTpl);
+		if(doCrop == true)
+		{
+			this->cropTemplate(img,this->mouthLoc,this->mouthTpl);
+			this->cropTemplate(img,this->leftEyebrowLoc,this->leftEyebrowTpl);
+			this->cropTemplate(img,this->rightEyebrowLoc,this->rightEyebrowTpl);
+			this->cropTemplate(img,this->leftEyeLoc,this->leftEyeTpl);
+			this->cropTemplate(img,this->rightEyeLoc,this->rightEyeTpl);
+		}
 
 		//update sub templates			
 		//updateMouthSubFeatureLocs(img, processedImg, *r, mouthLoc);
 		//updateMouthSubFeatureLocs(img, processedImg, *r);
-		updateSubFeatureLocs(img, processedImg, *r);
+		
+		//updateSubFeatureLocs(img, processedImg, *r);
 
 		return true;
 	}
