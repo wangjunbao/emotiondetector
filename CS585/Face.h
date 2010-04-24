@@ -184,7 +184,7 @@ public:
 		//print out search space relative to entire image, not just ROI
 		if(detailedOutput == true)
 		{
-			std::cout << "max: " << "(" << inputSearchSpace.x + maxloc.x << "," << inputSearchSpace.y + maxloc.y << "): " << maxval << std::endl;
+			//std::cout << "max: " << "(" << inputSearchSpace.x + maxloc.x << "," << inputSearchSpace.y + maxloc.y << "): " << maxval << std::endl;
 		}
 
 		return result;
@@ -228,106 +228,60 @@ public:
 			int newFaceWidth = r->width;
 			int newFaceHeight = r->height;
 
-			/* MOUTH */
-			Mat mouthTpl;
-			if(this->mouthTpl.empty())	//use default template from average face
-			{
-				Mat oldMouthTpl	= imread("templates/mouth.jpg",1);
-				resizeFeatureTemplate(oldMouthTpl,newFaceWidth,newFaceHeight,mouthTpl);
-			}
-			else //use an existing template from this face 
-				//(this only happens in debugging when we run isValidFace even on old faces)
-			{
-				mouthTpl = this->mouthTpl;
-				//resizeFeatureTemplate(mouthTpl,newFaceWidth,newFaceHeight,mouthTpl);
-			}
-			
-			//run NCC to get coordinates of the mouth
-			CvRect mouthSearchSpace = this->getMouthSearchSpace(r);
-			CvRect mouthLoc;
-			std::cout << "mouth=============================" << std::endl;
-			bool mouthFound = getSearchSpace(img,processedImg,r,mouthTpl,mouthSearchSpace,mouthLoc,true);
-			std::cout << "==============================mouth" << std::endl;
-			
-			//break out if no mouth found
-			if(mouthFound == false)
-			{
-				return false;
-			}
-			//store mouth coordinates and template image 
-			//(at first this will just be the resized version of the average face template)
-			else
-			{
-				this->mouthTpl = mouthTpl;
-				this->mouthLoc = mouthLoc;	
-			}
-			/* END MOUTH */
+			///* MOUTH */
+			//Mat mouthTpl;
+			//if(this->mouthTpl.empty())	//use default template from average face
+			//{
+			//	Mat oldMouthTpl	= imread("templates/mouth.jpg",1);
+			//	resizeFeatureTemplate(oldMouthTpl,newFaceWidth,newFaceHeight,mouthTpl);
+			//}
+			//else //use an existing template from this face 
+			//	//(this only happens in debugging when we run isValidFace even on old faces)
+			//{
+			//	mouthTpl = this->mouthTpl;
+			//	//resizeFeatureTemplate(mouthTpl,newFaceWidth,newFaceHeight,mouthTpl);
+			//}
+			//
+			////run NCC to get coordinates of the mouth
+			//CvRect mouthSearchSpace = this->getMouthSearchSpace(r);
+			//CvRect mouthLoc;
+			//std::cout << "mouth=============================" << std::endl;
+			//bool mouthFound = getSearchSpace(img,processedImg,r,mouthTpl,mouthSearchSpace,mouthLoc,true);
+			//std::cout << "==============================mouth" << std::endl;
+			//
+			////break out if no mouth found
+			//if(mouthFound == false)
+			//{
+			//	return false;
+			//}
+			////store mouth coordinates and template image 
+			////(at first this will just be the resized version of the average face template)
+			//else
+			//{
+			//	this->mouthTpl = mouthTpl;
+			//	this->mouthLoc = mouthLoc;	
+			//}
+			///* END MOUTH */
 
 
-			//CvRect parentLoc = this->mouthLoc;
-			CvRect parentLoc = mouthLoc;
+			CvRect parentLoc = this->mouthLoc;
+			//CvRect parentLoc = mouthLoc;
 
-			this->cropTemplate(img,parentLoc,this->mouthTpl);
+			//this->cropTemplate(img,parentLoc,this->mouthTpl);
 
 			cvNamedWindow( "mouth", 1 );
 			//imshow( "mouthTop", imgParentROI);
 			imshow("mouth",this->mouthTpl);
 
 
-
-
-			/* MOUTH TOP */
-			Mat mouthTopTpl;
-			if(this->mouthTopTpl.empty())	//use default template from average face
-			{
-				Mat oldMouthTpl	= imread("templates/mouthTop.jpg",1);
-				resizeFeatureTemplate(oldMouthTpl,newFaceWidth,newFaceHeight,mouthTopTpl);
-			}
-			else //use an existing template from this face 
-				//(this only happens in debugging when we run isValidFace even on old faces)
-			{
-				mouthTopTpl = this->mouthTopTpl;
-			}
-			
-			//run NCC to get coordinates of the mouthTop
-			//CvRect mouthSpace = this->mouthLoc;		//search where the mouth was found
-			CvRect mouthTopSearchSpace = cvRect(this->mouthLoc.x, this->mouthLoc.y,
-											this->mouthLoc.width, (int)((1.0/2.0)*this->mouthLoc.height));
-			CvRect mouthTopLoc;
-			std::cout << "mouthTop=============================" << std::endl;
-			bool mouthTopFound = getSearchSpace(img,processedImg,r,mouthTopTpl,mouthTopSearchSpace,mouthTopLoc);
-			std::cout << "==============================mouthTop" << std::endl;
-			
-			//break out if no mouthTop found
-			if(mouthTopFound == false)
-			{
-				return false;
-			}
-			//store mouthTop coordinates and template image 
-			//(at first this will just be the resized version of the average face template)
-			else
-			{
-				this->mouthTopTpl = mouthTopTpl;
-				this->mouthTopLoc = mouthTopLoc;	
-			}
-			/* END MOUTH TOP */
-
-
-
 			//top subtemplate
-			//Mat oldTopTpl = imread("templates/mouthTop.jpg",1);			
-			//resizeFeatureTemplate(oldTopTpl,r.width,r.height,this->mouthTopTpl);
-			//topSearchSpace = cvRect(parentLoc.x, parentLoc.y,parentLoc.width, parentLoc.height/2);
-			
-			/*topSearchSpace = cvRect(parentLoc.x + (2.0/8.0)*parentLoc.width, parentLoc.y,
-				(4.0/8.0)*parentLoc.width, (3.0/8.0)*parentLoc.height);			*/
-
-			topSearchSpace = this->mouthTopLoc;			
+			topSearchSpace = cvRect(parentLoc.x + (int)((1.0/4.0)*parentLoc.width),
+									parentLoc.y,
+									(int)((1.0/2.0)*parentLoc.width),
+									(int)((3.0/8.0)*parentLoc.height));					
 
 			//maybe we should run the ncc here instead of just doing location search
-
 			this->cropTemplate(img,topSearchSpace,this->mouthTopTpl);
-			//this->cropTemplate(img,this->mouthTopLoc,this->mouthTopTpl);
 
 			namedWindow( "mouthTop", 1 );
 			imshow( "mouthTop", this->mouthTopTpl);
@@ -340,58 +294,13 @@ public:
 				CV_RGB(255,255,0),1,0,0);
 
 
-
-
-			/* MOUTH BOTTOM */
-			Mat mouthBottomTpl;
-			if(this->mouthBottomTpl.empty())	//use default template from average face
-			{
-				Mat oldMouthTpl	= imread("templates/mouthBottom.jpg",1);
-				resizeFeatureTemplate(oldMouthTpl,newFaceWidth,newFaceHeight,mouthBottomTpl);
-			}
-			else //use an existing template from this face 
-				//(this only happens in debugging when we run isValidFace even on old faces)
-			{
-				mouthBottomTpl = this->mouthBottomTpl;
-			}
-			
-			//run NCC to get coordinates of the mouthBottom
-			//CvRect mouthSpace = this->mouthLoc;		//search where the mouth was found
-			//CvRect mouthBottomSearchSpace = cvRect(this->mouthLoc.x, this->mouthLoc.y + (int)((1.0/2.0)*this->mouthLoc.height),
-			//								//this->mouthLoc.width, (int)((1.0/2.0)*this->mouthLoc.height));
-			//								this->mouthLoc.width, (int)((1.0/1.0)*this->mouthLoc.height));
-			CvRect mouthBottomSearchSpace = cvRect(this->mouthLoc.x, this->mouthLoc.y,
-											this->mouthLoc.width, (this->mouthLoc.height));
-			CvRect mouthBottomLoc;
-			std::cout << "mouthBottom=============================" << std::endl;
-			bool mouthBottomFound = getSearchSpace(img,processedImg,r,mouthBottomTpl,mouthBottomSearchSpace,mouthBottomLoc,true);
-			std::cout << "==============================mouthBottom" << std::endl;
-			
-			//break out if no mouthBottom found
-			if(mouthBottomFound == false)
-			{
-				return false;
-			}
-			//store mouthBottom coordinates and template image 
-			//(at first this will just be the resized version of the average face template)
-			else
-			{
-				this->mouthBottomTpl = mouthBottomTpl;
-				this->mouthBottomLoc = mouthBottomLoc;	
-			}
-			/* END MOUTH BOTTOM */
-
-
 			//bottom subtemplate
-	/*		Mat oldBottomTpl = imread("templates/mouthBottom.jpg",1);
-			resizeFeatureTemplate(oldBottomTpl,r.width,r.height,this->mouthBottomTpl);
-			bottomSearchSpace = cvRect(parentLoc.x, parentLoc.y + (1.0/2.0)*parentLoc.height, parentLoc.width, (1.0/2.0)*parentLoc.height);
-			*/
-			
-			//bottomSearchSpace = cvRect(parentLoc.x + (2.0/8.0)*parentLoc.width, parentLoc.y + (5.0/8.0)*parentLoc.height, 
-			//	(4.0/8.0)*parentLoc.width, (3.0/8.0)*parentLoc.height);
+			bottomSearchSpace = cvRect(parentLoc.x + (1.0/4.0)*parentLoc.width,
+										parentLoc.y + (5.0/8.0)*parentLoc.height, 
+										(1.0/2.0)*parentLoc.width,
+										(3.0/8.0)*parentLoc.height);
 
-			bottomSearchSpace = this->mouthBottomLoc;
+			//bottomSearchSpace = this->mouthBottomLoc;
 			
 			
 			//maybe we should run the ncc here instead of just doing location search
@@ -588,7 +497,8 @@ int bufferX = 15;//10;//5;
 			this->mouthBottomTpl.release();
 			//we didnt' find the feature in this frame :(
 
-			return true;
+			//return true;
+			return false;
 		}
 
 		//std::cout << "top bot diff: " << abs(topLoc.y - bottomLoc.y) << std::endl;
@@ -686,42 +596,43 @@ int bufferX = 15;//10;//5;
 		
 		//return false if any of the features are not found
 
-		if( updateMouthSubFeatureLocs(img, processedImg, r) == false)
-		{
-			return false;
-		}
-		/* MOUTH */ //commented for now b/c we do this again in updateMouthSub
-		//Mat mouthTpl;
-		//if(this->mouthTpl.empty())	//use default template from average face
-		//{
-		//	Mat oldMouthTpl	= imread("templates/mouth.jpg",1);
-		//	resizeFeatureTemplate(oldMouthTpl,newFaceWidth,newFaceHeight,mouthTpl);
-		//}
-		//else //use an existing template from this face 
-		//	//(this only happens in debugging when we run isValidFace even on old faces)
-		//{
-		//	mouthTpl = this->mouthTpl;
-		//}
-		//
-		////run NCC to get coordinates of the mouth
-		//CvRect mouthSearchSpace = this->getMouthSearchSpace(r);
-		//CvRect mouthLoc;
-		////std::cout << "mouth=============================" << std::endl;
-		//bool mouthFound = getSearchSpace(img,processedImg,r,mouthTpl,mouthSearchSpace,mouthLoc,detailedOutput);
-		////std::cout << "==============================mouth" << std::endl;
-		//
-		////break out if no mouth found
-		//if(mouthFound == false)
+		//if( updateMouthSubFeatureLocs(img, processedImg, r) == false)
 		//{
 		//	return false;
 		//}
-		////store mouth coordinates and template image 
-		////(at first this will just be the resized version of the average face template)
-		//else
-		//{
-		//	this->mouthTpl = mouthTpl;
-		//	this->mouthLoc = mouthLoc;	
-		//}
+
+		/* MOUTH */ //commented for now b/c we do this again in updateMouthSub
+		Mat mouthTpl;
+		if(this->mouthTpl.empty())	//use default template from average face
+		{
+			Mat oldMouthTpl	= imread("templates/mouth.jpg",1);
+			resizeFeatureTemplate(oldMouthTpl,newFaceWidth,newFaceHeight,mouthTpl);
+		}
+		else //use an existing template from this face 
+			//(this only happens in debugging when we run isValidFace even on old faces)
+		{
+			mouthTpl = this->mouthTpl;
+		}
+		
+		//run NCC to get coordinates of the mouth
+		CvRect mouthSearchSpace = this->getMouthSearchSpace(r);
+		CvRect mouthLoc;
+		//std::cout << "mouth=============================" << std::endl;
+		bool mouthFound = getSearchSpace(img,processedImg,r,mouthTpl,mouthSearchSpace,mouthLoc,detailedOutput);
+		//std::cout << "==============================mouth" << std::endl;
+		
+		//break out if no mouth found
+		if(mouthFound == false)
+		{
+			return false;
+		}
+		//store mouth coordinates and template image 
+		//(at first this will just be the resized version of the average face template)
+		else
+		{
+			this->mouthTpl = mouthTpl;
+			this->mouthLoc = mouthLoc;	
+		}
 		/* END MOUTH */
 
 		/* LEFT EYEBROW */
@@ -853,11 +764,11 @@ int bufferX = 15;//10;//5;
 		}
 
 		//update sub templates			
-		//return updateMouthSubFeatureLocs(img, processedImg, r);
+		return updateMouthSubFeatureLocs(img, processedImg, r);
 		
 		//updateSubFeatureLocs(img, processedImg, r);
 
-		return true;
+		//return true;
 	}
 
 	void eyeSubCode()
