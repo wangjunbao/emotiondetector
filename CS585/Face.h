@@ -103,9 +103,17 @@ public:
 		namedWindow( "left eyebrow", 1 );
 		imshow("left eyebrow",this->leftEyebrowTpl);
 
+		//right eyebrow
+		namedWindow( "right eyebrow", 1 );
+		imshow("right eyebrow",this->rightEyebrowTpl);
+
 		//left eye
 		namedWindow( "left eye", 1 );
 		imshow("left eye",this->leftEyeTpl);
+
+		//right eye
+		namedWindow( "right eye", 1 );
+		imshow("right eye",this->rightEyeTpl);
 
 		//mouth
 		namedWindow( "mouth", 1 );
@@ -506,8 +514,8 @@ int bufferX = 15;//10;//5;
 		this->updateFaceCoords(r);
 
 		//mouth
-		bool updateMouthSuccess = this->updateMouthSubFeatureLocs(img,processedImg,r);
-		
+		//bool updateMouthSuccess = this->updateMouthSubFeatureLocs(img,processedImg,r);
+		bool updateMouthSuccess = true;
 		return (updateMouthSuccess);
 	}
 
@@ -586,7 +594,8 @@ int bufferX = 15;//10;//5;
 			//Mat mouthTpl;
 			resizeFeatureTemplate(oldMouthTpl,newFaceWidth,newFaceHeight,mouthTpl);
 		}
-		else
+		else //use old template if it exists, this should never happen but for debugging it will
+			//since we call isValidFace even on oldfaces
 		{
 			std::cout << "mouthTpl NOT empty" << std::endl;
 			//oldMouthTpl = this->mouthTpl;
@@ -599,7 +608,7 @@ int bufferX = 15;//10;//5;
 		
 		CvRect mouthLoc;
 		std::cout << "mouth=============================" << std::endl;
-		bool mouthFound = getSearchSpace(img,processedImg,r,mouthTpl,mouthSearchSpace,mouthLoc,false);
+		bool mouthFound = getSearchSpace(img,processedImg,r,mouthTpl,mouthSearchSpace,mouthLoc,true);
 		std::cout << "==============================mouth" << std::endl;
 		
 		if(mouthFound == false)
@@ -611,13 +620,24 @@ int bufferX = 15;//10;//5;
 		//update coordinates
 		this->mouthTpl = mouthTpl;
 		this->mouthLoc = mouthLoc;
+
+		//crop
+		this->cropTemplate(img,this->mouthLoc,this->mouthTpl);
 		
 		//look for eyebrows
 
 		//left eyebrow
-		Mat oldLeftEyebrowTpl = imread("templates/leftEyebrow.jpg",1);
 		Mat leftEyebrowTpl;
-		resizeFeatureTemplate(oldLeftEyebrowTpl,newFaceWidth,newFaceHeight,leftEyebrowTpl);
+
+		if(this->leftEyebrowTpl.empty())
+		{
+			Mat oldLeftEyebrowTpl = imread("templates/leftEyebrow.jpg",1);
+			resizeFeatureTemplate(oldLeftEyebrowTpl,newFaceWidth,newFaceHeight,leftEyebrowTpl);
+		}
+		else
+		{
+			leftEyebrowTpl = this->leftEyebrowTpl;
+		}
 		
 		CvRect leftEyebrowSearchSpace = this->getLeftEyebrowSearchSpace(r);
 		
@@ -640,14 +660,24 @@ int bufferX = 15;//10;//5;
 
 
 		//right eyebrow
-		Mat oldRightEyebrowTpl = imread("templates/rightEyebrow.jpg",1);
 		Mat rightEyebrowTpl;
-		resizeFeatureTemplate(oldRightEyebrowTpl,newFaceWidth,newFaceHeight,rightEyebrowTpl);
+
+		if(this->rightEyebrowTpl.empty())
+		{
+			Mat oldRightEyebrowTpl = imread("templates/rightEyebrow.jpg",1);
+			resizeFeatureTemplate(oldRightEyebrowTpl,newFaceWidth,newFaceHeight,rightEyebrowTpl);
+		}
+		else
+		{
+			rightEyebrowTpl = this->rightEyebrowTpl;
+		}
 		
 		CvRect rightEyebrowSearchSpace = this->getRightEyebrowSearchSpace(r);
 		
 		CvRect rightEyebrowLoc;
+		std::cout << "right eyebrow =============================" << std::endl;
 		bool rightEyebrowFound = getSearchSpace(img,processedImg,r,rightEyebrowTpl,rightEyebrowSearchSpace,rightEyebrowLoc,true);
+		std::cout << " ============================= right eyebrow" << std::endl;
 
 		if(rightEyebrowFound == false)
 		{
@@ -657,6 +687,9 @@ int bufferX = 15;//10;//5;
 		//update right eyebrow template
 		this->rightEyebrowTpl = rightEyebrowTpl;
 		this->rightEyebrowLoc = rightEyebrowLoc;
+
+		//crop
+		this->cropTemplate(img,this->rightEyebrowLoc,this->rightEyebrowTpl);
 
 
 
@@ -701,55 +734,19 @@ int bufferX = 15;//10;//5;
 		//each parent feature has specific search space (area of face)
 		//run NCC on parent feature (except left eye) to get search space for sub features
 		
-		//void updateEyeSubFeatureLocations(IplImage *img, IplImage *processedImg, double newFaceWidth, double newFaceHeight, CvRect& parentLoc)
-		//updateEyeSubFeatureLocations(img, processedImg, r->width, r->height, leftEyeLoc);
-		
-		//uncomment below:
-		//updateEyeSubFeatureLocations(img, processedImg, *r, leftEyeLoc);
-
-		////left eye left
-		//Mat oldLeftEyeLeftTpl = imread("templates/leftEyeLeft.jpg",1);
-		//Mat leftEyeLeftTpl;
-		//resizeFeatureTemplate(oldLeftEyeLeftTpl,newFaceWidth,newFaceHeight,leftEyeLeftTpl);
-		//CvRect leftEyeLeftSearchSpace = cvRect(leftEyeLoc.x,leftEyeLoc.y,
-		//	leftEyeLoc.width/2,leftEyeLoc.height);
-		//CvRect leftEyeLeftSubSearchSpace;
-		//bool leftEyeLeftFound = getSearchSpace(img,processedImg,r,leftEyeLeftTpl,leftEyeLeftSearchSpace,leftEyeLeftSubSearchSpace);
-
-		////left eye right
-		//Mat oldLeftEyeRightTpl = imread("templates/leftEyeRight.jpg",1);
-		//Mat leftEyeRightTpl;
-		//resizeFeatureTemplate(oldLeftEyeRightTpl,newFaceWidth,newFaceHeight,leftEyeRightTpl);	
-		//CvRect leftEyeRightSearchSpace = cvRect((leftEyeLoc.x + leftEyeLoc.width/2),leftEyeLoc.y,
-		//	leftEyeLoc.width/2,leftEyeLoc.height);
-		//CvRect leftEyeRightSubSearchSpace;
-		//bool leftEyeRightFound = getSearchSpace(img,processedImg,r,leftEyeRightTpl,leftEyeRightSearchSpace,leftEyeRightSubSearchSpace);
-
-		////left eye top
-		//Mat oldLeftEyeTopTpl = imread("templates/leftEyeTop.jpg",1);
-		//Mat leftEyeTopTpl;
-		//resizeFeatureTemplate(oldLeftEyeTopTpl,newFaceWidth,newFaceHeight,leftEyeTopTpl);
-		//CvRect leftEyeTopSearchSpace = cvRect((leftEyeLoc.x),(leftEyeLoc.y),
-		//	leftEyeLoc.width,leftEyeLoc.height/2);
-		//CvRect leftEyeTopSubSearchSpace;
-		//bool leftEyeTopFound = getSearchSpace(img,processedImg,r,leftEyeTopTpl,leftEyeTopSearchSpace,leftEyeTopSubSearchSpace);
-
-		////left eye bottom
-		//Mat oldLeftEyeBottomTpl = imread("templates/leftEyeBottom.jpg",1);
-		//Mat leftEyeBottomTpl;
-		//resizeFeatureTemplate(oldLeftEyeBottomTpl,newFaceWidth,newFaceHeight,leftEyeBottomTpl);
-		//CvRect leftEyeBottomSearchSpace = cvRect((leftEyeLoc.x),(leftEyeLoc.y + leftEyeLoc.height/2),
-		//	leftEyeLoc.width,leftEyeLoc.height/2);
-		//CvRect leftEyeBottomSubSearchSpace;
-		//bool leftEyeBottomFound = getSearchSpace(img,processedImg,r,leftEyeBottomTpl,leftEyeBottomSearchSpace,leftEyeBottomSubSearchSpace);
-
 		//uncomment starting here:
 
 		//right eye
-		Mat oldRightEyeTpl = imread("templates/rightEye.jpg",1);
 		Mat rightEyeTpl;
-		resizeFeatureTemplate(oldRightEyeTpl,newFaceWidth,newFaceHeight,rightEyeTpl);
-
+		if(this->rightEyeTpl.empty())
+		{
+			Mat oldRightEyeTpl = imread("templates/rightEye.jpg",1);
+			resizeFeatureTemplate(oldRightEyeTpl,newFaceWidth,newFaceHeight,rightEyeTpl);
+		}
+		else
+		{
+			rightEyeTpl = this->rightEyeTpl;
+		}
 		CvRect rightEyeSearchSpace = this->getRightEyeSearchSpace(r);
 
 		CvRect rightEyeLoc;
@@ -766,6 +763,9 @@ int bufferX = 15;//10;//5;
 		//update right eye stuff
 		this->rightEyeTpl = rightEyeTpl;
 		this->rightEyeLoc = rightEyeLoc;
+
+		//crop
+		this->cropTemplate(img,this->rightEyeLoc,this->rightEyeTpl);
 		
 
 		//update sub templates			
