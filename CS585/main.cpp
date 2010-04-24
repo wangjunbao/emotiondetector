@@ -21,8 +21,8 @@ void detectFaces( IplImage *img );
 
 int main( int argc, char** argv )
 {
-	bool isVideo = true; //video
-	//bool isVideo = false; //image
+	//bool isVideo = true; //video
+	bool isVideo = false; //image
 
 	//is image
 	if(isVideo == false)
