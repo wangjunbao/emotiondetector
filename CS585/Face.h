@@ -100,21 +100,21 @@ public:
 			cvPoint( r->x + r->width, r->y + r->height ),
 			CV_RGB( 255, 255, 0 ), 1, 8, 0 );
 
-		//left eyebrow
-		namedWindow( "left eyebrow", 1 );
-		imshow("left eyebrow",this->leftEyebrowTpl);
+		////left eyebrow
+		//namedWindow( "left eyebrow", 1 );
+		//imshow("left eyebrow",this->leftEyebrowTpl);
 
-		//right eyebrow
-		namedWindow( "right eyebrow", 1 );
-		imshow("right eyebrow",this->rightEyebrowTpl);
+		////right eyebrow
+		//namedWindow( "right eyebrow", 1 );
+		//imshow("right eyebrow",this->rightEyebrowTpl);
 
-		//left eye
-		namedWindow( "left eye", 1 );
-		imshow("left eye",this->leftEyeTpl);
+		////left eye
+		//namedWindow( "left eye", 1 );
+		//imshow("left eye",this->leftEyeTpl);
 
-		//right eye
-		namedWindow( "right eye", 1 );
-		imshow("right eye",this->rightEyeTpl);
+		////right eye
+		//namedWindow( "right eye", 1 );
+		//imshow("right eye",this->rightEyeTpl);
 
 		//mouth
 		namedWindow( "mouth", 1 );
@@ -184,7 +184,7 @@ public:
 		//print out search space relative to entire image, not just ROI
 		if(detailedOutput == true)
 		{
-			//std::cout << "max: " << "(" << inputSearchSpace.x + maxloc.x << "," << inputSearchSpace.y + maxloc.y << "): " << maxval << std::endl;
+			std::cout << "max: " << "(" << inputSearchSpace.x + maxloc.x << "," << inputSearchSpace.y + maxloc.y << "): " << maxval << std::endl;
 		}
 
 		return result;
@@ -239,14 +239,15 @@ public:
 				//(this only happens in debugging when we run isValidFace even on old faces)
 			{
 				mouthTpl = this->mouthTpl;
+				//resizeFeatureTemplate(mouthTpl,newFaceWidth,newFaceHeight,mouthTpl);
 			}
 			
 			//run NCC to get coordinates of the mouth
 			CvRect mouthSearchSpace = this->getMouthSearchSpace(r);
 			CvRect mouthLoc;
-			//std::cout << "mouth=============================" << std::endl;
+			std::cout << "mouth=============================" << std::endl;
 			bool mouthFound = getSearchSpace(img,processedImg,r,mouthTpl,mouthSearchSpace,mouthLoc,true);
-			//std::cout << "==============================mouth" << std::endl;
+			std::cout << "==============================mouth" << std::endl;
 			
 			//break out if no mouth found
 			if(mouthFound == false)
@@ -262,46 +263,54 @@ public:
 			}
 			/* END MOUTH */
 
-			//mouth
-			//Mat oldMouthTpl = imread("templates/mouth.jpg",1); //just to get the dimensions
-			////Mat oldMouthTpl = this->mouthTpl;
-			//Mat mouthTpl;
-			//resizeFeatureTemplate(oldMouthTpl,newFaceWidth,newFaceHeight,mouthTpl);
-			//
-			//CvRect mouthSearchSpace = cvRect(r->x + (int)((2.0/8.0)*r->width), 
-			//	(r->y +  (int)((5.0/8.0)*r->height)), (int)((4.0/8.0)*r->width), (int)((3.0/8.0)*r->height));
-			//
-			//CvRect mouthLoc;
-			//bool mouthFound = getSearchSpace(img,processedImg,r,mouthTpl,mouthSearchSpace,mouthLoc,true);
-
-			//std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~MOUTH FOUND: " << mouthFound << std::endl;
-
-			//if(mouthFound == false)
-			//{
-			//	return false;
-			//}
-
 
 			//CvRect parentLoc = this->mouthLoc;
 			CvRect parentLoc = mouthLoc;
 
-			Rect parentROI(parentLoc);	//Make a rectangle
-			//Rect parentROI(this->mouthLoc);
-			Mat imgParentROI = Mat(img)(parentROI);	//Point a cv::Mat header at it (no allocation is done)
-			imgParentROI.copyTo(this->mouthTpl);
+			this->cropTemplate(img,parentLoc,this->mouthTpl);
 
 			cvNamedWindow( "mouth", 1 );
 			//imshow( "mouthTop", imgParentROI);
 			imshow("mouth",this->mouthTpl);
 
-			
-			//std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~MOUTH FOUND: " << mouthFound << std::endl;
 
-			//if(mouthFound == false)
-			//{
-			//	std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~FACE LOST" << std::endl;
-			//	return false;
-			//}
+
+
+			/* MOUTH TOP */
+			Mat mouthTopTpl;
+			if(this->mouthTopTpl.empty())	//use default template from average face
+			{
+				Mat oldMouthTpl	= imread("templates/mouthTop.jpg",1);
+				resizeFeatureTemplate(oldMouthTpl,newFaceWidth,newFaceHeight,mouthTopTpl);
+			}
+			else //use an existing template from this face 
+				//(this only happens in debugging when we run isValidFace even on old faces)
+			{
+				mouthTopTpl = this->mouthTopTpl;
+			}
+			
+			//run NCC to get coordinates of the mouthTop
+			CvRect mouthSpace = this->mouthLoc;		//search where the mouth was found
+			CvRect mouthTopSearchSpace = cvRect(mouthSpace.x, mouthSpace.y,
+											mouthSpace.width, (int)((1.0/2.0)*mouthSpace.height));
+			CvRect mouthTopLoc;
+			std::cout << "mouthTop=============================" << std::endl;
+			bool mouthTopFound = getSearchSpace(img,processedImg,r,mouthTopTpl,mouthTopSearchSpace,mouthTopLoc);
+			std::cout << "==============================mouthTop" << std::endl;
+			
+			//break out if no mouthTop found
+			if(mouthTopFound == false)
+			{
+				return false;
+			}
+			//store mouthTop coordinates and template image 
+			//(at first this will just be the resized version of the average face template)
+			else
+			{
+				this->mouthTopTpl = mouthTopTpl;
+				this->mouthTopLoc = mouthTopLoc;	
+			}
+			/* END MOUTH TOP */
 
 
 
@@ -310,15 +319,15 @@ public:
 			//resizeFeatureTemplate(oldTopTpl,r.width,r.height,this->mouthTopTpl);
 			//topSearchSpace = cvRect(parentLoc.x, parentLoc.y,parentLoc.width, parentLoc.height/2);
 			
-			topSearchSpace = cvRect(parentLoc.x + (2.0/8.0)*parentLoc.width, parentLoc.y,
-				(4.0/8.0)*parentLoc.width, (3.0/8.0)*parentLoc.height);			
-			Rect topROI(topSearchSpace);
-			Mat imgTopROI = Mat(img)(topROI);
-			imgTopROI.copyTo(this->mouthTopTpl);
+			/*topSearchSpace = cvRect(parentLoc.x + (2.0/8.0)*parentLoc.width, parentLoc.y,
+				(4.0/8.0)*parentLoc.width, (3.0/8.0)*parentLoc.height);			*/
+
+			topSearchSpace = this->mouthTopLoc;			
 
 			//maybe we should run the ncc here instead of just doing location search
 
-			
+			this->cropTemplate(img,topSearchSpace,this->mouthTopTpl);
+			//this->cropTemplate(img,this->mouthTopLoc,this->mouthTopTpl);
 
 			namedWindow( "mouthTop", 1 );
 			imshow( "mouthTop", this->mouthTopTpl);
@@ -339,11 +348,10 @@ public:
 			
 			bottomSearchSpace = cvRect(parentLoc.x + (2.0/8.0)*parentLoc.width, parentLoc.y + (5.0/8.0)*parentLoc.height, 
 				(4.0/8.0)*parentLoc.width, (3.0/8.0)*parentLoc.height);
-			Rect bottomROI(bottomSearchSpace);	//Make a rectangle
-			Mat imgBottomROI = Mat(img)(bottomROI);	//Point a cv::Mat header at it (no allocation is done)
-			imgBottomROI.copyTo(this->mouthBottomTpl);
+			
 			
 			//maybe we should run the ncc here instead of just doing location search
+			this->cropTemplate(img,bottomSearchSpace,this->mouthBottomTpl);
 
 			cvNamedWindow( "mouthBottom", 1 );
 			imshow( "mouthBottom", this->mouthBottomTpl);
@@ -496,7 +504,7 @@ int bufferX = 15;//10;//5;
 
 		//update template image by running NCC
 		bool topFound = getSearchSpace(img,processedImg,r,mouthTopTpl,topSearchSpace,topLoc,true);
-		bool bottomFound = getSearchSpace(img,processedImg,r,mouthBottomTpl,bottomSearchSpace,bottomLoc,true);
+		bool bottomFound = getSearchSpace(img,processedImg,r,mouthBottomTpl,bottomSearchSpace,bottomLoc,false);
 
 		//update coordinates because maybe it was only taking the greatest but not surpassing threshold
 		if(topFound && bottomFound)
@@ -625,7 +633,7 @@ int bufferX = 15;//10;//5;
 
 
 	/* Return true if a face found by Haar is valid (has mouth,eyebrows,eyes) */
-	bool isValidFace(IplImage *img, IplImage *processedImg, CvRect *r, bool doCrop = true)
+	bool isValidFace(IplImage *img, IplImage *processedImg, CvRect *r, bool doCrop = true, bool detailedOutput=false)
 	{
 		//update face coordinates
 		this->updateFaceCoords(r);
@@ -653,7 +661,7 @@ int bufferX = 15;//10;//5;
 		CvRect mouthSearchSpace = this->getMouthSearchSpace(r);
 		CvRect mouthLoc;
 		//std::cout << "mouth=============================" << std::endl;
-		bool mouthFound = getSearchSpace(img,processedImg,r,mouthTpl,mouthSearchSpace,mouthLoc,true);
+		bool mouthFound = getSearchSpace(img,processedImg,r,mouthTpl,mouthSearchSpace,mouthLoc,detailedOutput);
 		//std::cout << "==============================mouth" << std::endl;
 		
 		//break out if no mouth found
@@ -685,7 +693,7 @@ int bufferX = 15;//10;//5;
 		CvRect leftEyebrowSearchSpace = this->getLeftEyebrowSearchSpace(r);
 		CvRect leftEyebrowLoc;
 		//std::cout << "left eyebrow =============================" << std::endl;
-		bool leftEyebrowFound = getSearchSpace(img,processedImg,r,leftEyebrowTpl,leftEyebrowSearchSpace,leftEyebrowLoc,true);
+		bool leftEyebrowFound = getSearchSpace(img,processedImg,r,leftEyebrowTpl,leftEyebrowSearchSpace,leftEyebrowLoc,detailedOutput);
 		//std::cout << " ============================= left eyebrow" << std::endl;
 
 		if(leftEyebrowFound == false)
@@ -715,7 +723,7 @@ int bufferX = 15;//10;//5;
 		CvRect rightEyebrowSearchSpace = this->getRightEyebrowSearchSpace(r);
 		CvRect rightEyebrowLoc;
 		//std::cout << "right eyebrow =============================" << std::endl;
-		bool rightEyebrowFound = getSearchSpace(img,processedImg,r,rightEyebrowTpl,rightEyebrowSearchSpace,rightEyebrowLoc,true);
+		bool rightEyebrowFound = getSearchSpace(img,processedImg,r,rightEyebrowTpl,rightEyebrowSearchSpace,rightEyebrowLoc,detailedOutput);
 		//std::cout << " ============================= right eyebrow" << std::endl;
 
 		if(rightEyebrowFound == false)
@@ -744,7 +752,7 @@ int bufferX = 15;//10;//5;
 		CvRect leftEyeSearchSpace = this->getLeftEyeSearchSpace(r);
 		CvRect leftEyeLoc;
 		//std::cout << "left eye =============================" << std::endl;
-		bool leftEyeFound = getSearchSpace(img,processedImg,r,leftEyeTpl,leftEyeSearchSpace,leftEyeLoc,true);
+		bool leftEyeFound = getSearchSpace(img,processedImg,r,leftEyeTpl,leftEyeSearchSpace,leftEyeLoc,detailedOutput);
 		//std::cout << "=============================left eye" << std::endl;
 		
 		if(leftEyeFound == false)
@@ -773,7 +781,7 @@ int bufferX = 15;//10;//5;
 		CvRect rightEyeSearchSpace = this->getRightEyeSearchSpace(r);
 		CvRect rightEyeLoc;
 		//std::cout << "right eye=============================" << std::endl;
-		bool rightEyeFound = getSearchSpace(img,processedImg,r,rightEyeTpl,rightEyeSearchSpace,rightEyeLoc,true);
+		bool rightEyeFound = getSearchSpace(img,processedImg,r,rightEyeTpl,rightEyeSearchSpace,rightEyeLoc,detailedOutput);
 		//std::cout << "=============================right eye" << std::endl;
 
 		if(rightEyeFound == false)
@@ -799,10 +807,9 @@ int bufferX = 15;//10;//5;
 		}
 
 		//update sub templates			
-		//updateMouthSubFeatureLocs(img, processedImg, *r, mouthLoc);
 		updateMouthSubFeatureLocs(img, processedImg, r);
 		
-		//updateSubFeatureLocs(img, processedImg, *r);
+		//updateSubFeatureLocs(img, processedImg, r);
 
 		return true;
 	}
