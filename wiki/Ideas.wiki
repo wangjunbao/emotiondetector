@@ -21,29 +21,40 @@
  * Real-time / fast detection
 
 ==What we are tracking==
+Feature measurements will be normalized in relation to the subject's neutral face
   * distance between left eyebrow and right eyebrow
     * | leftEyebrow.x - rightEyebrow.x |
   * distance between left eyebrow and left eye
-    * leftEyebrow.y - leftEye.y
+    * | leftEyebrow.y - leftEye.y |
   * distance between right eyebrow and right eye
-    * rightEyebrow.y - rightEye.y
+    * | rightEyebrow.y - rightEye.y |
   * amount of 'white' pixels in eye
     * greater = arousal +
+    * neutral
     * less = arousal -
     * none = arousal 0
-    * neutral
-  * distance between upper lip and lower lip
-    * | mouthTop.y - mouthBottom.y |
-  * distance between left part of mouth and right part of mouth
-    * | mouthLeft.x - mouthRight.y |
-  * relation between upper lip and height of left/right parts
-    * | mouthTop.y - mouthLeft.y
+  * mouth height: distance between upper lip and lower lip
+    * mouthTop.y - mouthBottom.y
+    * error if negative
+  * mouth width: distance between left part of mouth and right part of mouth 
+    * mouthRight.x - mouthLeft.x
+    * error if negative
+  * mouth curvature: relation between upper lip and height of left/right mouth
+    * mouthTop.y - (mouthLeft.y + mouthRight.y)/2
+    * assuming current xy coordinate plane, + value will be smile, - value will be frown
+
+ 
+
+
+== Emotions ==
+  * Sad
+  * Happy
+  * Angry
+  * Worried
+  * Bored
 
 == Flowchart ==
+  
 
-Mouth
-  Open
-  Neutral 
-  Closed 
   
   
