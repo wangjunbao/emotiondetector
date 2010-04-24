@@ -21,16 +21,20 @@
  * Real-time / fast detection
 
 ==What we are tracking==
-Feature measurements will be normalized in relation to the subject's neutral face
-  * distance between left eyebrow and right eyebrow
-    * | leftEyebrow.x - rightEyebrow.x |
-  * distance between left eyebrow and left eye
-    * | leftEyebrow.y - leftEye.y |
-  * distance between right eyebrow and right eye
-    * | rightEyebrow.y - rightEye.y |
+Measurements will be normalized in relation to the subject's neutral face
+  * brow furrow: X distance between left eyebrow and right eyebrow
+    * rightEyebrow.x - leftEyebrow.x
+    * error if negative
+    * hi = eyebrows are farther apart
+    * lo = eyebrows are close together
+  * left eyebrow raised degree: Y distance between left eyebrow and left eye
+    * leftEye.y - leftEyebrow.y
+    * error if negative
+  * right eyebrow raised degree: Y distance between right eyebrow and right eye
+    * rightEye.y - rightEyebrow.y
+    * error if negative
   * amount of 'white' pixels in eye
     * greater = arousal +
-    * neutral
     * less = arousal -
     * none = arousal 0
   * mouth height: distance between upper lip and lower lip
@@ -43,9 +47,6 @@ Feature measurements will be normalized in relation to the subject's neutral fac
     * mouthTop.y - (mouthLeft.y + mouthRight.y)/2
     * assuming current xy coordinate plane, + value will be smile, - value will be frown
 
- 
-
-
 == Emotions ==
   * Sad
   * Happy
@@ -54,7 +55,36 @@ Feature measurements will be normalized in relation to the subject's neutral fac
   * Bored
 
 == Flowchart ==
-  
+All calculations are done if isValidFace
 
+browFurrow
+  lo
+    leftRaised && rightRaised
+      lo
+        eyeOpen
+          lo
+            disgust/displeasure
+          hi
+            angry 
+      hi 
+        sad/worried
+      
+  hi/neutral
+    leftRaised && rightRaised
+      lo
+        eyeOpen
+        lo
+          asleep
+        hi
+          bored
+      hi
+        eyeOpen
+          lo
+            snotty?
+          hi
+            excited
+
+    
+    
   
   
