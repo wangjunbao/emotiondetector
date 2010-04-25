@@ -34,10 +34,10 @@ int main( int argc, char** argv )
 		  //char      *imgfilename = "HowellFace50.jpg";
 		  //char      *imgfilename = "grouppic2.jpg";
 		  //char      *imgfilename = "ChrisFace.jpg"; //this does not work well now but face may be too big
-		  char      *imgfilename = "ChrisFace50.jpg";
+		 // char      *imgfilename = "ChrisFace50.jpg";
 		  //char      *imgfilename = "averageFace.jpg";
 		  //char      *imgfilename = "templates/face.jpg";
-		  //char      *imgfilename = "templates - Howell/face.jpg";
+		  char      *imgfilename = "templates - Howell/face.jpg";
 
 		  cascade = ( CvHaarClassifierCascade* )cvLoad( filename, 0, 0, 0 );
 		  storage = cvCreateMemStorage( 0 );
@@ -340,7 +340,7 @@ void detectFaces( IplImage *img )
 			}
 			
 			//for debugging:
-			//face->isValidFace(img,processedImg,r,false,true); //DELETE
+			face->isValidFace(img,processedImg,r,false,true); //DELETE
 		}
 		
 	}//end for faces

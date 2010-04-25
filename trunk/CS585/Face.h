@@ -27,6 +27,13 @@ private:
 	Mat mouthBottomTpl;
 	CvRect mouthBottomLoc;
 
+	Mat mouthLeftTpl;
+	CvRect mouthLeftLoc;
+
+	Mat mouthRightTpl;
+	CvRect mouthRightLoc;
+
+
 	//left eyebrow
 	Mat leftEyebrowTpl;
 	CvRect leftEyebrowLoc;
@@ -127,6 +134,14 @@ public:
 		//mouth bottom
 		cvNamedWindow( "mouthBottom", 1 );
 		imshow( "mouthBottom", this->mouthBottomTpl);
+
+		//mouth left
+		cvNamedWindow( "mouthLeft", 1 );
+		imshow( "mouthLeft", this->mouthLeftTpl);
+
+		//mouth right
+		cvNamedWindow( "mouthRight", 1 );
+		imshow( "mouthRight", this->mouthRightTpl);
 
 	}
 
@@ -251,6 +266,28 @@ public:
 						(int)((1.0/2.0)*parentLoc.width),
 						(int)((3.0/8.0)*parentLoc.height));	
 	}
+
+	/* Look in the left halfish area of the mouth for the mouthLeft */
+	CvRect getMouthLeftSearchSpace()
+	{
+		CvRect parentLoc = this->mouthLoc;
+		return cvRect(parentLoc.x,
+						parentLoc.y + (int)((1.0/4.0)*parentLoc.height), 
+						(int)((1.0/4.0)*parentLoc.width),
+						(int)((1.0/2.0)*parentLoc.height));	
+	}
+
+
+	/* Look in the right halfish area of the mouth for the mouthRight */
+	CvRect getMouthRightSearchSpace()
+	{
+		CvRect parentLoc = this->mouthLoc;
+		return cvRect(parentLoc.x + (int)((3.0/4.0)*parentLoc.width),
+						parentLoc.y + (int)((1.0/4.0)*parentLoc.height), 
+						(int)((1.0/4.0)*parentLoc.width),
+						(int)((1.0/2.0)*parentLoc.height));	
+	}
+
 
 	/* look in top left 5/8's for left eyebrow */
 	CvRect getLeftEyebrowSearchSpace(CvRect *r)
@@ -761,11 +798,10 @@ public:
 
 		/* MOUTH SUBFEATURES */
 		//look at parent feature coords for search space
-		CvRect topSearchSpace;
-		CvRect bottomSearchSpace;
 		CvRect parentLoc = this->mouthLoc;
 
 		/* MOUTH TOP */
+		CvRect topSearchSpace;
 		topSearchSpace = this->getMouthTopSearchSpace();
 		this->cropTemplate(img,topSearchSpace,this->mouthTopTpl);
 
@@ -776,6 +812,7 @@ public:
 		/* END MOUTH TOP */
 
 		/* MOUTH BOTTOM */
+		CvRect bottomSearchSpace;
 		bottomSearchSpace = this->getMouthBottomSearchSpace();
 		this->cropTemplate(img,bottomSearchSpace,this->mouthBottomTpl);
 		
@@ -784,7 +821,36 @@ public:
 			Point(bottomSearchSpace.x+bottomSearchSpace.width,bottomSearchSpace.y+bottomSearchSpace.height),
 			CV_RGB(255,0,255),1,0,0);
 		/* END MOUTH BOTTOM */
+
+
+		/* MOUTH LEFT */
+		CvRect leftSearchSpace;
+		leftSearchSpace = this->getMouthLeftSearchSpace();
+		this->cropTemplate(img,leftSearchSpace,this->mouthLeftTpl);
+		
+		//pink box
+		rectangle(Mat(processedImg),Point(leftSearchSpace.x,leftSearchSpace.y),
+			Point(leftSearchSpace.x+leftSearchSpace.width,leftSearchSpace.y+leftSearchSpace.height),
+			CV_RGB(255,0,255),1,0,0);
+		/* END MOUTH LEFT */
+
+
+		/* MOUTH RIGHT */
+		CvRect rightSearchSpace;
+		rightSearchSpace = this->getMouthRightSearchSpace();
+		this->cropTemplate(img,rightSearchSpace,this->mouthRightTpl);
+		
+		//pink box
+		rectangle(Mat(processedImg),Point(rightSearchSpace.x,rightSearchSpace.y),
+			Point(rightSearchSpace.x+rightSearchSpace.width,rightSearchSpace.y+rightSearchSpace.height),
+			CV_RGB(255,0,255),1,0,0);
+		/* END MOUTH RIGHT */
+
+
+
 		/* END MOUTH SUBFEATURES */
+
+
 
 
 
