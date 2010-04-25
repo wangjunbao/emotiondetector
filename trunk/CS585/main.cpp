@@ -340,7 +340,7 @@ void detectFaces( IplImage *img )
 			}
 			
 			//for debugging:
-			face->isValidFace(img,processedImg,r,false,true); //DELETE
+			//face->isValidFace(img,processedImg,r,false,true); //DELETE
 		}
 		
 	}//end for faces

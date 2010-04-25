@@ -385,13 +385,13 @@ public:
 		Update locations of mouth subfeatures
 		Return true if update successful, false if unsuccessful (ie: features were lost)
 	*/
-	bool updateMouthSubFeatureLocs(IplImage *img, IplImage *processedImg, CvRect *r)
+	bool updateMouthTopBottom(IplImage *img, IplImage *processedImg, CvRect *r)
 	{
 		CvRect topSearchSpace;
 		CvRect bottomSearchSpace;
 			
 		//using twice the number of rows seems to give a good space
-		int bufferX = 1*this->mouthTopTpl.rows;
+		int bufferX = (int)((0.5)*this->mouthTopTpl.rows);
 		//std::cout << "buffer x: " << bufferX << std::endl;
 		if(bufferX < 0)
 		{
@@ -543,9 +543,170 @@ public:
 		{
 			return false;
 		}
-	}//end updateMouthSubFeatureLocs
+	}//end updateMouthTopBottom
 
 
+		bool updateMouthLeftRight(IplImage *img, IplImage *processedImg, CvRect *r)
+	{
+		CvRect leftSearchSpace;
+		CvRect rightSearchSpace;
+			
+		//using twice the number of rows seems to give a good space
+		int bufferX = (int)((0.5)*this->mouthLeftTpl.rows);
+		//std::cout << "buffer x: " << bufferX << std::endl;
+		if(bufferX < 0)
+		{
+			bufferX = 0;
+		}
+		
+		//int bufferY = this->mouthLeftTpl.rows + 
+		//	(int)( (((double)r->height/(double)this->oldFaceHeight) * this->mouthLeftLoc.y) - this->mouthLeftLoc.y );
+		//int bufferY = 15;//10;//5;			
+		int bufferY = bufferX; //2*this->mouthLeftTpl.rows;//(int)(1.5*this->mouthLeftTpl.rows);
+		if(bufferY < 0)
+		{
+			bufferY = 0;
+		}
+
+		//Edge cases for search spaces
+		//use same maximum boundaries as when searching for whole mouth template in face
+		CvRect mouthSearchSpace = this->getMouthSearchSpace(r);
+		//it is possible for the right lip to leave the "face" when the mouth is opened really wide
+		//but we rarely run into this case because the search space will not exceed half the height of the face
+
+		/* Left Edge Cases */
+		int leftSearchSpaceX = mouthLeftLoc.x - bufferX;
+		if(leftSearchSpaceX < mouthSearchSpace.x)
+		{
+			leftSearchSpaceX = mouthSearchSpace.x;
+		}
+
+		int leftSearchSpaceY = mouthLeftLoc.y - bufferY;
+		if(leftSearchSpaceY < mouthSearchSpace.y)
+		{
+			leftSearchSpaceY = mouthSearchSpace.y;
+		}
+
+		//make sure search space is not wider than the face
+		int leftSearchSpaceWidth = this->mouthLeftTpl.cols + 2*bufferX;
+		
+		int leftRightEdge = leftSearchSpaceX + leftSearchSpaceWidth;
+		int faceRightEdge = this->topLeftPoint.x + this->currentFaceWidth;
+		
+		if(leftRightEdge > faceRightEdge)
+		//if(leftSearchSpaceWidth > mouthSearchSpace.width)
+		{
+			//leftSearchSpaceWidth = mouthSearchSpace.width;
+			leftSearchSpaceWidth = faceRightEdge - leftSearchSpaceX;
+		}
+
+		int leftSearchSpaceHeight = this->mouthLeftTpl.rows + 2*bufferY;
+
+		int leftBottomEdge = leftSearchSpaceY + leftSearchSpaceHeight;
+		int faceBottomEdge = this->topLeftPoint.y + this->currentFaceHeight;
+
+		if(leftBottomEdge > faceBottomEdge)
+		//if(leftSearchSpaceHeight > mouthSearchSpace.height)
+		{
+			leftSearchSpaceHeight = faceBottomEdge - leftSearchSpaceY;
+			//leftSearchSpaceHeight = mouthSearchSpace.height;
+		}
+		/* End Left Edge Cases */
+
+		leftSearchSpace = cvRect(leftSearchSpaceX, leftSearchSpaceY, leftSearchSpaceWidth, leftSearchSpaceHeight);
+
+		//black rectangle for left search space
+		rectangle(Mat(processedImg),Point(leftSearchSpace.x,leftSearchSpace.y),
+			Point(leftSearchSpace.x + leftSearchSpace.width, leftSearchSpace.y + leftSearchSpace.height),CV_RGB(0, 0, 0), 1, 0, 0 );
+
+
+		/* Right Edge Cases */
+		int rightSearchSpaceX = mouthRightLoc.x - bufferX;
+		if(rightSearchSpaceX < mouthSearchSpace.x)
+		{
+			rightSearchSpaceX = mouthSearchSpace.x;
+		}
+
+		int rightSearchSpaceY = mouthRightLoc.y - bufferY;
+		if(rightSearchSpaceY < mouthSearchSpace.y)
+		{
+			rightSearchSpaceY = mouthSearchSpace.y;
+		}
+
+		int rightSearchSpaceWidth = this->mouthRightTpl.cols + 2*bufferX;
+		int rightRightEdge = rightSearchSpaceX + rightSearchSpaceWidth;
+
+		if(rightRightEdge > faceRightEdge)
+		//if(rightSearchSpaceWidth > mouthSearchSpace.width)
+		{
+			rightSearchSpaceWidth = faceRightEdge - rightSearchSpaceX;
+			//rightSearchSpaceWidth = mouthSearchSpace.width;
+		}
+
+		int rightSearchSpaceHeight = this->mouthRightTpl.rows + 2*bufferY;
+		int rightBottomEdge = rightSearchSpaceY + rightSearchSpaceHeight;
+
+		if(rightBottomEdge > (int)((1.25)*faceBottomEdge))
+		//if(rightSearchSpaceHeight > mouthSearchSpace.height)
+		{
+			rightSearchSpaceHeight = (int)((1.25)*faceBottomEdge) - rightSearchSpaceY;
+			//rightSearchSpaceHeight = mouthSearchSpace.height;
+		}
+		/* End Right Edge Cases */
+
+		rightSearchSpace = cvRect(rightSearchSpaceX, rightSearchSpaceY, rightSearchSpaceWidth, rightSearchSpaceHeight);
+
+		//white box
+		rectangle(Mat(processedImg),Point(rightSearchSpace.x,rightSearchSpace.y),
+			Point(rightSearchSpace.x + rightSearchSpace.width, rightSearchSpace.y + rightSearchSpace.height),CV_RGB(255, 255, 255), 1, 0, 0 );
+
+		//Update sub feature locations by running NCC
+		
+
+		CvRect leftLoc;
+		CvRect rightLoc;
+		bool leftFound;
+		bool rightFound;
+
+		/* UPDATE USING BUFFERS */
+		leftFound = getSearchSpace(img,processedImg,r,mouthLeftTpl,leftSearchSpace,leftLoc,true);
+		rightFound = getSearchSpace(img,processedImg,r,mouthRightTpl,rightSearchSpace,rightLoc,true);
+		if(leftFound == true && rightFound == true)
+		//if(true)
+		{
+			this->mouthLeftLoc = leftLoc;
+			this->mouthRightLoc = rightLoc;
+			return true;
+		}
+		/* END UPDATE USING BUFFERS */
+
+
+		/* LAST DITCH: UPDATE USING DEFAULT SEARCH SPACE: LOOK WHERE MOUTH IS */
+
+		//update mouth first
+		this->updateMouth(img,processedImg,r,false);
+
+		std::cout << "last ditch" << std::endl;
+		
+		leftSearchSpace = this->getMouthLeftSearchSpace();
+		rightSearchSpace = this->getMouthRightSearchSpace();
+		
+		leftFound = getSearchSpace(img,processedImg,r,mouthLeftTpl,leftSearchSpace,leftLoc,true);
+		rightFound = getSearchSpace(img,processedImg,r,mouthRightTpl,rightSearchSpace,rightLoc,true);
+
+		if(leftFound == true && rightFound == true)
+		{
+			this->mouthLeftLoc = leftLoc;
+			this->mouthRightLoc = rightLoc;
+			return true;
+		}
+		else //feature was lost, update failed
+		{
+			return false;
+		}
+	}//end updateMouthLeftRight
+
+	
 	bool updateLeftEyebrow(IplImage *img, IplImage *processedImg, CvRect *r, bool detailedOutput)
 	{
 		//store face dimensions in order to resize templates
@@ -728,10 +889,11 @@ public:
 		this->updateRightEye(img,processedImg,r,true);
 
 		//update mouth sub features
-		bool updateMouthSuccess = this->updateMouthSubFeatureLocs(img,processedImg,r);
-		//bool updateMouthSuccess = true;
+		bool updateMouthTopBottomSuccess = this->updateMouthTopBottom(img,processedImg,r);
+		bool updateMouthLeftRightSuccess = this->updateMouthLeftRight(img,processedImg,r);
+		//bool updateMouthTopBottomSuccess = true;
 		
-		//return (updateMouthSuccess);
+		//return (updateMouthTopBottomSuccess);
 		return true;
 	}
 
