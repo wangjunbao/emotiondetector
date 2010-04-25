@@ -325,7 +325,7 @@ void detectFaces( IplImage *img )
 			//bool updateSuccess = face->updateSubFeatureLocs(img,processedImg,*r);
 			
 			//bool updateSuccess = face->isValidFace(img,processedImg,r,false);
-			bool updateSuccess = face->updateFeatureLocs(img,processedImg,r);
+			bool updateSuccess = face->updateFeatureLocs(img,processedImg,r,true);
 
 			if(updateSuccess == false)
 			{

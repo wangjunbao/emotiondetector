@@ -355,33 +355,33 @@ public:
 
 		//if mouth subtemplates have not been cropped out yet, crop them out
 		//we could actually put this in isValidFace!!!
-		if(mouthTopTpl.empty() || mouthBottomTpl.empty())
-		{
-			//look at parent feature coords for search space
-			CvRect parentLoc = this->mouthLoc;
+		//if(mouthTopTpl.empty() || mouthBottomTpl.empty())
+		//{
+			////look at parent feature coords for search space
+			//CvRect parentLoc = this->mouthLoc;
 
-			/* MOUTH TOP */
-			topSearchSpace = this->getMouthTopSearchSpace();
-			this->cropTemplate(img,topSearchSpace,this->mouthTopTpl);
+			///* MOUTH TOP */
+			//topSearchSpace = this->getMouthTopSearchSpace();
+			//this->cropTemplate(img,topSearchSpace,this->mouthTopTpl);
 
-			//yellow box
-			rectangle(Mat(processedImg),Point(topSearchSpace.x,topSearchSpace.y),
-				Point(topSearchSpace.x+topSearchSpace.width,topSearchSpace.y+topSearchSpace.height),
-				CV_RGB(255,255,0),1,0,0);
-			/* END MOUTH TOP */
+			////yellow box
+			//rectangle(Mat(processedImg),Point(topSearchSpace.x,topSearchSpace.y),
+			//	Point(topSearchSpace.x+topSearchSpace.width,topSearchSpace.y+topSearchSpace.height),
+			//	CV_RGB(255,255,0),1,0,0);
+			///* END MOUTH TOP */
 
-			/* MOUTH BOTTOM */
-			bottomSearchSpace = this->getMouthBottomSearchSpace();
-			this->cropTemplate(img,bottomSearchSpace,this->mouthBottomTpl);
-			
-			//pink box
-			rectangle(Mat(processedImg),Point(bottomSearchSpace.x,bottomSearchSpace.y),
-				Point(bottomSearchSpace.x+bottomSearchSpace.width,bottomSearchSpace.y+bottomSearchSpace.height),
-				CV_RGB(255,0,255),1,0,0);
-			/* END MOUTH BOTTOM */
-		}
-		else //update search space for NCC
-		{
+			///* MOUTH BOTTOM */
+			//bottomSearchSpace = this->getMouthBottomSearchSpace();
+			//this->cropTemplate(img,bottomSearchSpace,this->mouthBottomTpl);
+			//
+			////pink box
+			//rectangle(Mat(processedImg),Point(bottomSearchSpace.x,bottomSearchSpace.y),
+			//	Point(bottomSearchSpace.x+bottomSearchSpace.width,bottomSearchSpace.y+bottomSearchSpace.height),
+			//	CV_RGB(255,0,255),1,0,0);
+			///* END MOUTH BOTTOM */
+		//}
+		//else //update search space for NCC
+		//{
 			//resize buffers for search space depending on how much face size changed			
 			/*int bufferX = this->mouthTopTpl.cols + 
 				(int)( (((double)r->width/(double)this->oldFaceWidth) * this->mouthTopLoc.x) - this->mouthTopLoc.x );*/
@@ -497,7 +497,7 @@ public:
 			rectangle(Mat(processedImg),Point(bottomSearchSpace.x,bottomSearchSpace.y),
 				Point(bottomSearchSpace.x + bottomSearchSpace.width, bottomSearchSpace.y + bottomSearchSpace.height),CV_RGB(255, 255, 255), 1, 0, 0 );
 
-		}//end else
+		//}//end else
 
 		//Update sub feature locations by running NCC
 		
@@ -630,22 +630,66 @@ public:
 
 
 	/* Update locations of all subfeatures */
-	bool updateSubFeatureLocs(IplImage *img, IplImage *processedImg, CvRect *r)
-	{
-		//update face coordinates
-		this->updateFaceCoords(r);
+	//bool updateSubFeatureLocs(IplImage *img, IplImage *processedImg, CvRect *r)
+	//{
+	//	//update face coordinates
+	//	this->updateFaceCoords(r);
 
-		//mouth
-		bool updateMouthSuccess = this->updateMouthSubFeatureLocs(img,processedImg,r);
-		//bool updateMouthSuccess = true;
-		return (updateMouthSuccess);
+	//	//mouth
+	//	bool updateMouthSuccess = this->updateMouthSubFeatureLocs(img,processedImg,r);
+	//	//bool updateMouthSuccess = true;
+	//	return (updateMouthSuccess);
+	//}
+
+
+	bool updateLeftEyebrow(IplImage *img, IplImage *processedImg, CvRect *r, bool detailedOutput)
+	{
+		//store face dimensions in order to resize templates
+		double newFaceWidth = r->width;
+		double newFaceHeight = r->height;
+
+		/* LEFT EYEBROW */
+		Mat leftEyebrowTpl;
+		if(this->leftEyebrowTpl.empty())
+		{
+			Mat oldLeftEyebrowTpl = imread("templates/leftEyebrow.jpg",1);
+			resizeFeatureTemplate(oldLeftEyebrowTpl,newFaceWidth,newFaceHeight,leftEyebrowTpl);
+		}
+		else
+		{
+			leftEyebrowTpl = this->leftEyebrowTpl;
+		}
+		
+		CvRect leftEyebrowSearchSpace = this->getLeftEyebrowSearchSpace(r);
+		CvRect leftEyebrowLoc;
+		//std::cout << "left eyebrow =============================" << std::endl;
+		bool leftEyebrowFound = getSearchSpace(img,processedImg,r,leftEyebrowTpl,leftEyebrowSearchSpace,leftEyebrowLoc,detailedOutput);
+		//std::cout << " ============================= left eyebrow" << std::endl;
+
+		if(leftEyebrowFound == false)
+		{
+			return false;
+		}
+		else //update left eyebrow template
+		{
+			this->leftEyebrowTpl = leftEyebrowTpl;
+			this->leftEyebrowLoc = leftEyebrowLoc;
+		}
+		/* END LEFT EYEBROW */
+
 	}
 
 	/* Update locations of all features by running NCC's */
-	bool updateFeatureLocs(IplImage *img, IplImage *processedImg, CvRect *r)
+	bool updateFeatureLocs(IplImage *img, IplImage *processedImg, CvRect *r, bool detailedOutput)
 	{
 		//call isValidFace without cropping out templates
 		//return this->isValidFace(img,processedImg,r,false);
+
+
+		//store face dimensions in order to resize templates
+		double newFaceWidth = r->width;
+		double newFaceHeight = r->height;
+
 
 		//update mouth coordinates
 
@@ -653,11 +697,17 @@ public:
 		//are we updating twice?
 		this->updateFaceCoords(r);
 
-		//mouth
+
+		//update eyebrows
+		this->updateLeftEyebrow(img,processedImg,r,true);
+		
+		//update eye subfeatures
+
+		//update mouth sub features
 		bool updateMouthSuccess = this->updateMouthSubFeatureLocs(img,processedImg,r);
 		//bool updateMouthSuccess = true;
+		
 		return (updateMouthSuccess);
-
 	}
 
 
@@ -845,7 +895,37 @@ public:
 		
 		//updateSubFeatureLocs(img, processedImg, r);
 
-		updateMouthSubFeatureLocs(img, processedImg, r);
+		//updateMouthSubFeatureLocs(img, processedImg, r);
+
+
+		/* MOUTH SUBFEATURES */
+		//look at parent feature coords for search space
+		CvRect topSearchSpace;
+		CvRect bottomSearchSpace;
+		CvRect parentLoc = this->mouthLoc;
+
+		/* MOUTH TOP */
+		topSearchSpace = this->getMouthTopSearchSpace();
+		this->cropTemplate(img,topSearchSpace,this->mouthTopTpl);
+
+		//yellow box
+		rectangle(Mat(processedImg),Point(topSearchSpace.x,topSearchSpace.y),
+			Point(topSearchSpace.x+topSearchSpace.width,topSearchSpace.y+topSearchSpace.height),
+			CV_RGB(255,255,0),1,0,0);
+		/* END MOUTH TOP */
+
+		/* MOUTH BOTTOM */
+		bottomSearchSpace = this->getMouthBottomSearchSpace();
+		this->cropTemplate(img,bottomSearchSpace,this->mouthBottomTpl);
+		
+		//pink box
+		rectangle(Mat(processedImg),Point(bottomSearchSpace.x,bottomSearchSpace.y),
+			Point(bottomSearchSpace.x+bottomSearchSpace.width,bottomSearchSpace.y+bottomSearchSpace.height),
+			CV_RGB(255,0,255),1,0,0);
+		/* END MOUTH BOTTOM */
+		/* END MOUTH SUBFEATURES */
+
+
 
 		return true;
 	}
