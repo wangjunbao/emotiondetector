@@ -571,9 +571,7 @@ public:
 		//Edge cases for search spaces
 		//use same maximum boundaries as when searching for whole mouth template in face
 		CvRect mouthSearchSpace = this->getMouthSearchSpace(r);
-		//it is possible for the right lip to leave the "face" when the mouth is opened really wide
-		//but we rarely run into this case because the search space will not exceed half the height of the face
-
+	
 		/* Left Edge Cases */
 		int leftSearchSpaceX = mouthLeftLoc.x - bufferX;
 		if(leftSearchSpaceX < mouthSearchSpace.x)
