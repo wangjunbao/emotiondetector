@@ -164,11 +164,11 @@ public:
 
 		minMaxLoc(res, &minval, &maxval, &minloc, &maxloc); 
 
-		//draw a box around the found feature
-		//green box
+		//draw a box around the found feature even if its below the thresh
+		//yellow box
 		if(detailedOutput == true)
 		{
-			rectangle(Mat(processedImg),maxloc,Point(maxloc.x + tpl.cols, maxloc.y + tpl.rows),CV_RGB(0, 255, 0), 1, 0, 0 );
+			rectangle(Mat(processedImg),maxloc,Point(maxloc.x + tpl.cols, maxloc.y + tpl.rows),CV_RGB(255, 255, 0), 1, 0, 0 );
 		}
 
 		outputSearchSpace = cvRect(inputSearchSpace.x + maxloc.x, inputSearchSpace.y + maxloc.y, tpl.cols, tpl.rows);
@@ -193,7 +193,14 @@ public:
 		//print out search space relative to entire image, not just ROI
 		if(detailedOutput == true)
 		{
-			//std::cout << "max: " << "(" << inputSearchSpace.x + maxloc.x << "," << inputSearchSpace.y + maxloc.y << "): " << maxval << std::endl;
+			std::cout << "max: " << "(" << inputSearchSpace.x + maxloc.x << "," << inputSearchSpace.y + maxloc.y << "): " << maxval << std::endl;
+		}
+
+		//draw a box around the found feature
+		//green box
+		if(result == true && detailedOutput == true)
+		{
+			rectangle(Mat(processedImg),maxloc,Point(maxloc.x + tpl.cols, maxloc.y + tpl.rows),CV_RGB(0, 255, 0), 1, 0, 0 );
 		}
 
 		return result;
@@ -417,16 +424,29 @@ public:
 				topSearchSpaceY = mouthSearchSpace.y;
 			}
 
+			//make sure search space is not wider than the face
 			int topSearchSpaceWidth = this->mouthTopTpl.cols + 2*bufferX;
-			if(topSearchSpaceWidth > mouthSearchSpace.width)
+			
+			int topRightEdge = topSearchSpaceX + topSearchSpaceWidth;
+			int faceRightEdge = this->topLeftPoint.x + this->currentFaceWidth;
+			
+			if(topRightEdge > faceRightEdge)
+			//if(topSearchSpaceWidth > mouthSearchSpace.width)
 			{
-				topSearchSpaceWidth = mouthSearchSpace.width;
+				//topSearchSpaceWidth = mouthSearchSpace.width;
+				topSearchSpaceWidth = faceRightEdge - topSearchSpaceX;
 			}
 
 			int topSearchSpaceHeight = this->mouthTopTpl.rows + 2*bufferY;
-			if(topSearchSpaceHeight > mouthSearchSpace.height)
+
+			int topBottomEdge = topSearchSpaceY + topSearchSpaceHeight;
+			int faceBottomEdge = this->topLeftPoint.y + this->currentFaceHeight;
+
+			if(topBottomEdge > faceBottomEdge)
+			//if(topSearchSpaceHeight > mouthSearchSpace.height)
 			{
-				topSearchSpaceHeight = mouthSearchSpace.height;
+				topSearchSpaceHeight = faceBottomEdge - topSearchSpaceY;
+				//topSearchSpaceHeight = mouthSearchSpace.height;
 			}
 			/* End Top Edge Cases */
 
@@ -451,15 +471,23 @@ public:
 			}
 
 			int bottomSearchSpaceWidth = this->mouthBottomTpl.cols + 2*bufferX;
-			if(bottomSearchSpaceWidth > mouthSearchSpace.width)
+			int bottomRightEdge = bottomSearchSpaceX + bottomSearchSpaceWidth;
+
+			if(bottomRightEdge > faceRightEdge)
+			//if(bottomSearchSpaceWidth > mouthSearchSpace.width)
 			{
-				bottomSearchSpaceWidth = mouthSearchSpace.width;
+				bottomSearchSpaceWidth = faceRightEdge - bottomSearchSpaceX;
+				//bottomSearchSpaceWidth = mouthSearchSpace.width;
 			}
 
 			int bottomSearchSpaceHeight = this->mouthBottomTpl.rows + 2*bufferY;
-			if(bottomSearchSpaceHeight > mouthSearchSpace.height)
+			int bottomBottomEdge = bottomSearchSpaceY + bottomSearchSpaceHeight;
+
+			if(bottomBottomEdge > (int)((1.25)*faceBottomEdge))
+			//if(bottomSearchSpaceHeight > mouthSearchSpace.height)
 			{
-				bottomSearchSpaceHeight = mouthSearchSpace.height;
+				bottomSearchSpaceHeight = (int)((1.25)*faceBottomEdge) - bottomSearchSpaceY;
+				//bottomSearchSpaceHeight = mouthSearchSpace.height;
 			}
 			/* End Bottom Edge Cases */
 
