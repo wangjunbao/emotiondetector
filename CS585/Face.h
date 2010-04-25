@@ -10,10 +10,10 @@ class Face
 private:
 	//face coordinates and dimensions:
 	Point topLeftPoint;
-	int oldFaceWidth;
-	int oldFaceHeight;
-	int currentFaceWidth;
-	int currentFaceHeight;
+	double oldFaceWidth;
+	double oldFaceHeight;
+	double currentFaceWidth;
+	double currentFaceHeight;
 
 
 
@@ -56,6 +56,12 @@ private:
 	Mat rightEyeTpl;
 	CvRect rightEyeLoc;
 
+	//neutral feature positions                            
+	double nBrowDistance; 
+	double nLeftEyebrowRaised;
+	double nRightEyebrowRaised;
+	double nMouthOpen;
+	double nMouthSmile;
 
 public:
 	Face(CvRect r) 
@@ -72,12 +78,12 @@ public:
 		return topLeftPoint;
 	}
 
-	int getWidth()
+	double getWidth()
 	{
 		return currentFaceWidth;
 	}
 
-	int getHeight()
+	double getHeight()
 	{
 		return currentFaceHeight;
 	}
@@ -381,7 +387,7 @@ public:
 		//make sure search space is not wider than the face
 		int searchSpaceWidth = featureTpl.cols + 2*bufferX;
 		int rightEdge = searchSpaceX + searchSpaceWidth;
-		int faceRightEdge = this->topLeftPoint.x + this->currentFaceWidth;
+		int faceRightEdge = (int)(this->topLeftPoint.x + this->currentFaceWidth);
 		
 		if(rightEdge > faceRightEdge)
 		{
@@ -390,7 +396,7 @@ public:
 
 		int searchSpaceHeight = featureTpl.rows + 2*bufferY;
 		int bottomEdge = searchSpaceY + searchSpaceHeight;
-		int faceBottomEdge = this->topLeftPoint.y + this->currentFaceHeight;
+		int faceBottomEdge = (int)(this->topLeftPoint.y + this->currentFaceHeight);
 
 		if(bottomEdge > faceBottomEdge)
 		{
@@ -534,7 +540,7 @@ public:
 		int topSearchSpaceWidth = this->mouthTopTpl.cols + 2*bufferX;
 		
 		int topRightEdge = topSearchSpaceX + topSearchSpaceWidth;
-		int faceRightEdge = this->topLeftPoint.x + this->currentFaceWidth;
+		int faceRightEdge = (int)(this->topLeftPoint.x + this->currentFaceWidth);
 		
 		if(topRightEdge > faceRightEdge)
 		//if(topSearchSpaceWidth > mouthSearchSpace.width)
@@ -546,7 +552,7 @@ public:
 		int topSearchSpaceHeight = this->mouthTopTpl.rows + 2*bufferY;
 
 		int topBottomEdge = topSearchSpaceY + topSearchSpaceHeight;
-		int faceBottomEdge = this->topLeftPoint.y + this->currentFaceHeight;
+		int faceBottomEdge = (int)(this->topLeftPoint.y + this->currentFaceHeight);
 
 		if(topBottomEdge > faceBottomEdge)
 		//if(topSearchSpaceHeight > mouthSearchSpace.height)
@@ -693,7 +699,7 @@ public:
 		int leftSearchSpaceWidth = this->mouthLeftTpl.cols + 2*bufferX;
 		
 		int leftRightEdge = leftSearchSpaceX + leftSearchSpaceWidth;
-		int faceRightEdge = this->topLeftPoint.x + this->currentFaceWidth;
+		int faceRightEdge = (int)(this->topLeftPoint.x + this->currentFaceWidth);
 		
 		if(leftRightEdge > faceRightEdge)
 		//if(leftSearchSpaceWidth > mouthSearchSpace.width)
@@ -705,7 +711,7 @@ public:
 		int leftSearchSpaceHeight = this->mouthLeftTpl.rows + 2*bufferY;
 
 		int leftBottomEdge = leftSearchSpaceY + leftSearchSpaceHeight;
-		int faceBottomEdge = this->topLeftPoint.y + this->currentFaceHeight;
+		int faceBottomEdge = (int)(this->topLeftPoint.y + this->currentFaceHeight);
 
 		if(leftBottomEdge > faceBottomEdge)
 		//if(leftSearchSpaceHeight > mouthSearchSpace.height)
@@ -1040,9 +1046,168 @@ public:
 		//bool updateMouthTopBottomSuccess = true;
 		
 		//return (updateMouthTopBottomSuccess);
+
+		this->detectEmotion();
+
 		return true;
 	}
 
+
+	void detectEmotion()
+	{
+		double curBrowDistance = (this->rightEyebrowLoc.x - this->leftEyebrowLoc.x)/this->currentFaceWidth;
+		double curLeftEyebrowRaised = (this->leftEyeLoc.y - this->leftEyebrowLoc.y)/this->currentFaceHeight;
+		double curRightEyebrowRaised = (this->rightEyeLoc.y - this->rightEyebrowLoc.y)/this->currentFaceHeight;
+		
+		//double curMouthOpen = (double)(this->mouthBottomLoc.y - this->mouthTopLoc.y)/(double)this->currentFaceHeight;
+		double curMouthOpen = (double)(this->mouthBottomLoc.y - this->mouthTopLoc.y);
+		
+		double curMouthSmile = (double)(this->mouthTopLoc.y - (this->mouthLeftLoc.y + this->mouthRightLoc.y)/2)/currentFaceHeight;
+		 
+		double diffBrowDistance = (curBrowDistance - nBrowDistance) / (curBrowDistance + nBrowDistance);
+		double diffLeftEyebrowRaised = (curLeftEyebrowRaised - nLeftEyebrowRaised) / (curLeftEyebrowRaised + nLeftEyebrowRaised);
+		double diffRightEyebrowRaised = (curRightEyebrowRaised - nRightEyebrowRaised) / (curRightEyebrowRaised + nRightEyebrowRaised);
+		double diffEyebrowRaised = (diffLeftEyebrowRaised + diffRightEyebrowRaised) / 2.0;
+		
+		//double diffMouthOpen = (double)(curMouthOpen - nMouthOpen) / (double)(curMouthOpen + nMouthOpen);
+		double diffMouthOpen = (double)(curMouthOpen - nMouthOpen) / (double)(nMouthOpen);
+		double diffMouthSmile = (curMouthSmile - nMouthSmile) / (curMouthSmile + nMouthSmile);
+		 
+
+		//std::cout << "browDistance: " << this->rightEyebrowLoc.x - this->leftEyebrowLoc.x << std::endl;
+		//std::cout << "leftEyebrowRaised: " << this->leftEyeLoc.y - this->leftEyebrowLoc.y << std::endl;
+		//std::cout << "rightEyebrowRaised: " << this->rightEyeLoc.y - this->rightEyebrowLoc.y << std::endl;
+		//std::cout << "mouthOpen: " << this->mouthBottomLoc.y - this->mouthTopLoc.y << std::endl;
+		
+		
+		/*std::cout << "curMouthOpen: " << curMouthOpen << std::endl;
+		
+		std::cout << "mouthBot: " << this->mouthBottomLoc.y << std::endl;
+		std::cout << "mouthTop: " << this->mouthTopLoc.y << std::endl;
+
+
+		std::cout << "nMouthOpen: " << nMouthOpen << std::endl;
+		*/
+
+		//std::cout << "mouthSmile: " << this->mouthTopLoc.y - (this->mouthLeftLoc.y + this->mouthRightLoc.y)/2 << std::endl;
+		 
+		//std::cout << "diffBrowDistance: " << diffBrowDistance << std::endl;
+		//std::cout << "diffLeftEyebrowRaised: " << diffLeftEyebrowRaised << std::endl;
+		//std::cout << "diffRightEyebrowRaised: " << diffRightEyebrowRaised << std::endl;
+		
+		
+		//std::cout << "diffMouthOpen: " << diffMouthOpen << std::endl;
+		
+		
+		//std::cout << "diffMouthSmile: " << diffMouthSmile << std::endl;
+		 
+		double emoThres = 0.04;
+		 
+		//// eyebrows are close together
+		//if(diffBrowDistance < -emoThres)
+		//{      
+		//		// eyebrows are close together
+		//		// eyebrows are lowered
+		//		if(diffEyebrowRaised < -emoThres && diffEyebrowRaised < -emoThres)
+		//		{
+		//				// eyebrows are close together
+		//				// eyebrows are lowered
+		//				// mouth neutral or not smiling
+		//				if(diffMouthSmile < -emoThres)
+		//				{
+		//						//you are angry
+		//						if (diffMouthOpen > emoThres)
+		//								// you are angrier
+		//				}
+		//				// eyebrows are close together
+		//				// eyebrows are lowered
+		//				// mouth smiling
+		//				else
+		//				{
+		//						//you are evil
+		//						if (diffMouthOpen > emoThres)
+		//								// you are more evil lol
+		//				}
+		//		}
+		//		// eyebrows are close together
+		//		// eyebrows are neutral/raised
+		//		else if (diffEyebrowRaised >= emoThres && diffEyebrowRaised >= emoThres)
+		//		{
+		//				// eyebrows are close together
+		//				// eyebrows are neutral/raised
+		//				// mouth not smiling
+		//				if(diffMouthSmile < -emoThres)
+		//				{
+		//						if(diffMouthOpen < -emoThres)
+		//								//sad
+		//						else
+		//								//disgust
+		//				}
+		//				// eyebrows are close together
+		//				// eyebrows are neutral/raised
+		//				// mouth neutral/smiling
+		//				else
+		//				{
+		//						//rasputin?
+		//				}
+		//		}
+		//}
+		//// eyebrows are neutral/apart
+		//else
+		//{
+		//		// eyebrows are neutral/apart
+		//		// eyebrows are lowered
+		//		if(diffEyebrowRaised < -emoThres && diffEyebrowRaised < -emoThres)
+		//		{
+		//				// eyebrows are neutral/apart
+		//				// eyebrows are lowered
+		//				// mouth not smiling
+		//				if(diffMouthSmile < -emoThres)
+		//				{
+		//						//contempt
+		//				}
+		//				// eyebrows are neutral/apart
+		//				// eyebrows are lowered
+		//				// mouth neutral
+		//				else if(diffMouthSmile >= -emoThres && diffMouthSmile <= emoThres)
+		//				{
+		//						//bored
+		//				}
+		//				// eyebrows are neutral/apart
+		//				// eyebrows are lowered
+		//				// mouth is smiling
+		//				else if(diffMouthSmile > emoThres)
+		//				{
+		//						//stoned lol
+		//						if (diffMouth > emoThres)
+		//								//more stoned
+		//				}
+		//		}
+		//		// eyebrows are neutral/apart
+		//		// eyebrows are neutral/raised
+		//		else if (diffEyebrowRaised >= emoThres && diffEyebrowRaised >= emoThres)
+		//		{
+		//				// eyebrows are neutral/apart
+		//				// eyebrows are neutral/raised
+		//				// mouth not smiling
+		//				if(diffMouthSmile < -emoThres)
+		//				{
+		//						//sad / snotty?
+		//						if(diffMouth < -emoThres )
+		//								// shocked/suprised
+		//				}
+		//				// eyebrows are neutral/apart
+		//				// eyebrows are neutral/raised
+		//				// mouth smiling
+		//				else if(diffMouthSmile > emoThres)
+		//				{
+		//						//smiling
+		//						if (diffMouthOpen > emoThres)
+		//								//big smile
+		//				}
+		//		}
+		//}
+	}
 
 	/* Return true if a face found by Haar is valid (has mouth,eyebrows,eyes) */
 	bool isValidFace(IplImage *img, IplImage *processedImg, CvRect *r, bool doCrop = true, bool detailedOutput=false)
@@ -1117,6 +1282,8 @@ public:
 		rectangle(Mat(processedImg),Point(topSearchSpace.x,topSearchSpace.y),
 			Point(topSearchSpace.x+topSearchSpace.width,topSearchSpace.y+topSearchSpace.height),
 			CV_RGB(255,255,0),1,0,0);
+
+		this->mouthTopLoc = topSearchSpace;
 		/* END MOUTH TOP */
 
 		/* MOUTH BOTTOM */
@@ -1128,6 +1295,8 @@ public:
 		rectangle(Mat(processedImg),Point(bottomSearchSpace.x,bottomSearchSpace.y),
 			Point(bottomSearchSpace.x+bottomSearchSpace.width,bottomSearchSpace.y+bottomSearchSpace.height),
 			CV_RGB(255,0,255),1,0,0);
+
+		this->mouthBottomLoc = bottomSearchSpace;
 		/* END MOUTH BOTTOM */
 
 
@@ -1140,6 +1309,8 @@ public:
 		rectangle(Mat(processedImg),Point(leftSearchSpace.x,leftSearchSpace.y),
 			Point(leftSearchSpace.x+leftSearchSpace.width,leftSearchSpace.y+leftSearchSpace.height),
 			CV_RGB(255,0,255),1,0,0);
+
+		this->mouthLeftLoc = leftSearchSpace;
 		/* END MOUTH LEFT */
 
 
@@ -1152,12 +1323,29 @@ public:
 		rectangle(Mat(processedImg),Point(rightSearchSpace.x,rightSearchSpace.y),
 			Point(rightSearchSpace.x+rightSearchSpace.width,rightSearchSpace.y+rightSearchSpace.height),
 			CV_RGB(255,0,255),1,0,0);
+
+		this->mouthRightLoc = rightSearchSpace;
 		/* END MOUTH RIGHT */
-
-
-
 		/* END MOUTH SUBFEATURES */
 
+		//store neutral positions
+		//put this where new face is initialized                               
+		nBrowDistance = (double)(this->rightEyebrowLoc.x - this->leftEyebrowLoc.x)/(double)this->currentFaceWidth;
+		nLeftEyebrowRaised = (double)(this->leftEyeLoc.y - this->leftEyebrowLoc.y)/(double)this->currentFaceHeight;
+		nRightEyebrowRaised = (double)(this->rightEyeLoc.y - this->rightEyebrowLoc.y)/(double)this->currentFaceHeight;
+		
+		//nMouthOpen = (double)(this->mouthBottomLoc.y - this->mouthTopLoc.y)/(double)this->currentFaceHeight;
+		
+		std::cout << "****************" << std::endl;
+		
+		nMouthOpen = (double)(this->mouthBottomLoc.y - this->mouthTopLoc.y);
+
+		std::cout << "mouthBot: " <<  this->mouthBottomLoc.y << std::endl;
+		std::cout << "mouthTop: " <<  this->mouthTopLoc.y << std::endl;
+
+		std::cout << "****************" << std::endl;
+		
+		nMouthSmile = (double)(this->mouthTopLoc.y - (double)(this->mouthLeftLoc.y + this->mouthRightLoc.y)/2.0)/(double)currentFaceHeight;
 
 
 		return true;

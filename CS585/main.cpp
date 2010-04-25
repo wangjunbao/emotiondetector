@@ -123,8 +123,8 @@ bool containedInOldFace(int faceX, int faceY, int faceWidth, int faceHeight)
 	for(int i=0; i<(int)(oldFaces.size()); i++)
     {
 		Face *oldFace = oldFaces.at(i);
-		int oldFaceWidth = oldFace->getWidth();
-		int oldFaceHeight = oldFace->getHeight();
+		int oldFaceWidth = (int)oldFace->getWidth();
+		int oldFaceHeight = (int)oldFace->getHeight();
 		int oldFaceX = oldFace->getTopLeftPoint().x;
 		int oldFaceY = oldFace->getTopLeftPoint().y;
 		int oldFaceBottomX = oldFaceX + oldFaceWidth;
@@ -155,8 +155,8 @@ bool containedInOldFace(int faceX, int faceY, int faceWidth, int faceHeight)
     for(int i=0; i<(int)(newFaces.size()); i++)
 	{
 		Face *oldFace = newFaces.at(i);
-		int oldFaceWidth = oldFace->getWidth();
-		int oldFaceHeight = oldFace->getHeight();
+		int oldFaceWidth = (int)oldFace->getWidth();
+		int oldFaceHeight = (int)oldFace->getHeight();
 		int oldFaceX = oldFace->getTopLeftPoint().x;
 		int oldFaceY = oldFace->getTopLeftPoint().y;
 		int oldFaceBottomX = oldFaceX + oldFaceWidth;
