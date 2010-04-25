@@ -342,12 +342,13 @@ public:
 	}
 
 	/* look near previous location of left eyebrow */
-	CvRect getLeftEyebrowUpdatedSearchSpace(CvRect *r)
+	CvRect getUpdatedSearchSpace(CvRect *r, 
+		CvRect &defaultSearchSpace, Mat& featureTpl, CvRect& featureLoc)
 	{
 		//CHANGE THESE FOR EACH FEATURE
-		CvRect defaultSearchSpace = this->getLeftEyebrowSearchSpace(r);
-		Mat featureTpl = this->leftEyebrowTpl;
-		CvRect featureLoc = this->leftEyebrowLoc;
+		//CvRect defaultSearchSpace = this->getLeftEyebrowSearchSpace(r);
+		//Mat featureTpl = this->leftEyebrowTpl;
+		//CvRect featureLoc = this->leftEyebrowLoc;
 
 		int bufferX = (int)((0.5)*featureTpl.rows);
 		if(bufferX < 0)
@@ -833,7 +834,8 @@ public:
 		}
 		else
 		{
-			leftEyebrowSearchSpace = this->getLeftEyebrowUpdatedSearchSpace(r);
+			leftEyebrowSearchSpace = this->getUpdatedSearchSpace(r,
+				this->getLeftEyebrowSearchSpace(r),this->leftEyebrowTpl,this->leftEyebrowLoc);
 		}
 		
 		CvRect leftEyebrowLoc;
