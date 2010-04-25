@@ -38,7 +38,7 @@ Measurements will be normalized in relation to the subject's neutral face
     * less = arousal -
     * none = arousal 0
   * mouth height: distance between upper lip and lower lip
-    * mouthTop.y - mouthBottom.y
+    * mouthBottom.y - mouthTop.y
     * error if negative
   * mouth width: distance between left part of mouth and right part of mouth 
     * mouthRight.x - mouthLeft.x
