@@ -22,7 +22,7 @@
 
 ==What we are tracking==
 Measurements will be normalized in relation to the subject's neutral face
-  * brow furrow: X distance between left eyebrow and right eyebrow
+  * brow distance (furrow): X distance between left eyebrow and right eyebrow
     * rightEyebrow.x - leftEyebrow.x
     * error if negative
     * hi = eyebrows are farther apart
