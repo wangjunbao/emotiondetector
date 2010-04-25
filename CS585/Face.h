@@ -155,6 +155,7 @@ public:
 
 		/* perform template matching */
 		Mat res;
+		tpl.copyTo(res);//added to fix bug?
 		matchTemplate(Mat(img), tpl, res, CV_TM_CCOEFF_NORMED);
 		 
 		/* find best matches location */
