@@ -344,9 +344,12 @@ public:
 	/* look near previous location of left eyebrow */
 	CvRect getLeftEyebrowUpdatedSearchSpace(CvRect *r)
 	{
-		CvRect leftSearchSpace;
+		//CHANGE THESE FOR EACH FEATURE
+		CvRect defaultSearchSpace = this->getLeftEyebrowSearchSpace(r);
+		Mat featureTpl = this->leftEyebrowTpl;
+		CvRect featureLoc = this->leftEyebrowLoc;
 
-		int bufferX = (int)((0.5)*this->leftEyebrowTpl.rows);
+		int bufferX = (int)((0.5)*featureTpl.rows);
 		if(bufferX < 0)
 		{
 			bufferX = 0;
@@ -359,51 +362,44 @@ public:
 		}
 
 		//Edge cases for search spaces
-		//use same maximum boundaries as parent
-		CvRect mouthSearchSpace = this->getLeftEyebrowSearchSpace(r);
+		//use same maximum boundaries as default
 	
-		/* Left Edge Cases */
-		int leftSearchSpaceX = this->leftEyebrowLoc.x - bufferX;
-		if(leftSearchSpaceX < mouthSearchSpace.x)
+		/* Edge Cases */
+		int searchSpaceX = featureLoc.x - bufferX;
+		if(searchSpaceX < defaultSearchSpace.x)
 		{
-			leftSearchSpaceX = mouthSearchSpace.x;
+			searchSpaceX = defaultSearchSpace.x;
 		}
 
-		int leftSearchSpaceY = this->leftEyebrowLoc.y - bufferY;
-		if(leftSearchSpaceY < mouthSearchSpace.y)
+		int searchSpaceY = featureLoc.y - bufferY;
+		if(searchSpaceY < defaultSearchSpace.y)
 		{
-			leftSearchSpaceY = mouthSearchSpace.y;
+			searchSpaceY = defaultSearchSpace.y;
 		}
 
 		//make sure search space is not wider than the face
-		int leftSearchSpaceWidth = this->leftEyebrowTpl.cols + 2*bufferX;
-		int leftRightEdge = leftSearchSpaceX + leftSearchSpaceWidth;
+		int searchSpaceWidth = featureTpl.cols + 2*bufferX;
+		int rightEdge = searchSpaceX + searchSpaceWidth;
 		int faceRightEdge = this->topLeftPoint.x + this->currentFaceWidth;
 		
-		if(leftRightEdge > faceRightEdge)
+		if(rightEdge > faceRightEdge)
 		{
-			leftSearchSpaceWidth = faceRightEdge - leftSearchSpaceX;
+			searchSpaceWidth = faceRightEdge - searchSpaceX;
 		}
 
-		int leftSearchSpaceHeight = this->mouthLeftTpl.rows + 2*bufferY;
-		int leftBottomEdge = leftSearchSpaceY + leftSearchSpaceHeight;
+		int searchSpaceHeight = featureTpl.rows + 2*bufferY;
+		int bottomEdge = searchSpaceY + searchSpaceHeight;
 		int faceBottomEdge = this->topLeftPoint.y + this->currentFaceHeight;
 
-		if(leftBottomEdge > faceBottomEdge)
+		if(bottomEdge > faceBottomEdge)
 		{
-			leftSearchSpaceHeight = faceBottomEdge - leftSearchSpaceY;
+			searchSpaceHeight = faceBottomEdge - searchSpaceY;
 		}
-		/* End Left Edge Cases */
-
-		leftSearchSpace = cvRect(leftSearchSpaceX, leftSearchSpaceY, leftSearchSpaceWidth, leftSearchSpaceHeight);
-
-		//black rectangle for left search space
-		//rectangle(Mat(processedImg),Point(leftSearchSpace.x,leftSearchSpace.y),
-		//	Point(leftSearchSpace.x + leftSearchSpace.width, leftSearchSpace.y + leftSearchSpace.height),CV_RGB(0, 0, 0), 1, 0, 0 );
+		/* End Edge Cases */
 	
-	
-		return cvRect(leftSearchSpaceX, leftSearchSpaceY, leftSearchSpaceWidth, leftSearchSpaceHeight);
+		return cvRect(searchSpaceX, searchSpaceY, searchSpaceWidth, searchSpaceHeight);
 	}
+
 
 	/* look in top right 5/8's for right eyebrow */
 	CvRect getRightEyebrowSearchSpace(CvRect *r)
