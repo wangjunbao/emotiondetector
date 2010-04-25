@@ -176,7 +176,9 @@ public:
 		//std::cout << "res size before: " << res.rows << " by " << res.cols << std::endl;
 		//tpl.copyTo(res);//added to fix bug?
 
-		matchTemplate(Mat(img), tpl, res, CV_TM_CCOEFF_NORMED);
+		try
+		{
+			matchTemplate(Mat(img), tpl, res, CV_TM_CCOEFF_NORMED);
 
 		//std::cout << "Mat(img) size after: " << Mat(img).rows << " by " << Mat(img).cols << std::endl;
 		//std::cout << "tpl size after: " << tpl.rows << " by " << tpl.cols << std::endl;
@@ -244,6 +246,24 @@ public:
 		}
 
 		return result;
+				}
+		catch(int i)
+		{
+			std::cout << "EXCEPTION IN GET SEARCH SPACE: int: " << i << std::endl;
+			return false;
+		}
+		catch(char *str)
+		{
+			std::cout << "EXCEPTION IN GET SEARCH SPACE: str: " << str << std::endl;
+			return false;
+		}
+		catch(...)
+		{
+			std::cout << "EXCEPTION IN GET SEARCH SPACE: UNKNOWN" << std::endl;
+			return false;
+
+		}
+
 
 	}
 
@@ -912,7 +932,7 @@ public:
 
 		//update mouth sub features
 		bool updateMouthTopBottomSuccess = this->updateMouthTopBottom(img,processedImg,r);
-		//bool updateMouthLeftRightSuccess = this->updateMouthLeftRight(img,processedImg,r);
+		bool updateMouthLeftRightSuccess = this->updateMouthLeftRight(img,processedImg,r);
 		//bool updateMouthTopBottomSuccess = true;
 		
 		//return (updateMouthTopBottomSuccess);
