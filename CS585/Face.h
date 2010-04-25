@@ -299,9 +299,6 @@ public:
 	bool updateMouthSubFeatureLocs(IplImage *img, IplImage *processedImg, CvRect *r)
 	{
 		//initialize search spaces to 0's
-		CvRect topLoc = cvRect(0,0,0,0);			
-		CvRect bottomLoc = cvRect(0,0,0,0);
-
 		CvRect topSearchSpace;		// if condition is true, parent feature subsection, else subfeature location with Buffer
 		CvRect bottomSearchSpace;
 
@@ -429,60 +426,108 @@ public:
 
 		}//end else
 
-		//update template image by running NCC
-		bool topFound = getSearchSpace(img,processedImg,r,mouthTopTpl,topSearchSpace,topLoc,true);
-		bool bottomFound = getSearchSpace(img,processedImg,r,mouthBottomTpl,bottomSearchSpace,bottomLoc,true);
-
-		//update coordinates because maybe it was only taking the greatest but not surpassing threshold
-		if(topFound && bottomFound)
-		//if(true)
-		{
-			this->mouthTopLoc.x = topLoc.x;
-			this->mouthTopLoc.y = topLoc.y;
-			this->mouthBottomLoc.x = bottomLoc.x;
-			this->mouthBottomLoc.y = bottomLoc.y;
-
-			//update (crop out) template images
-			//referenced from: http://opencv.willowgarage.com/documentation/cpp/c++_cheatsheet.html
+		//Update sub feature locations by running NCC
 			
-			//top
-			//Rect topROI(topLoc);	//Make a rectangle
-			//Mat imgTopROI = Mat(img)(topROI);	//Point a cv::Mat header at it (no allocation is done)
-			//imgTopROI.copyTo(this->mouthTopTpl);
-
-			cvNamedWindow( "mouthTop", 1 );
-			imshow( "mouthTop", this->mouthTopTpl);
-
-
-			//bottom
-			//Rect bottomROI(bottomLoc);	//Make a rectangle
-			//Mat imgBottomROI = Mat(img)(bottomROI);	//Point a cv::Mat header at it (no allocation is done)
-			//imgBottomROI.copyTo(this->mouthBottomTpl);
-
-			cvNamedWindow( "mouthBottom", 1 );
-			imshow( "mouthBottom", this->mouthBottomTpl);
-
-			//std::cout << "top bot diff: " << abs(topLoc.y - bottomLoc.y) << std::endl;
-			std::cout << "--------------------" << std::endl;
-			std::cout << "Top: (" << this->mouthTopLoc.x << ", " << this->mouthTopLoc.y << ")" << std::endl;
-			std::cout << "Bottom: (" << this->mouthBottomLoc.x << ", " << this->mouthBottomLoc.y << ")" << std::endl;
-			std::cout << "Y Diff: " << bottomLoc.y - topLoc.y << std::endl;
-			std::cout << "--------------------" << std::endl;
-
-			return true;
-
-		}
-		else //clear out templates
+		/* UPDATE TOP */
+		CvRect topLoc;
+		//first try the updated search space
+		if(getSearchSpace(img,processedImg,r,mouthTopTpl,topSearchSpace,topLoc,true) == true)
 		{
-			this->mouthTopTpl.release();
-			this->mouthBottomTpl.release();
-			//we didnt' find the feature in this frame :(
-
-			//return true;
-			return false;
+			this->mouthTopLoc = topLoc;
 		}
+		else
+		{
+			//last ditch: try the default search space (look where the mouth is)
+			std::cout << "last ditch top" << std::endl;
+			topSearchSpace = this->getMouthTopSearchSpace();
+			if(getSearchSpace(img,processedImg,r,mouthTopTpl,topSearchSpace,topLoc,true) == true)
+			{
+				this->mouthTopLoc = topLoc;
+			}
+			else //feature was lost, update failed
+			{
+				return false;
+			}
+		}
+		/* END UPDATE TOP */
 
-		//std::cout << "top bot diff: " << abs(topLoc.y - bottomLoc.y) << std::endl;
+		/* UPDATE BOTTOM */
+		CvRect bottomLoc;
+		//first try the updated search space
+		if(getSearchSpace(img,processedImg,r,mouthBottomTpl,bottomSearchSpace,bottomLoc,true) == true)
+		{
+			this->mouthBottomLoc = bottomLoc;
+		}
+		else
+		{
+			//last ditch: try the default search space (look where the mouth is)
+			std::cout << "last ditch bottom" << std::endl;
+			bottomSearchSpace = this->getMouthBottomSearchSpace();
+			if(getSearchSpace(img,processedImg,r,mouthBottomTpl,bottomSearchSpace,bottomLoc,true) == true)
+			{
+				this->mouthBottomLoc = bottomLoc;
+			}
+			else //feature was lost, update failed
+			{
+				return false;
+			}
+		}
+		/* END UPDATE BOTTOM */
+
+			//		std::cout << "--------------------" << std::endl;
+			//std::cout << "Top: (" << this->mouthTopLoc.x << ", " << this->mouthTopLoc.y << ")" << std::endl;
+			//std::cout << "Bottom: (" << this->mouthBottomLoc.x << ", " << this->mouthBottomLoc.y << ")" << std::endl;
+			//std::cout << "Y Diff: " << bottomLoc.y - topLoc.y << std::endl;
+			//std::cout << "--------------------" << std::endl;
+		
+		
+		//bool bottomFound = getSearchSpace(img,processedImg,r,mouthBottomTpl,bottomSearchSpace,bottomLoc,true);
+
+		////update coordinates because maybe it was only taking the greatest but not surpassing threshold
+		////if(topFound && bottomFound)
+		//if(bottomFound)
+		////if(true)
+		//{
+		//	//this->mouthTopLoc.x = topLoc.x;
+		//	//this->mouthTopLoc.y = topLoc.y;
+		//	this->mouthBottomLoc.x = bottomLoc.x;
+		//	this->mouthBottomLoc.y = bottomLoc.y;
+
+		//	//update (crop out) template images
+		//	//referenced from: http://opencv.willowgarage.com/documentation/cpp/c++_cheatsheet.html
+		//	
+		//	//top
+		//	//Rect topROI(topLoc);	//Make a rectangle
+		//	//Mat imgTopROI = Mat(img)(topROI);	//Point a cv::Mat header at it (no allocation is done)
+		//	//imgTopROI.copyTo(this->mouthTopTpl);
+
+
+		//	//bottom
+		//	//Rect bottomROI(bottomLoc);	//Make a rectangle
+		//	//Mat imgBottomROI = Mat(img)(bottomROI);	//Point a cv::Mat header at it (no allocation is done)
+		//	//imgBottomROI.copyTo(this->mouthBottomTpl);
+
+		//	//std::cout << "top bot diff: " << abs(topLoc.y - bottomLoc.y) << std::endl;
+		//	std::cout << "--------------------" << std::endl;
+		//	std::cout << "Top: (" << this->mouthTopLoc.x << ", " << this->mouthTopLoc.y << ")" << std::endl;
+		//	std::cout << "Bottom: (" << this->mouthBottomLoc.x << ", " << this->mouthBottomLoc.y << ")" << std::endl;
+		//	std::cout << "Y Diff: " << bottomLoc.y - topLoc.y << std::endl;
+		//	std::cout << "--------------------" << std::endl;
+
+		//	return true;
+
+		//}
+		//else //clear out templates
+		//{
+		//	this->mouthTopTpl.release();
+		//	this->mouthBottomTpl.release();
+		//	//we didnt' find the feature in this frame :(
+
+		//	//return true;
+		//	return false;
+		//}
+
+		////std::cout << "top bot diff: " << abs(topLoc.y - bottomLoc.y) << std::endl;
 
 
 	}//end updateMouthSubFeatureLocs
