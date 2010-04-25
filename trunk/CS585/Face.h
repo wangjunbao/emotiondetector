@@ -170,9 +170,33 @@ public:
 
 		/* perform template matching */
 		Mat res;
-		tpl.copyTo(res);//added to fix bug?
+		std::cout << "===================" << std::endl;
+		std::cout << "Mat(img) size before: " << Mat(img).rows << " by " << Mat(img).cols << std::endl;
+		std::cout << "tpl size before: " << tpl.rows << " by " << tpl.cols << std::endl;
+		std::cout << "res size before: " << res.rows << " by " << res.cols << std::endl;
+		//tpl.copyTo(res);//added to fix bug?
+
 		matchTemplate(Mat(img), tpl, res, CV_TM_CCOEFF_NORMED);
-		 
+
+		std::cout << "Mat(img) size after: " << Mat(img).rows << " by " << Mat(img).cols << std::endl;
+		std::cout << "tpl size after: " << tpl.rows << " by " << tpl.cols << std::endl;
+		std::cout << "res size after: " << res.rows << " by " << res.cols << std::endl;
+		std::cout << "===================" << std::endl;
+		
+		//matimg
+		namedWindow( "matimg", 1 );
+		imshow("matimg",Mat(img));
+
+		//tpl
+		namedWindow( "tpl", 1 );
+		imshow("tpl",tpl);
+
+		//res
+		namedWindow( "res", 1 );
+		imshow("res",res);
+
+
+
 		/* find best matches location */
 		Point minloc, maxloc;
 		double minval = 0.0;
@@ -888,7 +912,7 @@ public:
 
 		//update mouth sub features
 		bool updateMouthTopBottomSuccess = this->updateMouthTopBottom(img,processedImg,r);
-		bool updateMouthLeftRightSuccess = this->updateMouthLeftRight(img,processedImg,r);
+		//bool updateMouthLeftRightSuccess = this->updateMouthLeftRight(img,processedImg,r);
 		//bool updateMouthTopBottomSuccess = true;
 		
 		//return (updateMouthTopBottomSuccess);
@@ -1009,8 +1033,6 @@ public:
 
 
 		/* END MOUTH SUBFEATURES */
-
-
 
 
 
