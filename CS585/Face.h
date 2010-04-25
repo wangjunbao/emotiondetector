@@ -193,7 +193,7 @@ public:
 		//print out search space relative to entire image, not just ROI
 		if(detailedOutput == true)
 		{
-			std::cout << "max: " << "(" << inputSearchSpace.x + maxloc.x << "," << inputSearchSpace.y + maxloc.y << "): " << maxval << std::endl;
+			//std::cout << "max: " << "(" << inputSearchSpace.x + maxloc.x << "," << inputSearchSpace.y + maxloc.y << "): " << maxval << std::endl;
 		}
 
 		//draw a box around the found feature
@@ -506,7 +506,9 @@ public:
 		/* UPDATE TOP */
 		CvRect topLoc;
 		//first try the updated search space
-		if(getSearchSpace(img,processedImg,r,mouthTopTpl,topSearchSpace,topLoc,true) == true)
+		bool topFound = getSearchSpace(img,processedImg,r,mouthTopTpl,topSearchSpace,topLoc,true);
+		if(topFound == true)
+		//if(true)
 		{
 			this->mouthTopLoc = topLoc;
 		}
@@ -537,7 +539,9 @@ public:
 		/* UPDATE BOTTOM */
 		CvRect bottomLoc;
 		//first try the updated search space
-		if(getSearchSpace(img,processedImg,r,mouthBottomTpl,bottomSearchSpace,bottomLoc,true) == true)
+		bool bottomFound = getSearchSpace(img,processedImg,r,mouthBottomTpl,bottomSearchSpace,bottomLoc,true);
+		if(bottomFound == true)
+		//if(true)
 		{
 			this->mouthBottomLoc = bottomLoc;
 		}
@@ -840,6 +844,8 @@ public:
 		//return updateMouthSubFeatureLocs(img, processedImg, r);
 		
 		//updateSubFeatureLocs(img, processedImg, r);
+
+		updateMouthSubFeatureLocs(img, processedImg, r);
 
 		return true;
 	}

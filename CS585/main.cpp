@@ -296,7 +296,7 @@ void detectFaces( IplImage *img )
 				
 				delete face;
 			}
-			else if( face->isValidFace(img,processedImg,r) )
+			else if( face->isValidFace(img,processedImg,r,true,true) )
 			{
 				std::cout << "new valid face at: (" << face->getTopLeftPoint().x <<"," << face->getTopLeftPoint().y << ")" << std::endl;
 
@@ -340,7 +340,7 @@ void detectFaces( IplImage *img )
 			}
 			
 			//for debugging:
-			//face->isValidFace(img,processedImg,r,false); //DELETE
+			//face->isValidFace(img,processedImg,r,false,true); //DELETE
 		}
 		
 	}//end for faces
