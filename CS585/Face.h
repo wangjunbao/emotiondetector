@@ -100,21 +100,21 @@ public:
 			cvPoint( r->x + r->width, r->y + r->height ),
 			CV_RGB( 255, 255, 0 ), 1, 8, 0 );
 
-		////left eyebrow
-		//namedWindow( "left eyebrow", 1 );
-		//imshow("left eyebrow",this->leftEyebrowTpl);
+		//left eyebrow
+		namedWindow( "left eyebrow", 1 );
+		imshow("left eyebrow",this->leftEyebrowTpl);
 
-		////right eyebrow
-		//namedWindow( "right eyebrow", 1 );
-		//imshow("right eyebrow",this->rightEyebrowTpl);
+		//right eyebrow
+		namedWindow( "right eyebrow", 1 );
+		imshow("right eyebrow",this->rightEyebrowTpl);
 
-		////left eye
-		//namedWindow( "left eye", 1 );
-		//imshow("left eye",this->leftEyeTpl);
+		//left eye
+		namedWindow( "left eye", 1 );
+		imshow("left eye",this->leftEyeTpl);
 
-		////right eye
-		//namedWindow( "right eye", 1 );
-		//imshow("right eye",this->rightEyeTpl);
+		//right eye
+		namedWindow( "right eye", 1 );
+		imshow("right eye",this->rightEyeTpl);
 
 		//mouth
 		namedWindow( "mouth", 1 );
@@ -300,7 +300,7 @@ public:
 
 
 	/* Update the location of the mouth */
-	bool updateMouth(IplImage *img, IplImage *processedImg, CvRect *r)
+	bool updateMouth(IplImage *img, IplImage *processedImg, CvRect *r, bool detailedOutput)
 	{
 		//store face dimensions in order to resize templates
 		double newFaceWidth = r->width;
@@ -323,7 +323,7 @@ public:
 		CvRect mouthSearchSpace = this->getMouthSearchSpace(r);
 		CvRect mouthLoc;
 		//std::cout << "mouth=============================" << std::endl;
-		bool mouthFound = getSearchSpace(img,processedImg,r,mouthTpl,mouthSearchSpace,mouthLoc);
+		bool mouthFound = getSearchSpace(img,processedImg,r,mouthTpl,mouthSearchSpace,mouthLoc,detailedOutput);
 		//std::cout << "==============================mouth" << std::endl;
 		
 		//break out if no mouth found
@@ -519,7 +519,7 @@ public:
 			//update mouth first
 			if(mouthUpdated == false)
 			{
-				this->updateMouth(img,processedImg,r);
+				this->updateMouth(img,processedImg,r,false);
 				mouthUpdated = true;
 			}
 
@@ -552,7 +552,7 @@ public:
 			//update mouth first
 			if(mouthUpdated == false)
 			{
-				this->updateMouth(img,processedImg,r);
+				this->updateMouth(img,processedImg,r,false);
 				mouthUpdated = true;
 			}
 
@@ -674,122 +674,18 @@ public:
 		{
 			this->leftEyebrowTpl = leftEyebrowTpl;
 			this->leftEyebrowLoc = leftEyebrowLoc;
+			return true;
 		}
 		/* END LEFT EYEBROW */
 
 	}
 
-	/* Update locations of all features by running NCC's */
-	bool updateFeatureLocs(IplImage *img, IplImage *processedImg, CvRect *r, bool detailedOutput)
+	
+	bool updateRightEyebrow(IplImage *img, IplImage *processedImg, CvRect *r, bool detailedOutput)
 	{
-		//call isValidFace without cropping out templates
-		//return this->isValidFace(img,processedImg,r,false);
-
-
 		//store face dimensions in order to resize templates
 		double newFaceWidth = r->width;
 		double newFaceHeight = r->height;
-
-
-		//update mouth coordinates
-
-		//update face coordinates
-		//are we updating twice?
-		this->updateFaceCoords(r);
-
-
-		//update eyebrows
-		this->updateLeftEyebrow(img,processedImg,r,true);
-		
-		//update eye subfeatures
-
-		//update mouth sub features
-		bool updateMouthSuccess = this->updateMouthSubFeatureLocs(img,processedImg,r);
-		//bool updateMouthSuccess = true;
-		
-		return (updateMouthSuccess);
-	}
-
-
-	/* Return true if a face found by Haar is valid (has mouth,eyebrows,eyes) */
-	bool isValidFace(IplImage *img, IplImage *processedImg, CvRect *r, bool doCrop = true, bool detailedOutput=false)
-	{
-		//update face coordinates
-		this->updateFaceCoords(r);
-
-		//store face dimensions in order to resize templates
-		double newFaceWidth = r->width;
-		double newFaceHeight = r->height;
-		
-		//return false if any of the features are not found
-
-		//if( updateMouthSubFeatureLocs(img, processedImg, r) == false)
-		//{
-		//	return false;
-		//}
-
-		/* MOUTH */ //commented for now b/c we do this again in updateMouthSub
-		Mat mouthTpl;
-		if(this->mouthTpl.empty())	//use default template from average face
-		{
-			Mat oldMouthTpl	= imread("templates/mouth.jpg",1);
-			resizeFeatureTemplate(oldMouthTpl,newFaceWidth,newFaceHeight,mouthTpl);
-		}
-		else //use an existing template from this face 
-			//(this only happens in debugging when we run isValidFace even on old faces)
-		{
-			mouthTpl = this->mouthTpl;
-		}
-		
-		//run NCC to get coordinates of the mouth
-		CvRect mouthSearchSpace = this->getMouthSearchSpace(r);
-		CvRect mouthLoc;
-		//std::cout << "mouth=============================" << std::endl;
-		bool mouthFound = getSearchSpace(img,processedImg,r,mouthTpl,mouthSearchSpace,mouthLoc,detailedOutput);
-		//std::cout << "==============================mouth" << std::endl;
-		
-		//break out if no mouth found
-		if(mouthFound == false)
-		{
-			return false;
-		}
-		//store mouth coordinates and template image 
-		//(at first this will just be the resized version of the average face template)
-		else
-		{
-			this->mouthTpl = mouthTpl;
-			this->mouthLoc = mouthLoc;	
-		}
-		/* END MOUTH */
-
-		/* LEFT EYEBROW */
-		Mat leftEyebrowTpl;
-		if(this->leftEyebrowTpl.empty())
-		{
-			Mat oldLeftEyebrowTpl = imread("templates/leftEyebrow.jpg",1);
-			resizeFeatureTemplate(oldLeftEyebrowTpl,newFaceWidth,newFaceHeight,leftEyebrowTpl);
-		}
-		else
-		{
-			leftEyebrowTpl = this->leftEyebrowTpl;
-		}
-		
-		CvRect leftEyebrowSearchSpace = this->getLeftEyebrowSearchSpace(r);
-		CvRect leftEyebrowLoc;
-		//std::cout << "left eyebrow =============================" << std::endl;
-		bool leftEyebrowFound = getSearchSpace(img,processedImg,r,leftEyebrowTpl,leftEyebrowSearchSpace,leftEyebrowLoc,detailedOutput);
-		//std::cout << " ============================= left eyebrow" << std::endl;
-
-		if(leftEyebrowFound == false)
-		{
-			return false;
-		}
-		else //update left eyebrow template
-		{
-			this->leftEyebrowTpl = leftEyebrowTpl;
-			this->leftEyebrowLoc = leftEyebrowLoc;
-		}
-		/* END LEFT EYEBROW */
 
 		/* RIGHT EYEBROW */
 		Mat rightEyebrowTpl;
@@ -818,8 +714,17 @@ public:
 		{
 			this->rightEyebrowTpl = rightEyebrowTpl;
 			this->rightEyebrowLoc = rightEyebrowLoc;
+			return true;
 		}
 		/* END RIGHT EYEBROW */
+	}
+
+
+	bool updateLeftEye(IplImage *img, IplImage *processedImg, CvRect *r, bool detailedOutput)
+	{
+		//store face dimensions in order to resize templates
+		double newFaceWidth = r->width;
+		double newFaceHeight = r->height;
 
 		/* LEFT EYE */
 		Mat leftEyeTpl;
@@ -847,8 +752,17 @@ public:
 		{
 			this->leftEyeTpl = leftEyeTpl;
 			this->leftEyeLoc = leftEyeLoc;
+			return true;
 		}
 		/* END LEFT EYE */
+	}
+
+
+	bool updateRightEye(IplImage *img, IplImage *processedImg, CvRect *r, bool detailedOutput)
+	{
+		//store face dimensions in order to resize templates
+		double newFaceWidth = r->width;
+		double newFaceHeight = r->height;
 
 		/* RIGHT EYE */
 		Mat rightEyeTpl;
@@ -876,6 +790,92 @@ public:
 		{
 			this->rightEyeTpl = rightEyeTpl;
 			this->rightEyeLoc = rightEyeLoc;
+			return true;
+		}
+		/* END RIGHT EYE */
+	}
+
+	
+	/* Update locations of all features by running NCC's */
+	bool updateFeatureLocs(IplImage *img, IplImage *processedImg, CvRect *r, bool detailedOutput)
+	{
+		//call isValidFace without cropping out templates
+		//return this->isValidFace(img,processedImg,r,false);
+
+
+		//store face dimensions in order to resize templates
+		double newFaceWidth = r->width;
+		double newFaceHeight = r->height;
+
+
+		//update mouth coordinates
+
+		//update face coordinates
+		//are we updating twice?
+		this->updateFaceCoords(r);
+
+
+		//update eyebrows
+		this->updateLeftEyebrow(img,processedImg,r,true);
+		this->updateRightEyebrow(img,processedImg,r,true);
+		
+		//update eye subfeatures
+		this->updateLeftEye(img,processedImg,r,true);
+		this->updateRightEye(img,processedImg,r,true);
+
+		//update mouth sub features
+		bool updateMouthSuccess = this->updateMouthSubFeatureLocs(img,processedImg,r);
+		//bool updateMouthSuccess = true;
+		
+		//return (updateMouthSuccess);
+		return true;
+	}
+
+
+	/* Return true if a face found by Haar is valid (has mouth,eyebrows,eyes) */
+	bool isValidFace(IplImage *img, IplImage *processedImg, CvRect *r, bool doCrop = true, bool detailedOutput=false)
+	{
+		//update face coordinates
+		this->updateFaceCoords(r);
+
+		//store face dimensions in order to resize templates
+		double newFaceWidth = r->width;
+		double newFaceHeight = r->height;
+		
+		//return false if any of the features are not found
+
+		/* MOUTH */
+		if(this->updateMouth(img,processedImg,r,true) == false)
+		{
+			return false;
+		}
+		/* END MOUTH */
+
+		/* LEFT EYEBROW */
+		if(this->updateLeftEyebrow(img,processedImg,r,true) == false)
+		{
+			return false;
+		}
+		/* END LEFT EYEBROW */
+
+		/* RIGHT EYEBROW */
+		if(this->updateRightEyebrow(img,processedImg,r,true) == false)
+		{
+			return false;
+		}
+		/* END RIGHT EYEBROW */
+
+		/* LEFT EYE */
+		if(this->updateLeftEye(img,processedImg,r,true) == false)
+		{
+			return false;
+		}
+		/* END LEFT EYE */
+
+		/* RIGHT EYE */
+		if(this->updateRightEye(img,processedImg,r,true) == false)
+		{
+			return false;
 		}
 		/* END RIGHT EYE */
 
@@ -890,13 +890,7 @@ public:
 			this->cropTemplate(img,this->rightEyeLoc,this->rightEyeTpl);
 		}
 
-		//update sub templates			
-		//return updateMouthSubFeatureLocs(img, processedImg, r);
-		
-		//updateSubFeatureLocs(img, processedImg, r);
-
-		//updateMouthSubFeatureLocs(img, processedImg, r);
-
+		//crop out sub templates			
 
 		/* MOUTH SUBFEATURES */
 		//look at parent feature coords for search space
