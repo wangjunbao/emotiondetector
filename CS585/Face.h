@@ -107,41 +107,41 @@ public:
 			cvPoint( r->x + r->width, r->y + r->height ),
 			CV_RGB( 255, 255, 0 ), 1, 8, 0 );
 
-		//left eyebrow
-		namedWindow( "left eyebrow", 1 );
-		imshow("left eyebrow",this->leftEyebrowTpl);
+		////left eyebrow
+		//namedWindow( "left eyebrow", 1 );
+		//imshow("left eyebrow",this->leftEyebrowTpl);
 
-		//right eyebrow
-		namedWindow( "right eyebrow", 1 );
-		imshow("right eyebrow",this->rightEyebrowTpl);
+		////right eyebrow
+		//namedWindow( "right eyebrow", 1 );
+		//imshow("right eyebrow",this->rightEyebrowTpl);
 
-		//left eye
-		namedWindow( "left eye", 1 );
-		imshow("left eye",this->leftEyeTpl);
+		////left eye
+		//namedWindow( "left eye", 1 );
+		//imshow("left eye",this->leftEyeTpl);
 
-		//right eye
-		namedWindow( "right eye", 1 );
-		imshow("right eye",this->rightEyeTpl);
+		////right eye
+		//namedWindow( "right eye", 1 );
+		//imshow("right eye",this->rightEyeTpl);
 
-		//mouth
-		namedWindow( "mouth", 1 );
-		imshow("mouth",this->mouthTpl);
+		////mouth
+		//namedWindow( "mouth", 1 );
+		//imshow("mouth",this->mouthTpl);
 
-		//mouth top
-		namedWindow( "mouthTop", 1 );
-		imshow( "mouthTop", this->mouthTopTpl);
+		////mouth top
+		//namedWindow( "mouthTop", 1 );
+		//imshow( "mouthTop", this->mouthTopTpl);
 
-		//mouth bottom
-		cvNamedWindow( "mouthBottom", 1 );
-		imshow( "mouthBottom", this->mouthBottomTpl);
+		////mouth bottom
+		//cvNamedWindow( "mouthBottom", 1 );
+		//imshow( "mouthBottom", this->mouthBottomTpl);
 
-		//mouth left
-		cvNamedWindow( "mouthLeft", 1 );
-		imshow( "mouthLeft", this->mouthLeftTpl);
+		////mouth left
+		//cvNamedWindow( "mouthLeft", 1 );
+		//imshow( "mouthLeft", this->mouthLeftTpl);
 
-		//mouth right
-		cvNamedWindow( "mouthRight", 1 );
-		imshow( "mouthRight", this->mouthRightTpl);
+		////mouth right
+		//cvNamedWindow( "mouthRight", 1 );
+		//imshow( "mouthRight", this->mouthRightTpl);
 
 	}
 
@@ -170,30 +170,30 @@ public:
 
 		/* perform template matching */
 		Mat res;
-		std::cout << "===================" << std::endl;
-		std::cout << "Mat(img) size before: " << Mat(img).rows << " by " << Mat(img).cols << std::endl;
-		std::cout << "tpl size before: " << tpl.rows << " by " << tpl.cols << std::endl;
-		std::cout << "res size before: " << res.rows << " by " << res.cols << std::endl;
+		//std::cout << "===================" << std::endl;
+		//std::cout << "Mat(img) size before: " << Mat(img).rows << " by " << Mat(img).cols << std::endl;
+		//std::cout << "tpl size before: " << tpl.rows << " by " << tpl.cols << std::endl;
+		//std::cout << "res size before: " << res.rows << " by " << res.cols << std::endl;
 		//tpl.copyTo(res);//added to fix bug?
 
 		matchTemplate(Mat(img), tpl, res, CV_TM_CCOEFF_NORMED);
 
-		std::cout << "Mat(img) size after: " << Mat(img).rows << " by " << Mat(img).cols << std::endl;
-		std::cout << "tpl size after: " << tpl.rows << " by " << tpl.cols << std::endl;
-		std::cout << "res size after: " << res.rows << " by " << res.cols << std::endl;
-		std::cout << "===================" << std::endl;
+		//std::cout << "Mat(img) size after: " << Mat(img).rows << " by " << Mat(img).cols << std::endl;
+		//std::cout << "tpl size after: " << tpl.rows << " by " << tpl.cols << std::endl;
+		//std::cout << "res size after: " << res.rows << " by " << res.cols << std::endl;
+		//std::cout << "===================" << std::endl;
 		
-		//matimg
-		namedWindow( "matimg", 1 );
-		imshow("matimg",Mat(img));
+		////matimg
+		//namedWindow( "matimg", 1 );
+		//imshow("matimg",Mat(img));
 
-		//tpl
-		namedWindow( "tpl", 1 );
-		imshow("tpl",tpl);
+		////tpl
+		//namedWindow( "tpl", 1 );
+		//imshow("tpl",tpl);
 
-		//res
-		namedWindow( "res", 1 );
-		imshow("res",res);
+		////res
+		//namedWindow( "res", 1 );
+		//imshow("res",res);
 
 
 
@@ -266,9 +266,9 @@ public:
 	CvRect getMouthSearchSpace(CvRect *r)
 	{
 		return cvRect(r->x,
-						(r->y +  (int)((1.0/2.0)*r->height)),
+						(r->y +  (int)((2.0/3.0)*r->height)),
 						r->width, 
-						(int)((1.0/2.0)*r->height));
+						(int)((1.0/3.0)*r->height));
 	}
 
 	/* Look in the top halfish area of the mouth for the mouthTop */
