@@ -180,73 +180,72 @@ public:
 		{
 			matchTemplate(Mat(img), tpl, res, CV_TM_CCOEFF_NORMED);
 
-		//std::cout << "Mat(img) size after: " << Mat(img).rows << " by " << Mat(img).cols << std::endl;
-		//std::cout << "tpl size after: " << tpl.rows << " by " << tpl.cols << std::endl;
-		//std::cout << "res size after: " << res.rows << " by " << res.cols << std::endl;
-		//std::cout << "===================" << std::endl;
-		
-		////matimg
-		//namedWindow( "matimg", 1 );
-		//imshow("matimg",Mat(img));
+			//std::cout << "Mat(img) size after: " << Mat(img).rows << " by " << Mat(img).cols << std::endl;
+			//std::cout << "tpl size after: " << tpl.rows << " by " << tpl.cols << std::endl;
+			//std::cout << "res size after: " << res.rows << " by " << res.cols << std::endl;
+			//std::cout << "===================" << std::endl;
+			
+			////matimg
+			//namedWindow( "matimg", 1 );
+			//imshow("matimg",Mat(img));
 
-		////tpl
-		//namedWindow( "tpl", 1 );
-		//imshow("tpl",tpl);
+			////tpl
+			//namedWindow( "tpl", 1 );
+			//imshow("tpl",tpl);
 
-		////res
-		//namedWindow( "res", 1 );
-		//imshow("res",res);
+			////res
+			//namedWindow( "res", 1 );
+			//imshow("res",res);
 
 
+			/* find best matches location */
+			Point minloc, maxloc;
+			double minval = 0.0;
+			double maxval = 0.0;
 
-		/* find best matches location */
-		Point minloc, maxloc;
-		double minval = 0.0;
-		double maxval = 0.0;
+			minMaxLoc(res, &minval, &maxval, &minloc, &maxloc); 
 
-		minMaxLoc(res, &minval, &maxval, &minloc, &maxloc); 
+			//draw a box around the found feature even if its below the thresh
+			//yellow box
+			if(detailedOutput == true)
+			{
+				rectangle(Mat(processedImg),maxloc,Point(maxloc.x + tpl.cols, maxloc.y + tpl.rows),CV_RGB(255, 255, 0), 1, 0, 0 );
+			}
 
-		//draw a box around the found feature even if its below the thresh
-		//yellow box
-		if(detailedOutput == true)
-		{
-			rectangle(Mat(processedImg),maxloc,Point(maxloc.x + tpl.cols, maxloc.y + tpl.rows),CV_RGB(255, 255, 0), 1, 0, 0 );
+			outputSearchSpace = cvRect(inputSearchSpace.x + maxloc.x, inputSearchSpace.y + maxloc.y, tpl.cols, tpl.rows);
+			//std::cout << "**************outputSearchSpace: " << outputSearchSpace.width << " by " << outputSearchSpace.height << std::endl;
+
+			cvResetImageROI(img);
+			cvResetImageROI(processedImg);
+
+			result = maxval > THRESH;
+
+			//for debugging:
+			//draw a red box around the face if the feature was found
+			//if(result == true)
+			//{
+			//	//red box
+			//	cvRectangle( processedImg,
+			//		cvPoint( r->x, r->y ),
+			//		cvPoint( r->x + r->width, r->y + r->height ),
+			//		CV_RGB( 255, 0, 0 ), 1, 8, 0 );
+			//}
+
+			//print out search space relative to entire image, not just ROI
+			if(detailedOutput == true)
+			{
+				//std::cout << "max: " << "(" << inputSearchSpace.x + maxloc.x << "," << inputSearchSpace.y + maxloc.y << "): " << maxval << std::endl;
+			}
+
+			//draw a box around the found feature
+			//green box
+			if(result == true && detailedOutput == true)
+			{
+				rectangle(Mat(processedImg),maxloc,Point(maxloc.x + tpl.cols, maxloc.y + tpl.rows),CV_RGB(0, 255, 0), 1, 0, 0 );
+			}
+
+			return result;
 		}
-
-		outputSearchSpace = cvRect(inputSearchSpace.x + maxloc.x, inputSearchSpace.y + maxloc.y, tpl.cols, tpl.rows);
-		//std::cout << "**************outputSearchSpace: " << outputSearchSpace.width << " by " << outputSearchSpace.height << std::endl;
-
-		cvResetImageROI(img);
-		cvResetImageROI(processedImg);
-
-		result = maxval > THRESH;
-
-		//for debugging:
-		//draw a red box around the face if the feature was found
-		//if(result == true)
-		//{
-		//	//red box
-		//	cvRectangle( processedImg,
-		//		cvPoint( r->x, r->y ),
-		//		cvPoint( r->x + r->width, r->y + r->height ),
-		//		CV_RGB( 255, 0, 0 ), 1, 8, 0 );
-		//}
-
-		//print out search space relative to entire image, not just ROI
-		if(detailedOutput == true)
-		{
-			//std::cout << "max: " << "(" << inputSearchSpace.x + maxloc.x << "," << inputSearchSpace.y + maxloc.y << "): " << maxval << std::endl;
-		}
-
-		//draw a box around the found feature
-		//green box
-		if(result == true && detailedOutput == true)
-		{
-			rectangle(Mat(processedImg),maxloc,Point(maxloc.x + tpl.cols, maxloc.y + tpl.rows),CV_RGB(0, 255, 0), 1, 0, 0 );
-		}
-
-		return result;
-				}
 		catch(int i)
 		{
 			std::cout << "EXCEPTION IN GET SEARCH SPACE: int: " << i << std::endl;
@@ -340,6 +339,70 @@ public:
 						r->y, 
 						(int)((5.0/8.0)*r->width), 
 						(int)((1.0/2.0)*r->height) );
+	}
+
+	/* look near previous location of left eyebrow */
+	CvRect getLeftEyebrowUpdatedSearchSpace(CvRect *r)
+	{
+		CvRect leftSearchSpace;
+
+		int bufferX = (int)((0.5)*this->leftEyebrowTpl.rows);
+		if(bufferX < 0)
+		{
+			bufferX = 0;
+		}
+
+		int bufferY = bufferX;
+		if(bufferY < 0)
+		{
+			bufferY = 0;
+		}
+
+		//Edge cases for search spaces
+		//use same maximum boundaries as parent
+		CvRect mouthSearchSpace = this->getLeftEyebrowSearchSpace(r);
+	
+		/* Left Edge Cases */
+		int leftSearchSpaceX = this->leftEyebrowLoc.x - bufferX;
+		if(leftSearchSpaceX < mouthSearchSpace.x)
+		{
+			leftSearchSpaceX = mouthSearchSpace.x;
+		}
+
+		int leftSearchSpaceY = this->leftEyebrowLoc.y - bufferY;
+		if(leftSearchSpaceY < mouthSearchSpace.y)
+		{
+			leftSearchSpaceY = mouthSearchSpace.y;
+		}
+
+		//make sure search space is not wider than the face
+		int leftSearchSpaceWidth = this->leftEyebrowTpl.cols + 2*bufferX;
+		int leftRightEdge = leftSearchSpaceX + leftSearchSpaceWidth;
+		int faceRightEdge = this->topLeftPoint.x + this->currentFaceWidth;
+		
+		if(leftRightEdge > faceRightEdge)
+		{
+			leftSearchSpaceWidth = faceRightEdge - leftSearchSpaceX;
+		}
+
+		int leftSearchSpaceHeight = this->mouthLeftTpl.rows + 2*bufferY;
+		int leftBottomEdge = leftSearchSpaceY + leftSearchSpaceHeight;
+		int faceBottomEdge = this->topLeftPoint.y + this->currentFaceHeight;
+
+		if(leftBottomEdge > faceBottomEdge)
+		{
+			leftSearchSpaceHeight = faceBottomEdge - leftSearchSpaceY;
+		}
+		/* End Left Edge Cases */
+
+		leftSearchSpace = cvRect(leftSearchSpaceX, leftSearchSpaceY, leftSearchSpaceWidth, leftSearchSpaceHeight);
+
+		//black rectangle for left search space
+		//rectangle(Mat(processedImg),Point(leftSearchSpace.x,leftSearchSpace.y),
+		//	Point(leftSearchSpace.x + leftSearchSpace.width, leftSearchSpace.y + leftSearchSpace.height),CV_RGB(0, 0, 0), 1, 0, 0 );
+	
+	
+		return cvRect(leftSearchSpaceX, leftSearchSpaceY, leftSearchSpaceWidth, leftSearchSpaceHeight);
 	}
 
 	/* look in top right 5/8's for right eyebrow */
@@ -590,7 +653,7 @@ public:
 	}//end updateMouthTopBottom
 
 
-		bool updateMouthLeftRight(IplImage *img, IplImage *processedImg, CvRect *r)
+	bool updateMouthLeftRight(IplImage *img, IplImage *processedImg, CvRect *r)
 	{
 		CvRect leftSearchSpace;
 		CvRect rightSearchSpace;
@@ -749,7 +812,7 @@ public:
 	}//end updateMouthLeftRight
 
 	
-	bool updateLeftEyebrow(IplImage *img, IplImage *processedImg, CvRect *r, bool detailedOutput)
+	bool updateLeftEyebrow(IplImage *img, IplImage *processedImg, CvRect *r, bool useDefaultSearchSpace, bool detailedOutput)
 	{
 		//store face dimensions in order to resize templates
 		double newFaceWidth = r->width;
@@ -767,7 +830,16 @@ public:
 			leftEyebrowTpl = this->leftEyebrowTpl;
 		}
 		
-		CvRect leftEyebrowSearchSpace = this->getLeftEyebrowSearchSpace(r);
+		CvRect leftEyebrowSearchSpace;
+		if(useDefaultSearchSpace == true)
+		{
+			leftEyebrowSearchSpace = this->getLeftEyebrowSearchSpace(r);
+		}
+		else
+		{
+			leftEyebrowSearchSpace = this->getLeftEyebrowUpdatedSearchSpace(r);
+		}
+		
 		CvRect leftEyebrowLoc;
 		//std::cout << "left eyebrow =============================" << std::endl;
 		bool leftEyebrowFound = getSearchSpace(img,processedImg,r,leftEyebrowTpl,leftEyebrowSearchSpace,leftEyebrowLoc,detailedOutput);
@@ -923,7 +995,7 @@ public:
 
 
 		//update eyebrows
-		this->updateLeftEyebrow(img,processedImg,r,true);
+		this->updateLeftEyebrow(img,processedImg,r,false,true);
 		this->updateRightEyebrow(img,processedImg,r,true);
 		
 		//update eye subfeatures
@@ -960,7 +1032,7 @@ public:
 		/* END MOUTH */
 
 		/* LEFT EYEBROW */
-		if(this->updateLeftEyebrow(img,processedImg,r,true) == false)
+		if(this->updateLeftEyebrow(img,processedImg,r,true,true) == false)
 		{
 			return false;
 		}
