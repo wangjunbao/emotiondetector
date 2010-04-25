@@ -298,7 +298,7 @@ void detectFaces( IplImage *img )
 			}
 			else if( face->isValidFace(img,processedImg,r) )
 			{
-				//std::cout << "new valid face at: (" << face->getTopLeftPoint().x <<"," << face->getTopLeftPoint().y << ")" << std::endl;
+				std::cout << "new valid face at: (" << face->getTopLeftPoint().x <<"," << face->getTopLeftPoint().y << ")" << std::endl;
 
 				//update sub features
 

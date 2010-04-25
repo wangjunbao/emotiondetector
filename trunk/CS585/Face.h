@@ -292,6 +292,50 @@ public:
 	}
 
 
+	/* Update the location of the mouth */
+	bool updateMouth(IplImage *img, IplImage *processedImg, CvRect *r)
+	{
+		//store face dimensions in order to resize templates
+		double newFaceWidth = r->width;
+		double newFaceHeight = r->height;
+
+		/* MOUTH */
+		Mat mouthTpl;
+		if(this->mouthTpl.empty())	//use default template from average face
+		{
+			Mat oldMouthTpl	= imread("templates/mouth.jpg",1);
+			resizeFeatureTemplate(oldMouthTpl,newFaceWidth,newFaceHeight,mouthTpl);
+		}
+		else //use an existing template from this face 
+			//(this only happens in debugging when we run isValidFace even on old faces)
+		{
+			mouthTpl = this->mouthTpl;
+		}
+		
+		//run NCC to get coordinates of the mouth
+		CvRect mouthSearchSpace = this->getMouthSearchSpace(r);
+		CvRect mouthLoc;
+		//std::cout << "mouth=============================" << std::endl;
+		bool mouthFound = getSearchSpace(img,processedImg,r,mouthTpl,mouthSearchSpace,mouthLoc);
+		//std::cout << "==============================mouth" << std::endl;
+		
+		//break out if no mouth found
+		if(mouthFound == false)
+		{
+			return false;
+		}
+		//store mouth coordinates and template image 
+		//(at first this will just be the resized version of the average face template)
+		else
+		{
+			this->mouthTpl = mouthTpl;
+			this->mouthLoc = mouthLoc;	
+		}
+		/* END MOUTH */
+		return true; //update was successful
+	}
+
+
 	/* 
 		Update locations of mouth subfeatures
 		Return true if update successful, false if unsuccessful (ie: features were lost)
@@ -303,6 +347,7 @@ public:
 		CvRect bottomSearchSpace;
 
 		//if mouth subtemplates have not been cropped out yet, crop them out
+		//we could actually put this in isValidFace!!!
 		if(mouthTopTpl.empty() || mouthBottomTpl.empty())
 		{
 			//look at parent feature coords for search space
@@ -427,7 +472,9 @@ public:
 		}//end else
 
 		//Update sub feature locations by running NCC
-			
+		
+		bool mouthUpdated = false; //has the location of the whole mouth been updated?
+
 		/* UPDATE TOP */
 		CvRect topLoc;
 		//first try the updated search space
@@ -438,6 +485,14 @@ public:
 		else
 		{
 			//last ditch: try the default search space (look where the mouth is)
+
+			//update mouth first
+			if(mouthUpdated == false)
+			{
+				this->updateMouth(img,processedImg,r);
+				mouthUpdated = true;
+			}
+
 			std::cout << "last ditch top" << std::endl;
 			topSearchSpace = this->getMouthTopSearchSpace();
 			if(getSearchSpace(img,processedImg,r,mouthTopTpl,topSearchSpace,topLoc,true) == true)
@@ -461,6 +516,14 @@ public:
 		else
 		{
 			//last ditch: try the default search space (look where the mouth is)
+
+			//update mouth first
+			if(mouthUpdated == false)
+			{
+				this->updateMouth(img,processedImg,r);
+				mouthUpdated = true;
+			}
+
 			std::cout << "last ditch bottom" << std::endl;
 			bottomSearchSpace = this->getMouthBottomSearchSpace();
 			if(getSearchSpace(img,processedImg,r,mouthBottomTpl,bottomSearchSpace,bottomLoc,true) == true)
@@ -529,6 +592,7 @@ public:
 
 		////std::cout << "top bot diff: " << abs(topLoc.y - bottomLoc.y) << std::endl;
 
+		return true;
 
 	}//end updateMouthSubFeatureLocs
 
@@ -549,7 +613,19 @@ public:
 	bool updateFeatureLocs(IplImage *img, IplImage *processedImg, CvRect *r)
 	{
 		//call isValidFace without cropping out templates
-		return this->isValidFace(img,processedImg,r,false);
+		//return this->isValidFace(img,processedImg,r,false);
+
+		//update mouth coordinates
+
+		//update face coordinates
+		//are we updating twice?
+		this->updateFaceCoords(r);
+
+		//mouth
+		bool updateMouthSuccess = this->updateMouthSubFeatureLocs(img,processedImg,r);
+		//bool updateMouthSuccess = true;
+		return (updateMouthSuccess);
+
 	}
 
 
@@ -733,11 +809,11 @@ public:
 		}
 
 		//update sub templates			
-		return updateMouthSubFeatureLocs(img, processedImg, r);
+		//return updateMouthSubFeatureLocs(img, processedImg, r);
 		
 		//updateSubFeatureLocs(img, processedImg, r);
 
-		//return true;
+		return true;
 	}
 
 	void eyeSubCode()
