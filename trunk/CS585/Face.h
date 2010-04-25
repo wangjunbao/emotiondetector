@@ -858,7 +858,7 @@ public:
 	}
 
 	
-	bool updateRightEyebrow(IplImage *img, IplImage *processedImg, CvRect *r, bool detailedOutput)
+	bool updateRightEyebrow(IplImage *img, IplImage *processedImg, CvRect *r, bool useDefaultSearchSpace, bool detailedOutput)
 	{
 		//store face dimensions in order to resize templates
 		double newFaceWidth = r->width;
@@ -877,7 +877,19 @@ public:
 			rightEyebrowTpl = this->rightEyebrowTpl;
 		}
 		
-		CvRect rightEyebrowSearchSpace = this->getRightEyebrowSearchSpace(r);
+		CvRect rightEyebrowSearchSpace;
+		if(useDefaultSearchSpace == true)
+		{
+			rightEyebrowSearchSpace = this->getRightEyebrowSearchSpace(r);
+		}
+		else
+		{
+			rightEyebrowSearchSpace = this->getUpdatedSearchSpace(r,
+				this->getRightEyebrowSearchSpace(r),this->rightEyebrowTpl,this->rightEyebrowLoc);
+		}
+
+		
+		
 		CvRect rightEyebrowLoc;
 		//std::cout << "right eyebrow =============================" << std::endl;
 		bool rightEyebrowFound = getSearchSpace(img,processedImg,r,rightEyebrowTpl,rightEyebrowSearchSpace,rightEyebrowLoc,detailedOutput);
@@ -994,7 +1006,7 @@ public:
 
 		//update eyebrows
 		this->updateLeftEyebrow(img,processedImg,r,false,true);
-		this->updateRightEyebrow(img,processedImg,r,true);
+		this->updateRightEyebrow(img,processedImg,r,false,true);
 		
 		//update eye subfeatures
 		this->updateLeftEye(img,processedImg,r,true);
@@ -1037,7 +1049,7 @@ public:
 		/* END LEFT EYEBROW */
 
 		/* RIGHT EYEBROW */
-		if(this->updateRightEyebrow(img,processedImg,r,true) == false)
+		if(this->updateRightEyebrow(img,processedImg,r,true,true) == false)
 		{
 			return false;
 		}
