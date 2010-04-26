@@ -1282,9 +1282,9 @@ public:
 			}
 		}
 
-
 		//surprised
-		if((browHorizNeutral || browFar) && browRaised)
+		if(browRaised)
+		//if((browHorizNeutral || browFar) && browRaised)
 		{
 			std::cout << "surprised" << std::endl;
 			if(mouthOpen)
@@ -1294,35 +1294,12 @@ public:
 		}
 
 
-		//disgusted
-		if(browClose && browRaised && notSmiling)
-		{
-			std::cout << "disgusted" << std::endl;
-			if(mouthOpen)
-			{
-				std::cout << "	mouth open" << std::endl;
-			}
-			if(frowning)
-			{
-				std::cout << "	frowning" << std::endl;
-			}
-		}
-
-		//contempt
-		if( (browHorizNeutral || browFar)
-			&& (browRaiseNeutral || browLowered)
-			&& (mouthOpenNeutral || mouthClosed)
-			&& (smilingNeutral || notSmiling)
-			)
-		{
-			std::cout << "contempt" << std::endl;
-		}
-
 
 		//happy
 		if( (browHorizNeutral || browFar)
 			&& (browRaiseNeutral || browRaised)
-			&& smiling )
+			&& ( smiling || (notFrowning && mouthOpen) )
+			)
 		{
 			std::cout << "happy" << std::endl;
 			if(mouthOpen)
@@ -1347,17 +1324,6 @@ public:
 		{
 			std::cout << "rightWink" << std::endl;
 		}
-
-		//skeptical
-		else if( ((diffLeftEyebrowRaised > browRaisedThres) && !(diffRightEyebrowRaised > browRaisedThres))
-			|| ((diffRightEyebrowRaised > browRaisedThres) && !(diffLeftEyebrowRaised > browRaisedThres))
-			)
-		{
-			std::cout << "skeptical" << std::endl;
-		}
-
-
-
 
 		
 	
