@@ -1099,17 +1099,11 @@ public:
 		//std::cout << "diffLeftEyebrowRaised: " << diffLeftEyebrowRaised << std::endl;
 		//std::cout << "diffRightEyebrowRaised: " << diffRightEyebrowRaised << std::endl;
 		//std::cout << "diffEyebrowRaised: " << diffEyebrowRaised << std::endl;
-
-		std::cout << "nMouthSmile: " << nMouthSmile << std::endl;
-		std::cout << "curMouthSmile: " << curMouthSmile << std::endl;
-		std::cout << "diffMouthSmile: " << diffMouthSmile << std::endl;
-
-		//std::cout << "diffMouthOpen: " << diffMouthOpen << std::endl;
 		//std::cout << "nMouthSmile: " << nMouthSmile << std::endl;
 		//std::cout << "curMouthSmile: " << curMouthSmile << std::endl;
 		//std::cout << "diffMouthSmile: " << diffMouthSmile << std::endl;
+		//std::cout << "diffMouthOpen: " << diffMouthOpen << std::endl;
 		
-		 
 		double emoThres = 0.04;
 		 
 		// eyebrows are close together
@@ -1127,9 +1121,17 @@ public:
 				if(diffMouthSmile > emoThres)
 				{
 					std::cout << "mouth neutral or not smiling" << std::endl;
-						////you are angry
-						//if (diffMouthOpen > emoThres)
-						//		// you are angrier
+					//you are angry
+					if (diffMouthOpen > emoThres)
+					{
+						// you are angrier
+						std::cout << "you are angrier" << std::endl;
+					}//if diffMouthOpen
+					else
+					{
+						//you are angry
+						std::cout << "you are angry" << std::endl;
+					}//else diffMouthOpen
 				}//end if diffMouthSmile
 				// eyebrows are close together
 				// eyebrows are lowered
