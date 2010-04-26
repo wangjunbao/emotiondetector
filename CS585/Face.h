@@ -1238,9 +1238,19 @@ public:
 				//if(diffMouthSmile < -emoThres)
 				{
 					std::cout << "mouth not smiling" << std::endl;
-						////sad / snotty?
-						//if(diffMouth < -emoThres )
-						//		// shocked/suprised
+					//sad / snotty?
+					if(diffMouthOpen < -emoThres )
+					//if(diffMouth < -emoThres )
+					{
+						// shocked/suprised
+						std::cout << "mouth opened" << std::endl;
+						std::cout << "shocked/suprised" << std::endl;
+					}
+					else
+					{
+						std::cout << "mouth not opened" << std::endl;
+						std::cout << "sad / snotty?" << std::endl;
+					}
 				}
 				// eyebrows are neutral/apart
 				// eyebrows are neutral/raised
