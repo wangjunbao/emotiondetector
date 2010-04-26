@@ -1231,24 +1231,28 @@ public:
 			//else if (diffEyebrowRaised >= emoThres && diffEyebrowRaised >= emoThres)
 			{
 				std::cout << "eyebrows are neutral/raised" << std::endl;
-				//// eyebrows are neutral/apart
-				//// eyebrows are neutral/raised
-				//// mouth not smiling
+				// eyebrows are neutral/apart
+				// eyebrows are neutral/raised
+				// mouth not smiling
+				if(diffMouthSmile > emoThres)
 				//if(diffMouthSmile < -emoThres)
-				//{
-				//		//sad / snotty?
-				//		if(diffMouth < -emoThres )
-				//				// shocked/suprised
-				//}
-				//// eyebrows are neutral/apart
-				//// eyebrows are neutral/raised
-				//// mouth smiling
+				{
+					std::cout << "mouth not smiling" << std::endl;
+						////sad / snotty?
+						//if(diffMouth < -emoThres )
+						//		// shocked/suprised
+				}
+				// eyebrows are neutral/apart
+				// eyebrows are neutral/raised
+				// mouth smiling
+				else if(diffMouthSmile < -emoThres)
 				//else if(diffMouthSmile > emoThres)
-				//{
-				//		//smiling
-				//		if (diffMouthOpen > emoThres)
-				//				//big smile
-				//}
+				{
+					std::cout << "mouth smiling" << std::endl;
+						////smiling
+						//if (diffMouthOpen > emoThres)
+						//		//big smile
+				}
 			}//else diffEyebrowRaised
 		}//else diffBrowDistance
 		std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
