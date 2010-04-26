@@ -1112,18 +1112,20 @@ public:
 		//std::cout << "curMouthFrown: " << curMouthFrown << std::endl;
 		//std::cout << "diffMouthFrown: " << diffMouthFrown << std::endl;
 
-		std::cout << "nMouthOpen: " << nMouthOpen << std::endl;
-		std::cout << "curMouthOpen: " << curMouthOpen << std::endl;
-		std::cout << "diffMouthOpen: " << diffMouthOpen << std::endl;
+		//std::cout << "nMouthOpen: " << nMouthOpen << std::endl;
+		//std::cout << "curMouthOpen: " << curMouthOpen << std::endl;
+		//std::cout << "diffMouthOpen: " << diffMouthOpen << std::endl;
 		
 		//double emoThres = 0.02;//0.04;
 
 
 		//horizontal distance btn eyebrows
+		bool browClose = false;
 		double browDistThres = 0.10;
 		if(diffBrowDistance < -browDistThres)
 		{
 			std::cout << "eyebrows are close together horizontally" << std::endl;
+			browClose = true;
 		}
 		else if(diffBrowDistance > browDistThres)
 		{
@@ -1136,6 +1138,7 @@ public:
 		
 
 		//eyebrows raised or lowered
+		bool browRaised = false;
 		double browRaisedThres = 0.10;
 		if(diffEyebrowRaised < -browRaisedThres)
 		{
@@ -1144,6 +1147,7 @@ public:
 		else if(diffEyebrowRaised > browRaisedThres)
 		{
 			std::cout << "eyebrows are raised" << std::endl;
+			browRaised = true;
 		}
 		else
 		{
@@ -1152,10 +1156,12 @@ public:
 
 
 		//smiling or not smiling
+		bool smiling = false;
 		double smileThres = 0.25;
 		if(diffMouthSmile < -smileThres)
 		{
 			std::cout << "mouth smiling" << std::endl;
+			smiling = true;
 		}
 		else if(diffMouthSmile > smileThres)
 		{
@@ -1167,10 +1173,12 @@ public:
 		}
 
 		//frowning or not frowning
+		bool frowning = false;
 		double frownThres = 0.15;
 		if(diffMouthFrown < -frownThres)
 		{
 			std::cout << "mouth frowning" << std::endl;
+			frowning = true;
 		}
 		else if(diffMouthFrown > frownThres)
 		{
@@ -1183,10 +1191,12 @@ public:
 
 
 		//mouth open or closed
+		bool mouthOpen = false;
 		double mouthOpenThres = 0.10;
 		if(diffMouthOpen > mouthOpenThres)
 		{
 			std::cout << "mouth open" << std::endl;
+			mouthOpen = true;
 		}
 		else if(diffMouthOpen < -mouthOpenThres)
 		{
@@ -1197,6 +1207,20 @@ public:
 			std::cout << "mouth openness neutral" << std::endl;
 		}
 
+
+		//anger
+		if(browClose && !browRaised && !smiling)
+		{
+			std::cout << "angry" << std::endl;
+			if(frowning)
+			{
+				std::cout << "	frowning" << std::endl;
+			}
+			if(mouthOpen)
+			{
+				std::cout << "	mouth open" << std::endl;
+			}
+		}
 
 
 
