@@ -1222,6 +1222,26 @@ public:
 			}
 		}
 
+		//sadness
+		else if(browClose && browRaised && !smiling)
+		{
+			std::cout << "sad" << std::endl;
+			if(browRaised)
+			{
+				std::cout << "	brow raised" << std::endl;
+			}			
+			if(frowning)
+			{
+				std::cout << "	frowning" << std::endl;
+			}
+			if(mouthOpen)
+			{
+				std::cout << "	mouth open" << std::endl;
+			}
+		}
+
+
+
 
 
 		
