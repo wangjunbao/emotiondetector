@@ -1095,11 +1095,13 @@ public:
 		//std::cout << "mouthSmile: " << this->mouthTopLoc.y - (this->mouthLeftLoc.y + this->mouthRightLoc.y)/2 << std::endl;
 		
 		std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
-		std::cout << "browDistance: " << this->rightEyebrowLoc.x - this->leftEyebrowLoc.x << std::endl;
-		std::cout << "diffBrowDistance: " << diffBrowDistance << std::endl;
-		//std::cout << "diffLeftEyebrowRaised: " << diffLeftEyebrowRaised << std::endl;
-		//std::cout << "diffRightEyebrowRaised: " << diffRightEyebrowRaised << std::endl;
-		//std::cout << "diffEyebrowRaised: " << diffEyebrowRaised << std::endl;
+		//std::cout << "browDistance: " << this->rightEyebrowLoc.x - this->leftEyebrowLoc.x << std::endl;
+		//std::cout << "diffBrowDistance: " << diffBrowDistance << std::endl;
+		
+		std::cout << "diffLeftEyebrowRaised: " << diffLeftEyebrowRaised << std::endl;
+		std::cout << "diffRightEyebrowRaised: " << diffRightEyebrowRaised << std::endl;
+		std::cout << "diffEyebrowRaised: " << diffEyebrowRaised << std::endl;
+		
 		//std::cout << "nMouthSmile: " << nMouthSmile << std::endl;
 		//std::cout << "curMouthSmile: " << curMouthSmile << std::endl;
 		//std::cout << "diffMouthSmile: " << diffMouthSmile << std::endl;
@@ -1109,7 +1111,7 @@ public:
 		double smileThres = 0.00;
 
 		//horizontal distance btn eyebrows
-		double browDistThres = 0.10;//0.05;
+		double browDistThres = 0.10;
 		if(diffBrowDistance < -browDistThres)
 		{
 			std::cout << "eyebrows are close together horizontally" << std::endl;
@@ -1123,6 +1125,22 @@ public:
 			std::cout << "eyebrows are neutral horizontally" << std::endl;
 		}
 		
+
+		//eyebrows raised or lowered
+		double browRaisedThres = 0.10;
+		if(diffEyebrowRaised < -browRaisedThres)
+		{
+			std::cout << "eyebrows are lowered" << std::endl;
+		}
+		else if(diffEyebrowRaised > browRaisedThres)
+		{
+			std::cout << "eyebrows are raised" << std::endl;
+		}
+		else
+		{
+			std::cout << "eyebrows are neutral" << std::endl;
+		}
+
 		
 	
 		std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
