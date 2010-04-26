@@ -1058,21 +1058,23 @@ public:
 		double curBrowDistance = (this->rightEyebrowLoc.x - this->leftEyebrowLoc.x)/this->currentFaceWidth;
 		double diffBrowDistance = (curBrowDistance - nBrowDistance) / nBrowDistance;
 		
-
-
 		double curLeftEyebrowRaised = (this->leftEyeLoc.y - this->leftEyebrowLoc.y)/this->currentFaceHeight;
 		double curRightEyebrowRaised = (this->rightEyeLoc.y - this->rightEyebrowLoc.y)/this->currentFaceHeight;
-		double curMouthOpen = (double)(this->mouthBottomLoc.y - this->mouthTopLoc.y)/(double)this->currentFaceHeight;
-		double curMouthSmile = ((this->mouthLeftLoc.y + this->mouthRightLoc.y)/2.0)/currentFaceHeight;
-		 
-		
 		double diffLeftEyebrowRaised = (curLeftEyebrowRaised - nLeftEyebrowRaised) / nLeftEyebrowRaised;
 		double diffRightEyebrowRaised = (curRightEyebrowRaised - nRightEyebrowRaised) / nRightEyebrowRaised;
 		double diffEyebrowRaised = (diffLeftEyebrowRaised + diffRightEyebrowRaised) / 2.0;
+
+		double curMouthSmile = ((this->mouthLeftLoc.y + this->mouthRightLoc.y)/2.0)/this->currentFaceHeight;
+		double diffMouthSmile = (curMouthSmile - nMouthSmile) / nMouthSmile;
+
+		double curMouthOpen = (double)(this->mouthBottomLoc.y - this->mouthTopLoc.y)/(double)this->currentFaceHeight;
+		
+		 
+	
 		
 		double diffMouthOpen = (double)(curMouthOpen - nMouthOpen) / (double)(nMouthOpen);
 		
-		double diffMouthSmile = -1.0 * (curMouthSmile - nMouthSmile) / nMouthSmile;
+		
 		 
 
 		//std::cout << "browDistance: " << this->rightEyebrowLoc.x - this->leftEyebrowLoc.x << std::endl;
@@ -1093,9 +1095,15 @@ public:
 		//std::cout << "mouthSmile: " << this->mouthTopLoc.y - (this->mouthLeftLoc.y + this->mouthRightLoc.y)/2 << std::endl;
 		
 		std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
-		std::cout << "diffBrowDistance: " << diffBrowDistance << std::endl;
+		//std::cout << "diffBrowDistance: " << diffBrowDistance << std::endl;
 		//std::cout << "diffLeftEyebrowRaised: " << diffLeftEyebrowRaised << std::endl;
 		//std::cout << "diffRightEyebrowRaised: " << diffRightEyebrowRaised << std::endl;
+		//std::cout << "diffEyebrowRaised: " << diffEyebrowRaised << std::endl;
+
+		std::cout << "nMouthSmile: " << nMouthSmile << std::endl;
+		std::cout << "curMouthSmile: " << curMouthSmile << std::endl;
+		std::cout << "diffMouthSmile: " << diffMouthSmile << std::endl;
+
 		//std::cout << "diffMouthOpen: " << diffMouthOpen << std::endl;
 		//std::cout << "nMouthSmile: " << nMouthSmile << std::endl;
 		//std::cout << "curMouthSmile: " << curMouthSmile << std::endl;
@@ -1113,25 +1121,26 @@ public:
 			if(diffEyebrowRaised < -emoThres && diffEyebrowRaised < -emoThres)
 			{
 				std::cout << "eyebrows are lowered" << std::endl;
-
-					//// eyebrows are close together
-					//// eyebrows are lowered
-					//// mouth neutral or not smiling
-					//if(diffMouthSmile < -emoThres)
-					//{
-					//		//you are angry
-					//		if (diffMouthOpen > emoThres)
-					//				// you are angrier
-					//}
-					//// eyebrows are close together
-					//// eyebrows are lowered
-					//// mouth smiling
-					//else
-					//{
-					//		//you are evil
-					//		if (diffMouthOpen > emoThres)
-					//				// you are more evil lol
-					//}
+				// eyebrows are close together
+				// eyebrows are lowered
+				// mouth neutral or not smiling
+				if(diffMouthSmile > emoThres)
+				{
+					std::cout << "mouth neutral or not smiling" << std::endl;
+						////you are angry
+						//if (diffMouthOpen > emoThres)
+						//		// you are angrier
+				}//end if diffMouthSmile
+				// eyebrows are close together
+				// eyebrows are lowered
+				// mouth smiling
+				else
+				{
+					std::cout << "mouth smiling" << std::endl;
+						////you are evil
+						//if (diffMouthOpen > emoThres)
+						//		// you are more evil lol
+				}//end else diffMouthSmile
 			}//end if diffEyebrowRaised
 			// eyebrows are close together
 			// eyebrows are neutral/raised
@@ -1352,7 +1361,7 @@ public:
 
 		std::cout << "****************" << std::endl;
 		
-		nMouthSmile = ((this->mouthLeftLoc.y + this->mouthRightLoc.y)/2.0) /currentFaceHeight;
+		nMouthSmile = ( (this->mouthLeftLoc.y + this->mouthRightLoc.y)/2.0 ) / (double)this->currentFaceHeight;
 
 
 		return true;
