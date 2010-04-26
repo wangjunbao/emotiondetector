@@ -1095,13 +1095,13 @@ public:
 		//std::cout << "mouthSmile: " << this->mouthTopLoc.y - (this->mouthLeftLoc.y + this->mouthRightLoc.y)/2 << std::endl;
 		
 		std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
-		//std::cout << "diffBrowDistance: " << diffBrowDistance << std::endl;
+		std::cout << "diffBrowDistance: " << diffBrowDistance << std::endl;
 		//std::cout << "diffLeftEyebrowRaised: " << diffLeftEyebrowRaised << std::endl;
 		//std::cout << "diffRightEyebrowRaised: " << diffRightEyebrowRaised << std::endl;
-		//std::cout << "diffEyebrowRaised: " << diffEyebrowRaised << std::endl;
-		std::cout << "nMouthSmile: " << nMouthSmile << std::endl;
-		std::cout << "curMouthSmile: " << curMouthSmile << std::endl;
-		std::cout << "diffMouthSmile: " << diffMouthSmile << std::endl;
+		std::cout << "diffEyebrowRaised: " << diffEyebrowRaised << std::endl;
+		//std::cout << "nMouthSmile: " << nMouthSmile << std::endl;
+		//std::cout << "curMouthSmile: " << curMouthSmile << std::endl;
+		//std::cout << "diffMouthSmile: " << diffMouthSmile << std::endl;
 		//std::cout << "diffMouthOpen: " << diffMouthOpen << std::endl;
 		
 		double emoThres = 0.04;
@@ -1113,7 +1113,8 @@ public:
 			std::cout << "eyebrows are close together" << std::endl;
 			// eyebrows are close together
 			// eyebrows are lowered
-			if(diffEyebrowRaised < -emoThres && diffEyebrowRaised < -emoThres)
+			if(diffEyebrowRaised < -emoThres)
+			//if(diffEyebrowRaised < -emoThres && diffEyebrowRaised < -emoThres)
 			{
 				std::cout << "eyebrows are lowered" << std::endl;
 				// eyebrows are close together
@@ -1154,7 +1155,8 @@ public:
 			}//end if diffEyebrowRaised
 			// eyebrows are close together
 			// eyebrows are neutral/raised
-			else if (diffEyebrowRaised >= emoThres && diffEyebrowRaised >= emoThres)
+			else if (diffEyebrowRaised >= emoThres)
+			//else if (diffEyebrowRaised >= emoThres && diffEyebrowRaised >= emoThres)
 			{
 				std::cout << "eyebrows are neutral/raised" << std::endl;
 				// eyebrows are close together
@@ -1191,60 +1193,66 @@ public:
 		else
 		{
 			std::cout << "eyebrows are neutral/apart" << std::endl;
+			// eyebrows are neutral/apart
+			// eyebrows are lowered
+			if(diffEyebrowRaised < -emoThres)
+			//if(diffEyebrowRaised < -emoThres && diffEyebrowRaised < -emoThres)
+			{
+				//HARD TO REACH THIS
+				//IS THIS PHYSICALLY POSSIBLE?
+				std::cout << "eyebrows are lowered" << std::endl;
 				//// eyebrows are neutral/apart
 				//// eyebrows are lowered
-				//if(diffEyebrowRaised < -emoThres && diffEyebrowRaised < -emoThres)
+				//// mouth not smiling
+				//if(diffMouthSmile < -emoThres)
 				//{
-				//		// eyebrows are neutral/apart
-				//		// eyebrows are lowered
-				//		// mouth not smiling
-				//		if(diffMouthSmile < -emoThres)
-				//		{
-				//				//contempt
-				//		}
-				//		// eyebrows are neutral/apart
-				//		// eyebrows are lowered
-				//		// mouth neutral
-				//		else if(diffMouthSmile >= -emoThres && diffMouthSmile <= emoThres)
-				//		{
-				//				//bored
-				//		}
-				//		// eyebrows are neutral/apart
-				//		// eyebrows are lowered
-				//		// mouth is smiling
-				//		else if(diffMouthSmile > emoThres)
-				//		{
-				//				//stoned lol
-				//				if (diffMouth > emoThres)
-				//						//more stoned
-				//		}
+				//		//contempt
+				//}
+				//// eyebrows are neutral/apart
+				//// eyebrows are lowered
+				//// mouth neutral
+				//else if(diffMouthSmile >= -emoThres && diffMouthSmile <= emoThres)
+				//{
+				//		//bored
+				//}
+				//// eyebrows are neutral/apart
+				//// eyebrows are lowered
+				//// mouth is smiling
+				//else if(diffMouthSmile > emoThres)
+				//{
+				//		//stoned lol
+				//		if (diffMouth > emoThres)
+				//				//more stoned
+				//}
+			}//if diffEyebrowRaised
+			// eyebrows are neutral/apart
+			// eyebrows are neutral/raised
+			else if (diffEyebrowRaised >= emoThres)
+			//else if (diffEyebrowRaised >= emoThres && diffEyebrowRaised >= emoThres)
+			{
+				std::cout << "eyebrows are neutral/raised" << std::endl;
+				//// eyebrows are neutral/apart
+				//// eyebrows are neutral/raised
+				//// mouth not smiling
+				//if(diffMouthSmile < -emoThres)
+				//{
+				//		//sad / snotty?
+				//		if(diffMouth < -emoThres )
+				//				// shocked/suprised
 				//}
 				//// eyebrows are neutral/apart
 				//// eyebrows are neutral/raised
-				//else if (diffEyebrowRaised >= emoThres && diffEyebrowRaised >= emoThres)
+				//// mouth smiling
+				//else if(diffMouthSmile > emoThres)
 				//{
-				//		// eyebrows are neutral/apart
-				//		// eyebrows are neutral/raised
-				//		// mouth not smiling
-				//		if(diffMouthSmile < -emoThres)
-				//		{
-				//				//sad / snotty?
-				//				if(diffMouth < -emoThres )
-				//						// shocked/suprised
-				//		}
-				//		// eyebrows are neutral/apart
-				//		// eyebrows are neutral/raised
-				//		// mouth smiling
-				//		else if(diffMouthSmile > emoThres)
-				//		{
-				//				//smiling
-				//				if (diffMouthOpen > emoThres)
-				//						//big smile
-				//		}
+				//		//smiling
+				//		if (diffMouthOpen > emoThres)
+				//				//big smile
 				//}
-		}//end else diffBrowDistance
+			}//else diffEyebrowRaised
+		}//else diffBrowDistance
 		std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
-	}//end detectEmotion()
+	}//detectEmotion()
 
 	/* Return true if a face found by Haar is valid (has mouth,eyebrows,eyes) */
 	bool isValidFace(IplImage *img, IplImage *processedImg, CvRect *r, bool doCrop = true, bool detailedOutput=false)
