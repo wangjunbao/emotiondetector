@@ -1156,23 +1156,25 @@ public:
 			else if (diffEyebrowRaised >= emoThres && diffEyebrowRaised >= emoThres)
 			{
 				std::cout << "eyebrows are neutral/raised" << std::endl;
-					//// eyebrows are close together
-					//// eyebrows are neutral/raised
-					//// mouth not smiling
-					//if(diffMouthSmile < -emoThres)
-					//{
-					//		if(diffMouthOpen < -emoThres)
-					//				//sad
-					//		else
-					//				//disgust
-					//}
-					//// eyebrows are close together
-					//// eyebrows are neutral/raised
-					//// mouth neutral/smiling
-					//else
-					//{
-					//		//rasputin?
-					//}
+				// eyebrows are close together
+				// eyebrows are neutral/raised
+				// mouth neutral or not smiling
+				if(diffMouthSmile > emoThres)
+				{
+					std::cout << "mouth neutral or not smiling" << std::endl;
+						//if(diffMouthOpen < -emoThres)
+						//		//sad
+						//else
+						//		//disgust
+				}
+				// eyebrows are close together
+				// eyebrows are neutral/raised
+				// mouth neutral/smiling
+				else
+				{
+					std::cout << "mouth smiling" << std::endl;
+					std::cout << "rasputin?" << std::endl;
+				}
 			}//end else if diffEyebrowRaised
 		}//end if diffBrowDistance
 		// eyebrows are neutral/apart
