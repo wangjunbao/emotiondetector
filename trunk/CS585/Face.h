@@ -1139,9 +1139,16 @@ public:
 				else
 				{
 					std::cout << "mouth smiling" << std::endl;
-						////you are evil
-						//if (diffMouthOpen > emoThres)
-						//		// you are more evil lol
+					//you are evil
+					if (diffMouthOpen > emoThres)
+					{
+						std::cout << "you are evil" << std::endl;
+					}//if diffMouthOpen
+					// you are more evil lol
+					else
+					{
+						std::cout << "you are more evil lol" << std::endl;
+					}//else diffMouthOpen
 				}//end else diffMouthSmile
 			}//end if diffEyebrowRaised
 			// eyebrows are close together
