@@ -1070,15 +1070,10 @@ public:
 		double curMouthSmile = (this->mouthTopLoc.y - ((this->mouthLeftLoc.y + this->mouthRightLoc.y)/2.0))/this->currentFaceHeight;
 		double diffMouthSmile = (curMouthSmile - nMouthSmile) / nMouthSmile;
 
-
 		double curMouthFrown = ((this->mouthLeftLoc.y + this->mouthRightLoc.y)/2.0 - this->mouthBottomLoc.y )/this->currentFaceHeight;
 		double diffMouthFrown = (curMouthFrown - nMouthFrown) / nMouthFrown;
 
 		double curMouthOpen = (double)(this->mouthBottomLoc.y - this->mouthTopLoc.y)/(double)this->currentFaceHeight;
-		
-		 
-	
-		
 		double diffMouthOpen = (double)(curMouthOpen - nMouthOpen) / (double)(nMouthOpen);
 		
 		
@@ -1090,13 +1085,13 @@ public:
 		//std::cout << "mouthOpen: " << this->mouthBottomLoc.y - this->mouthTopLoc.y << std::endl;
 		
 		
-		//std::cout << "curMouthOpen: " << curMouthOpen << std::endl;
+		
 		//
 		//std::cout << "mouthBot: " << this->mouthBottomLoc.y << std::endl;
 		//std::cout << "mouthTop: " << this->mouthTopLoc.y << std::endl;
 
 
-		//std::cout << "nMouthOpen: " << nMouthOpen << std::endl;
+		
 		
 
 		std::cout << "mouthSmile: " << this->mouthTopLoc.y - (this->mouthLeftLoc.y + this->mouthRightLoc.y)/2 << std::endl;
@@ -1109,17 +1104,19 @@ public:
 		//std::cout << "diffRightEyebrowRaised: " << diffRightEyebrowRaised << std::endl;
 		//std::cout << "diffEyebrowRaised: " << diffEyebrowRaised << std::endl;
 		
-		std::cout << "nMouthSmile: " << nMouthSmile << std::endl;
-		std::cout << "curMouthSmile: " << curMouthSmile << std::endl;
-		std::cout << "diffMouthSmile: " << diffMouthSmile << std::endl;
+		//std::cout << "nMouthSmile: " << nMouthSmile << std::endl;
+		//std::cout << "curMouthSmile: " << curMouthSmile << std::endl;
+		//std::cout << "diffMouthSmile: " << diffMouthSmile << std::endl;
 
-		std::cout << "nMouthFrown: " << nMouthFrown << std::endl;
-		std::cout << "curMouthFrown: " << curMouthFrown << std::endl;
-		std::cout << "diffMouthFrown: " << diffMouthFrown << std::endl;
+		//std::cout << "nMouthFrown: " << nMouthFrown << std::endl;
+		//std::cout << "curMouthFrown: " << curMouthFrown << std::endl;
+		//std::cout << "diffMouthFrown: " << diffMouthFrown << std::endl;
 
-		//std::cout << "diffMouthOpen: " << diffMouthOpen << std::endl;
+		std::cout << "nMouthOpen: " << nMouthOpen << std::endl;
+		std::cout << "curMouthOpen: " << curMouthOpen << std::endl;
+		std::cout << "diffMouthOpen: " << diffMouthOpen << std::endl;
 		
-		double emoThres = 0.02;//0.04;
+		//double emoThres = 0.02;//0.04;
 
 
 		//horizontal distance btn eyebrows
@@ -1150,7 +1147,7 @@ public:
 		}
 		else
 		{
-			std::cout << "eyebrows are neutral" << std::endl;
+			std::cout << "eyebrows are neutral raised" << std::endl;
 		}
 
 
@@ -1166,7 +1163,7 @@ public:
 		}
 		else
 		{
-			std::cout << "mouth neutral" << std::endl;
+			std::cout << "mouth smile neutral" << std::endl;
 		}
 
 		//frowning or not frowning
@@ -1181,7 +1178,23 @@ public:
 		}
 		else
 		{
-			std::cout << "mouth neutral" << std::endl;
+			std::cout << "mouth frown neutral" << std::endl;
+		}
+
+
+		//mouth open or closed
+		double mouthOpenThres = 0.10;
+		if(diffMouthOpen > mouthOpenThres)
+		{
+			std::cout << "mouth open" << std::endl;
+		}
+		else if(diffMouthOpen < -mouthOpenThres)
+		{
+			std::cout << "mouth closed" << std::endl;
+		}
+		else
+		{
+			std::cout << "mouth openness neutral" << std::endl;
 		}
 
 
