@@ -1243,12 +1243,12 @@ public:
 					//if(diffMouth < -emoThres )
 					{
 						// shocked/suprised
-						std::cout << "mouth opened" << std::endl;
+						std::cout << "mouth opened?" << std::endl;
 						std::cout << "shocked/suprised" << std::endl;
 					}
 					else
 					{
-						std::cout << "mouth not opened" << std::endl;
+						std::cout << "mouth not opened?" << std::endl;
 						std::cout << "sad / snotty?" << std::endl;
 					}
 				}
@@ -1259,9 +1259,17 @@ public:
 				//else if(diffMouthSmile > emoThres)
 				{
 					std::cout << "mouth smiling" << std::endl;
-						////smiling
-						//if (diffMouthOpen > emoThres)
-						//		//big smile
+					//smiling
+					if (diffMouthOpen > emoThres)
+					{
+						//big smile
+						std::cout << "mouth opened" << std::endl;
+						std::cout << "big smile" << std::endl;
+					}
+				}
+				else
+				{
+					std::cout << "What is this?" << std::endl;
 				}
 			}//else diffEyebrowRaised
 		}//else diffBrowDistance
