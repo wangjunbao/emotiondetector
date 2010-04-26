@@ -1227,43 +1227,49 @@ public:
 			mouthOpenNeutral = true;
 		}
 
+		double degree;
 
-		//leftWink
-		if( (diffLeftEyebrowRaised < -browRaisedThres)
-			&& !(diffRightEyebrowRaised < -browRaisedThres)
-			)
-		{
-			std::cout << "leftWink" << std::endl;
-		}
 
-		//rightWink
-		else if( (diffRightEyebrowRaised < -browRaisedThres)
-			&& !(diffLeftEyebrowRaised < -browRaisedThres)
-			)
-		{
-			std::cout << "rightWink" << std::endl;
-		}
-		
+		////leftWink
+		//if( (diffLeftEyebrowRaised < -browRaisedThres)
+		//	&& !(diffRightEyebrowRaised < -browRaisedThres)
+		//	)
+		//{
+		//	std::cout << "leftWink" << std::endl;
+		//}
+
+		////rightWink
+		//else if( (diffRightEyebrowRaised < -browRaisedThres)
+		//	&& !(diffLeftEyebrowRaised < -browRaisedThres)
+		//	)
+		//{
+		//	std::cout << "rightWink" << std::endl;
+		//}
+		//
 		//neutral
-		else if(browHorizNeutral && browRaiseNeutral 
+		if(browHorizNeutral && browRaiseNeutral 
 			&& smilingNeutral && frowningNeutral && mouthOpenNeutral)
 		{
-			std::cout << "true neutral" << std::endl;
+			degree = abs(diffBrowDistance) + abs(diffEyebrowRaised) + abs(diffMouthSmile) + abs(diffMouthFrown) + abs(diffMouthOpen);
+			std::cout << "true neutral: " << degree << std::endl;
 		}
 
 		//angry
 		else if(browClose && browLowered && (notSmiling || smilingNeutral))
 		{
-			std::cout << "angry" << std::endl;
+			degree = abs(diffBrowDistance) + abs(diffEyebrowRaised) + abs(diffMouthSmile);
+			std::cout << "angry: ";
 			if(mouthOpen)
 			{
-				std::cout << "	mouth open" << std::endl;
+				degree += abs(diffMouthOpen);
+				std::cout << "	mouth open: " << std::endl;
 			}
 			if(frowning)
 			{
-				std::cout << "	frowning" << std::endl;
+				degree += abs(diffMouthFrown);
+				std::cout << "	frowning: " << std::endl;
 			}
-
+			std::cout << degree << std::endl;
 		}
 
 		//sad
@@ -1274,28 +1280,33 @@ public:
 			&& (mouthOpenNeutral || mouthClosed) 
 			)
 		{
-			std::cout << "sad" << std::endl;
-			if(mouthOpen)
-			{
-				std::cout << "	mouth open" << std::endl;
-			}
-			if(frowning)
-			{
-				std::cout << "	frowning" << std::endl;
-			}
+			degree = notSmiling * abs(diffMouthSmile) + frowning * abs(diffMouthFrown) + browClose * abs(diffBrowDistance) + abs(diffMouthOpen);
+			std::cout << "sad: " << degree << std::endl;
 		}
 
 		//afraid
-		else if( ((notSmiling || frowning) || browClose)
+		//else if( ((notSmiling || frowning) || browClose)
+		else if( ((notSmiling || frowning) && browClose)	
 			&& mouthOpen 
 			)
 		//if( browClose && mouthOpen ) //&&(browRaiseNeutral || browRaised) 
 		{
-			std::cout << "afraid" << std::endl;
+			degree = notSmiling * abs(diffMouthSmile) + frowning * abs(diffMouthFrown) + abs(diffBrowDistance) + abs(diffMouthOpen);
+			std::cout << "afraid: " << degree << std::endl;
+		}
+
+		//surprised
+		else if(browRaised && (browHorizNeutral || browFar) && (notSmiling || smilingNeutral) )
+		//if((browHorizNeutral || browFar) && browRaised)
+		{
+			degree = abs(diffEyebrowRaised) + abs(diffBrowDistance) + abs(diffMouthSmile);
+			std::cout << "surprised";
 			if(mouthOpen)
-			{
-				std::cout << "	mouth open" << std::endl;
+			{	
+				degree += abs(diffMouthOpen);
+				std::cout << " mouth open";
 			}
+			std::cout << ": " << degree << std::endl;
 		}
 
 		//happy
@@ -1304,23 +1315,17 @@ public:
 			&& ( smiling || (notFrowning && mouthOpen) )
 			)
 		{
-			std::cout << "happy" << std::endl;
+			degree = abs(diffBrowDistance) + abs(diffEyebrowRaised) + smiling * abs(diffMouthSmile);
+			std::cout << "happy";
 			if(mouthOpen)
 			{
-				std::cout << "	mouth open" << std::endl;
+				degree += abs(diffMouthFrown) + abs(diffMouthOpen);
+				std::cout << " mouth open";
 			}
+			std::cout << ": " << degree << std::endl;
 		}
 
-		//surprised
-		else if(browRaised)
-		//if((browHorizNeutral || browFar) && browRaised)
-		{
-			std::cout << "surprised" << std::endl;
-			if(mouthOpen)
-			{
-				std::cout << "	mouth open" << std::endl;
-			}
-		}
+		
 
 		else
 		{
@@ -1331,6 +1336,9 @@ public:
 	
 		std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
 	}//detectEmotion()
+
+
+	
 
 	/* Return true if a face found by Haar is valid (has mouth,eyebrows,eyes) */
 	bool isValidFace(IplImage *img, IplImage *processedImg, CvRect *r, bool doCrop = true, bool detailedOutput=false)
