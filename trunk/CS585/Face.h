@@ -1054,6 +1054,19 @@ public:
 	}
 
 
+	void colorImage(Mat& dst, int r, int g, int b)
+	{
+		for(int x=0; x<dst.cols; x++)
+		{
+			for(int y=0; y<dst.rows; y++)
+			{
+				dst.data[y*dst.step+dst.channels()*x+2] /= r;
+				dst.data[y*dst.step+dst.channels()*x+1] /= g;
+				dst.data[y*dst.step+dst.channels()*x+0] /= b;	
+			}
+		}
+	}
+
 	void detectEmotion()
 	{
 		double curBrowDistance = (this->rightEyebrowLoc.x - this->leftEyebrowLoc.x)/this->currentFaceWidth;
@@ -1117,6 +1130,10 @@ public:
 		//std::cout << "diffMouthOpen: " << diffMouthOpen << std::endl;
 		
 		//double emoThres = 0.02;//0.04;
+
+
+		Mat output = imread("pagoda.jpg",1);
+		
 
 
 		//horizontal distance btn eyebrows
@@ -1252,6 +1269,9 @@ public:
 		{
 			degree = abs(diffBrowDistance) + abs(diffEyebrowRaised) + abs(diffMouthSmile) + abs(diffMouthFrown) + abs(diffMouthOpen);
 			std::cout << "true neutral: " << degree << std::endl;
+				
+			//leave image color alone
+			this->colorImage(output,1,1,1);
 		}
 
 		//angry
@@ -1270,6 +1290,9 @@ public:
 				std::cout << "	frowning: " << std::endl;
 			}
 			std::cout << degree << std::endl;
+
+			//more red
+			this->colorImage(output,1,5,5);
 		}
 
 		//sad
@@ -1282,6 +1305,9 @@ public:
 		{
 			degree = notSmiling * abs(diffMouthSmile) + frowning * abs(diffMouthFrown) + browClose * abs(diffBrowDistance) + abs(diffMouthOpen);
 			std::cout << "sad: " << degree << std::endl;
+			
+			//more blue
+			this->colorImage(output,5,5,1);
 		}
 
 		//afraid
@@ -1293,6 +1319,9 @@ public:
 		{
 			degree = notSmiling * abs(diffMouthSmile) + frowning * abs(diffMouthFrown) + abs(diffBrowDistance) + abs(diffMouthOpen);
 			std::cout << "afraid: " << degree << std::endl;
+
+			//more purple
+			this->colorImage(output,1,5,1);
 		}
 
 		//surprised
@@ -1307,6 +1336,9 @@ public:
 				std::cout << " mouth open";
 			}
 			std::cout << ": " << degree << std::endl;
+
+			//more green
+			this->colorImage(output,5,1,5);
 		}
 
 		//happy
@@ -1323,9 +1355,10 @@ public:
 				std::cout << " mouth open";
 			}
 			std::cout << ": " << degree << std::endl;
-		}
 
-		
+			//more yellow
+			this->colorImage(output,1,1,5);
+		}
 
 		else
 		{
@@ -1335,6 +1368,9 @@ public:
 		
 	
 		std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+
+		namedWindow( "output", 1 );
+		imshow("output",output);
 	}//detectEmotion()
 
 
