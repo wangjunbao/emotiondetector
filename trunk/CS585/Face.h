@@ -1310,7 +1310,7 @@ public:
 			std::cout << "sad: " << degree << std::endl;
 			
 			//more blue
-			if(degree > 0.2)
+			if(degree > 0.3)
 			{
 				this->colorImage(output,5,5,1);
 			}
