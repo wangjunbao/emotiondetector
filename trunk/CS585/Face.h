@@ -161,7 +161,7 @@ public:
 		CvRect *r, Mat& tpl, CvRect& inputSearchSpace, CvRect& outputSearchSpace, bool detailedOutput=false)
 	{
 		bool result = false;
-		double THRESH = 0.50;
+		double THRESH = 0.40;//0.50;
 
 		//Ref: http://nashruddin.com/OpenCV_Region_of_Interest_(ROI)
 		
@@ -1354,9 +1354,16 @@ public:
 		}
 
 		//happy
-		else if( (browHorizNeutral || browFar)
+		//else if( (browHorizNeutral || browFar)
+		//	&& (browRaiseNeutral || browRaised)
+		//	&& ( smiling || (notFrowning && mouthOpen) )
+		//	)
+		else if(smiling
+			||
+			(
+			(browHorizNeutral || browFar)
 			&& (browRaiseNeutral || browRaised)
-			&& ( smiling || (notFrowning && mouthOpen) )
+			&& ( (notFrowning && mouthOpen) ))
 			)
 		{
 			degree = abs(diffBrowDistance) + abs(diffEyebrowRaised) + smiling * abs(diffMouthSmile);
