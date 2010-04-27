@@ -1302,7 +1302,7 @@ public:
 		//if( (browHorizNeutral || browFar) 
 		//	&& (browRaiseNeutral || browRaised)
 		//	&& notSmiling)
-		else if( ((notSmiling || frowning) || (browClose || browHorizNeutral))
+		else if( ((notSmiling || frowning) && (browClose || browHorizNeutral))
 			&& (mouthOpenNeutral || mouthClosed) 
 			)
 		{
