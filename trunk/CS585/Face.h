@@ -1292,7 +1292,10 @@ public:
 			std::cout << degree << std::endl;
 
 			//more red
-			this->colorImage(output,1,5,5);
+			if(degree > 0.4)
+			{
+				this->colorImage(output,1,5,5);
+			}
 		}
 
 		//sad
@@ -1307,7 +1310,10 @@ public:
 			std::cout << "sad: " << degree << std::endl;
 			
 			//more blue
-			this->colorImage(output,5,5,1);
+			if(degree > 0.2)
+			{
+				this->colorImage(output,5,5,1);
+			}
 		}
 
 		//afraid
@@ -1321,7 +1327,10 @@ public:
 			std::cout << "afraid: " << degree << std::endl;
 
 			//more purple
-			this->colorImage(output,1,5,1);
+			if(degree > 1.5)
+			{
+				this->colorImage(output,1,5,1);
+			}
 		}
 
 		//surprised
@@ -1338,7 +1347,10 @@ public:
 			std::cout << ": " << degree << std::endl;
 
 			//more green
-			this->colorImage(output,5,1,5);
+			if(degree > 0.4)
+			{
+				this->colorImage(output,5,1,5);
+			}
 		}
 
 		//happy
@@ -1357,7 +1369,10 @@ public:
 			std::cout << ": " << degree << std::endl;
 
 			//more yellow
-			this->colorImage(output,1,1,5);
+			if(degree > 0.35)
+			{
+				this->colorImage(output,1,1,5);
+			}
 		}
 
 		else
