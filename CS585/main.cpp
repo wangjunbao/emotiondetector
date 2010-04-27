@@ -1,5 +1,5 @@
 /**
- * Display video from webcam and detect faces
+ * Detect faces and run emotion detection on them
  */
 #include <stdio.h>
 #include <cv.h>
@@ -35,9 +35,9 @@ int main( int argc, char** argv )
 		  //char      *imgfilename = "grouppic2.jpg";
 		  //char      *imgfilename = "ChrisFace.jpg"; //this does not work well now but face may be too big
 		 // char      *imgfilename = "ChrisFace50.jpg";
-		  //char      *imgfilename = "averageFace.jpg";
+		  char      *imgfilename = "averageFace.jpg";
 		  //char      *imgfilename = "templates/face.jpg";
-		  char      *imgfilename = "templates - Howell/face.jpg";
+		  //char      *imgfilename = "templates - Howell/face.jpg";
 
 		  cascade = ( CvHaarClassifierCascade* )cvLoad( filename, 0, 0, 0 );
 		  storage = cvCreateMemStorage( 0 );
@@ -71,12 +71,10 @@ int main( int argc, char** argv )
 		int       key = ' ';
 		char      *filename = "haarcascade_frontalface_default.xml";
 
-		///* load the classifier
-		//   note that I put the file in the same directory with
-		//   this code */
+		//classifier is in the same directory as code
 		cascade = ( CvHaarClassifierCascade* )cvLoad( filename, 0, 0, 0 );
 	 
-		///* setup memory buffer; needed by the face detector */
+		//setup memory buffer for face detector */
 		storage = cvCreateMemStorage( 0 );
 	 
 		/* create a window */
