@@ -1302,11 +1302,11 @@ public:
 		//if( (browHorizNeutral || browFar) 
 		//	&& (browRaiseNeutral || browRaised)
 		//	&& notSmiling)
-		else if( ((notSmiling || frowning) || browClose)
+		else if( ((notSmiling || frowning) || (browClose || browHorizNeutral))
 			&& (mouthOpenNeutral || mouthClosed) 
 			)
 		{
-			degree = notSmiling * abs(diffMouthSmile) + frowning * abs(diffMouthFrown) + browClose * abs(diffBrowDistance) + abs(diffMouthOpen);
+			degree = notSmiling * abs(diffMouthSmile) + frowning * abs(diffMouthFrown) + abs(diffBrowDistance) + abs(diffMouthOpen);
 			std::cout << "sad: " << degree << std::endl;
 			
 			//more blue
@@ -1327,7 +1327,7 @@ public:
 			std::cout << "afraid: " << degree << std::endl;
 
 			//more purple
-			if(degree > 1.5)
+			if(degree > 1.0)
 			{
 				this->colorImage(output,1,5,1);
 			}
@@ -1378,6 +1378,9 @@ public:
 		else
 		{
 			std::cout << "unrecognized emotion - wait for version 2.0" << std::endl;
+			
+			//orange just so we know
+			this->colorImage(output,1,2,5);
 		}
 
 		
