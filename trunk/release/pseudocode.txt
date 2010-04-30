@@ -1,0 +1,210 @@
+#summary Pseudo-code for algorithms
+
+
+boolean matchesOldFace(Point curTopLeft, Face &oldFace)
+{
+    NOT_FOUND_VAL = 999
+    SUM_THRESH = 0.2;
+    
+    double minSumDiff = NOT_FOUND_VAL
+
+    for (each face in oldFaces)
+    {
+        //L-distance btn top left coords of face and old face
+        double currentXDiff = abs(curTopPoint.x - oldTopPoint.x)
+        double currentYDiff = abs(curTopPoint.y - oldTopPoint.y)
+        double currentSumDiff = currentXDiff + currentYDiff
+        
+        if( currentSumDiff < SUM_THRESH 
+            && currentSumDiff < minSumDiff)
+        {
+            minSumDiff = currentSumDiff
+            oldFace = face
+        }
+    }
+    
+    if(minSumDiff == NOT_FOUND_VAL)
+    {
+        return false
+    }
+    else
+    {
+        return true
+    }
+
+}
+
+
+=Main Algorithm=
+
+{{{
+/*Main Algorithm*/
+for (each frame in video)
+{
+    initialize output
+    run Viola-Jones -> faceSequence
+    allocate memory for newFaces
+    
+    for (each faceRect in faceSequence)
+    {
+        Face *face = null;
+        boolean isFaceOld = matchesOldFace(Point(faceRect.x,faceRect.y), *face);
+        
+        if (isFaceOld == false)
+        {
+            face = new Face()
+            
+            if(isValidFace(newFaceCoords,leftEyeTemplate))
+            {
+                face.updateSubFeatureLocations(newFaceCoords,
+                    doResize=true,doCrop=true,frame#)
+                
+                do Emotion Detection -> store it
+                
+                add value to output
+                add face to newFaces
+            }
+            else
+            {
+                delete face
+            }
+        }
+        else if (isFaceOld == true)
+        {
+                //face = oldFace with best match
+                face.updateSubFeatureLocations(newFaceCoords,
+                    doResize=true,doCrop=false,frame#)
+                
+                do Emotion Detection -> store it
+                
+                add value to output
+                add oldFace to newFaces
+                delete oldFace from oldFaces
+        }
+    }
+    oldFaces <- newFaces
+    free memory for newFaces
+    return output
+}
+
+}}}
+
+
+=Face class=
+{{{
+
+/*Face class*/
+//templates:
+
+/* Left eye */
+//locations
+Point leftEyePt
+Point leftEyeLeftPt
+Point leftEyeRightPt
+Point leftEyeTopPt
+Point leftEyeBottomPt
+
+//templates
+Mat leftEyeLeftTpl
+Mat leftEyeRightTpl
+Mat leftEyeTopTpl
+Mat leftEyeBottomTpl
+
+
+/* Left eye */
+//locations
+Point leftEyePt
+Point leftEyeLeftPt
+Point leftEyeRightPt
+Point leftEyeTopPt
+Point leftEyeBottomPt
+
+//templates
+Mat leftEyeLeftTpl
+Mat leftEyeRightTpl
+Mat leftEyeTopTpl
+Mat leftEyeBottomTpl
+
+
+
+//getters and setters for templates
+
+//getter and setter for coordinates
+
+
+Face(cropped out face image and coordinates, frame #)
+
+void runNCC(feature, searchSpaceCoordinates, maxval, maxloc)
+{
+    run NCC on feature in searchSpace
+    update maxval and maxloc
+}
+
+void updateSubFeatureLocations(newFaceCoords, boolean doResize, boolean doCrop, int frame #)
+{
+    store face coords
+    
+    //typically doResize and doCrop are true at same time
+    
+    //for now always resize
+    if(doResize == true or frame # is mod something)
+    {
+        resize templates based on new face coords
+    }
+    
+    for (all sub features)
+    {
+    
+        if(subfeature has no previous coordinates, i.e. == -1)
+        {
+            look at parent feature coords for search space
+        }
+        else
+        {
+            search space = previous loc + buffer + midpt to opposite feature
+        }
+    
+        runNCC(search space)
+        store new maxloc
+    }
+    
+    if(doCrop == true or frame # is mod something)
+    {
+        crop out new template images based on stored locations
+    }
+
+}
+
+//when creating a face
+boolean isValidFace(newFaceCoords, leftEyeTemplate)
+{
+    resize left eye template
+    
+    maxval, maxloc
+    leftEyeSearchLocation = upper left box
+    runNCC(leftEye, leftEyeSearchLocation, &maxval, &maxloc)
+    
+    if maxval < thresh
+    {
+        return false
+    }
+    else
+    {
+        resize each parent feature (except left eye)
+        
+        //each parent feature has specific search space (area of face)
+        run NCC on parent feature (except left eye) to get search space for sub features
+        
+        return true
+    }
+}
+
+
+void cleanup()
+{
+    delete all allocated memory
+}
+
+
+
+}}}
