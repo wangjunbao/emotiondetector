@@ -58,8 +58,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="cv200.lib cvaux200.lib cxcore200.lib highgui200.lib opencv_ffmpeg200.lib"
-				AdditionalLibraryDirectories="C:\Program Files\OpenCV2.0\lib"
+				AdditionalDependencies="cv200d.lib cvaux200d.lib cxcore200d.lib highgui200d.lib opencv_ffmpeg200d.lib"
+				AdditionalLibraryDirectories="C:\Program Files\OpenCV2.0\lib;C:\Program Files\OpenCV2.0\bin"
 				GenerateDebugInformation="true"
 				TargetMachine="1"
 			/>
@@ -130,7 +130,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="cv200.lib cvaux200.lib cxcore200.lib highgui200.lib opencv_ffmpeg200.lib"
+				AdditionalDependencies="cv200.lib cvaux200.lib cxcore200.lib highgui200.lib"
 				AdditionalLibraryDirectories="C:\Program Files\OpenCV2.0\lib"
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
