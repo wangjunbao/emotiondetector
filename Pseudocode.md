@@ -1,0 +1,90 @@
+# Main Algorithm #
+
+```
+/*Main Algorithm*/
+for (each frame in video)
+{
+    initialize output
+    run Viola-Jones -> faceSequence
+    allocate memory for newFaces
+    
+    for (each face in faceSequence)
+    {
+        if (face.coordinates does NOT match any coordinates in oldFaces)
+        {
+            resize eye template
+            run NCC -> ncc
+            if (ncc > thresh)
+            {
+                create face object
+                crop all templates for face
+                do Emotion Detection -> store it
+                add value to output
+                add face to newFaces
+            }
+        }
+        else if (face.coordinates matches an oldFace within some buffer)
+        {
+                update coordinates of face
+                update all template images
+                do Emotion Detection -> store it
+                add value to output
+                add oldFace to newFaces
+                delete oldFace from oldFaces
+        }
+    }
+    oldFaces <- newFaces
+    free memory for newFaces
+    return output
+}
+
+```
+
+
+# Face class #
+```
+
+/*Face class*/
+//templates:
+Mat leftEye
+Mat leftEyeLeft
+Mat leftEyeRight
+Mat leftEyeTop
+Mat leftEyeBottom
+
+Mat rightEye
+Mat rightEyeLeft
+Mat rightEyeRight
+Mat rightEyeTop
+Mat rightEyeBottom
+
+Mat leftBrow
+Mat leftBrowLeft
+Mat leftBrowRight
+Mat leftBrowTop
+Mat leftBrowBottom
+
+Mat rightBrow
+Mat rightBrowLeft
+Mat rightBrowRight
+Mat rightBrowTop
+Mat rightBrowBottom
+
+Mat mouth
+Mat mouthLeft
+Mat mouthRight
+Mat mouthTop
+Mat mouthBottom
+
+//getters and setters for templates
+
+//getter and setter for coordinates
+
+void cleanup()
+{
+    delete all allocated memory
+}
+
+
+
+```

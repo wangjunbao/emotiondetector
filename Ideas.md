@@ -1,0 +1,93 @@
+# Brainstorm! #
+
+## Approach ##
+  1. Use Haar cascades to find faces
+> 2. Use size of face to scale our default template
+> 3. Search subsection of each face to find location of eyebrows, eyes, mouth
+> 4. Search each feature location for more precise templates (corner of eyes, iris, corner and middle point of eyebrow, corners and top and bottom of lips)
+> 5.
+
+## Challenges ##
+  * Changes in face size (moving towards and away from camera)
+  * Changes in angle (tilting head or turning left or right)
+  * Occlusion of features
+
+## Possible Improvements / Differences from Previous Approaches ##
+  * Automatic detection of face and feature (Shugrina had this, Black and Yacoob did not)
+  * Detecting emotion in a single image - compare to some average normal face if a normal face is not available for that person. (Black and Yacoob used video sequences)
+  * Detecting emotions of multiple faces simultaneously - aggregate emotions to change output even more
+  * Real-time / fast detection
+
+## What we are tracking ##
+Measurements will be normalized in relation to the subject's neutral face
+  * brow distance (furrow): X distance between left eyebrow and right eyebrow
+    * rightEyebrow.x - leftEyebrow.x
+    * error if negative
+    * hi = eyebrows are farther apart
+    * lo = eyebrows are close together
+  * left eyebrow raised degree: Y distance between left eyebrow and left eye
+    * leftEye.y - leftEyebrow.y
+    * error if negative
+  * right eyebrow raised degree: Y distance between right eyebrow and right eye
+    * rightEye.y - rightEyebrow.y
+    * error if negative
+  * amount of 'white' pixels in eye
+    * greater = arousal +
+    * less = arousal -
+    * none = arousal 0
+  * mouth height: distance between upper lip and lower lip
+    * mouthBottom.y - mouthTop.y
+    * error if negative
+  * mouth width: distance between left part of mouth and right part of mouth
+    * mouthRight.x - mouthLeft.x
+    * error if negative
+  * mouth curvature: relation between upper lip and height of left/right mouth
+    * mouthTop.y - (mouthLeft.y + mouthRight.y)/2
+    * assuming current xy coordinate plane, + value will be smile, - value will be frown
+
+## Emotions ##
+  * Sad
+  * Happy
+  * Angry
+  * Worried
+  * Bored
+
+## Flowchart ##
+All calculations are done if isValidFace
+
+browFurrow
+> lo
+> > leftRaised && rightRaised
+> > > lo
+> > > > eyeOpen
+> > > > > lo
+> > > > > > disgust/displeasure
+
+> > > > > hi
+> > > > > > angry
+
+> > > hi
+> > > > sad/worried
+
+
+> hi/neutral
+> > leftRaised && rightRaised
+> > > lo
+> > > > eyeOpen
+> > > > lo
+> > > > > asleep
+
+> > > > hi
+> > > > > bored
+
+> > > hi
+> > > > eyeOpen
+> > > > > lo
+> > > > > > snotty?
+
+> > > > > hi
+> > > > > > excited
+
+
+
+

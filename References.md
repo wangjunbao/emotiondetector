@@ -1,0 +1,32 @@
+# References #
+
+## FACS ##
+  * http://face-and-emotion.com/dataface/facs/manual/TOC.html
+  * http://www-2.cs.cmu.edu/afs/cs/project/face/www/facs.htm
+  * http://www.psych.nyu.edu/pelli/docs/NilaLeighIntel.pdf
+
+## Face Images ##
+  * With Expressions https://pal.utdallas.edu/facedb/request/index
+  * Average Face http://www.faceresearch.org/demos/average
+
+## OpenCV Face Detection ##
+  * http://www.cs.princeton.edu/courses/archive/fall08/cos429/CourseMaterials/Precept1/facedetect.pdf
+  * http://nashruddin.com/OpenCV_Face_Detection
+  * http://opencv.willowgarage.com/wiki/FaceDetection
+  * http://www.cognotics.com/opencv/servo_2007_series/part_2/index.html
+
+
+## Face Detection ##
+  * Robust Real-time Object Detection: http://research.microsoft.com/en-us/um/people/viola/pubs/detect/violajones_ijcv.pdf
+  * Automatic Face Localization http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.28.5660&rep=rep1&type=pdf
+## Feature Tracking ##
+  * A Self-initializing Eyebrow Tracker for Binary Switch Emulation http://www.cs.bu.edu/techreports/pdf/2002-023-eyebrow-tracker.pdf
+  * Tracking and Recognizing Facial Expressions in Image Sequences...handout from class
+
+## Empathic Painting ##
+> ### For images and video: ###
+    * http://www.cs.bu.edu/fac/betke/research/empathic-painting.html
+    * http://www.cs.bath.ac.uk/~vision/empaint/
+
+> ### Paper: ###
+    * http://www.cs.bu.edu/fac/betke/papers/ShugrinaBetkeCollomosse-2006.pdf
